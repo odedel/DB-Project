@@ -44,7 +44,6 @@ public class DBConnection {
             System.out.println("Unable to close the connection - "
                     + e.getMessage());
         }
-
     }
 
     private static String JDBC_DRIVER = "com.mysql.jdbc.Driver";
