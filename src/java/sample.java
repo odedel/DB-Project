@@ -1,7 +1,10 @@
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.System;
+import java.util.Collection;
+import java.util.LinkedList;
 
 
 class Row {
@@ -36,17 +39,24 @@ class Sample {
         FileInputStream fis = new FileInputStream("c:\\Users\\Tomer\\Documents\\DB-tau\\DB-Project\\yago\\yagoTypes.tsv");
         BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
         String line = reader.readLine();
+
+        Collection<String> countries = collectEntitiesByType(reader, COUNTRY_TYPE);
+        System.out.println(countries);
+
+    }
+
+    private static Collection<String> collectEntitiesByType(BufferedReader reader, String entityType) throws IOException {
+        String line;
+        Collection<String> collection = new LinkedList<>();
+        line = reader.readLine();
         while(line != null){
-            System.out.println(line);
-            line = reader.readLine();
             String[] split = line.split("\t");
             Row row = new Row(split);
-            if (row.relationType.equals(COUNTRY_TYPE)) {
-                int i =0;
+            if(row.superEntity.equals(entityType)) {
+                collection.add(row.entity);
             }
+            line = reader.readLine();
         }
-
-
-        System.out.println("hello");
+        return collection;
     }
 }
