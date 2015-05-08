@@ -49,7 +49,7 @@ public class DBConnection {
     private static String JDBC_DRIVER = "com.mysql.jdbc.Driver";
     private static String CONNECTION_STRING = "jdbc:mysql://%s/%s";
     private static String DEFAULT_HOST = "localhost:3306";
-    private static String DEFAULT_SCHEMA = "sakila";
+    private static String DEFAULT_SCHEMA = "toyt";
     private static String DEFAULT_USER = "root";
     private static String DEFAULT_PASSWORD = "root";
 }
