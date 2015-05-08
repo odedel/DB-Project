@@ -1,6 +1,7 @@
 package main;
 
 import questions.Question;
+import questions.QuestionGenerator;
 
 /**
  * Created by Oded on 08/05/2015.
@@ -12,5 +13,7 @@ public class Main {
 
         System.out.println(q.checkAnswer("Hey"));
         System.out.println(q.checkAnswer("a"));
+
+        System.out.println(QuestionGenerator.questionGenerator());
     }
 }
