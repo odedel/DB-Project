@@ -1,5 +1,7 @@
 package main;
 
+import questions.Question;
+
 /**
  * Created by Oded on 08/05/2015.
  */
