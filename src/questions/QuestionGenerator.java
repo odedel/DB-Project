@@ -1,6 +1,6 @@
 package questions;
 
-public class QuestionMaker {
+public class QuestionGenerator {
 
     /**
      * Generates the question
