@@ -1,0 +1,1 @@
+https://dev.mysql.com/doc/workbench/en/wb-getting-started-tutorial-creating-a-model.html
