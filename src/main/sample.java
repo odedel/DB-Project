@@ -124,16 +124,16 @@ class Sample {
     }
 
     private static void getCountryFacts() throws IOException {
-        String factFiles[] = new String[]{"yago\\yagoDateFacts.tsv", "yago\\yagoFacts.tsv", "yago\\yagoLiteralFacts.tsv", };
-        for(String factFile : factFiles) {
+        String factFiles[] = new String[]{"yago\\yagoDateFacts.tsv", "yago\\yagoFacts.tsv", "yago\\yagoLiteralFacts.tsv",};
+        for (String factFile : factFiles) {
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(factFile)));
             reduceEntitiesByAttributeFromCollectionWithMatcher(reader, new Callback() {
                 @Override
                 public void reduce(Row row) {
-                    if(map.containsKey(row.entity)) {
+                    if (map.containsKey(row.entity)) {
                         map.get(row.entity).facts.add(row);
                     }
-                    if(map.containsKey(row.superEntity)) {
+                    if (map.containsKey(row.superEntity)) {
                         map.get(row.superEntity).facts.add(row);
                     }
                 }
