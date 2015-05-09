@@ -110,38 +110,17 @@ class Sample {
     private static void getCountryIDs() throws IOException {
         FileInputStream fis = new FileInputStream("c:\\Users\\Tomer\\Documents\\DB-tau\\DB-Project\\yago\\yagoTypes.tsv");
         BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
-        collectEntitiesByAttribute(reader, COUNTRY_TYPE, Attribute.SECOND_ENTITY, Attribute.FIRST_ENTITY, new NCallback() {
+        reduceEntitiesByAttributeFromCollectionWithMatcher(reader, new Callback() {
             @Override
             public void run(Row row) {
                 map.put(row.entity, new Country());
             }
+
+            @Override
+            public boolean match(Row row) {
+                return row.superEntity.equals(COUNTRY_TYPE);
+            }
         });
-    }
-
-    private static void collectEntitiesByAttribute(BufferedReader reader, String entityType, Attribute attribute, Attribute collectedAttribute, Callback callback) throws IOException {
-        String line;
-        line = reader.readLine();
-        while (line != null) {
-            String[] split = line.split("\t");
-            if (split[attribute.ordinal()].equals(entityType)) {
-                callback.run(new Row(split));
-            }
-            line = reader.readLine();
-        }
-    }
-
-    private static void reduceEntitiesByAttributeFromCollection(BufferedReader reader, String entityType, Attribute attribute, Collection<String> ids, Callback callback) throws IOException {
-        String line;
-        line = reader.readLine();
-        while (line != null) {
-            String[] split = line.split("\t");
-            if (split[attribute.ordinal()].equals(entityType)) {
-                if (ids.contains(split[1])) {
-                    callback.run(new Row(split));
-                }
-            }
-            line = reader.readLine();
-        }
     }
 
     private static void reduceEntitiesByAttributeFromCollectionWithMatcher(BufferedReader reader, Callback callback) throws IOException {
