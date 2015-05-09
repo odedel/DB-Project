@@ -5,6 +5,7 @@ import main.util.Row;
 import main.util.Utils;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,11 +14,11 @@ public class CountryData {
     static String COUNTRY_TYPE = "<wikicat_Countries>";
     static String PREF_LABEL = "skos:prefLabel";
 
-    public static Map<String, Country> collectCountries() throws IOException {
+    public static Collection<Country> collectCountries() throws IOException {
         getCountryIDs();
         getCountryNames();
         getCountryFacts();
-        return countries;
+        return countries.values();
     }
 
     private static void getCountryNames() throws IOException {
