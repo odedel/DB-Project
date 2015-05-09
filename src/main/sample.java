@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.lang.System;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 
 
@@ -51,15 +50,15 @@ enum Attribute {
 
 abstract class Callback {
 
-    public abstract void run(Row row);
+    public abstract void reduce(Row row);
 
-    public abstract boolean match(Row row);
+    public abstract boolean map(Row row);
 }
 
 abstract class NCallback extends Callback {
 
     @Override
-    public boolean match(Row row) {
+    public boolean map(Row row) {
         return false;
     }
 }
@@ -95,13 +94,13 @@ class Sample {
         BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
         reduceEntitiesByAttributeFromCollectionWithMatcher(reader, new Callback() {
             @Override
-            public void run(Row row) {
+            public void reduce(Row row) {
                 map.get(row.entity).name = row.superEntity;
                 System.out.println("Collected country " + i++);
             }
 
             @Override
-            public boolean match(Row row) {
+            public boolean map(Row row) {
                 return row.relationType.equals(PREF_LABEL) && countries.contains(row.entity);
             }
         });
@@ -112,12 +111,12 @@ class Sample {
         BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
         reduceEntitiesByAttributeFromCollectionWithMatcher(reader, new Callback() {
             @Override
-            public void run(Row row) {
+            public void reduce(Row row) {
                 map.put(row.entity, new Country());
             }
 
             @Override
-            public boolean match(Row row) {
+            public boolean map(Row row) {
                 return row.superEntity.equals(COUNTRY_TYPE);
             }
         });
@@ -129,8 +128,8 @@ class Sample {
         while (line != null) {
             String[] split = line.split("\t");
             Row row = new Row(split);
-            if (callback.match(row)) {
-                callback.run(row);
+            if (callback.map(row)) {
+                callback.reduce(row);
             }
             line = reader.readLine();
         }
