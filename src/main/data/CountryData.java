@@ -21,7 +21,6 @@ public class CountryData {
         getCountryIDs();
         getCountryNames();
         getCountryFacts();
-        int i = 0;
     }
 
     private static void getCountryNames() throws IOException {
