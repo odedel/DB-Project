@@ -159,9 +159,4 @@ class Sample {
         }
     }
 
-//    private static Collection<String> collectEntitiesByRelation(BufferedReader reader, String relationType) throws IOException {
-//        return collectEntitiesByAttribute(reader, PREF_LABEL, Attribute.RELATION_TYPE, Attribute.FIRST_ENTITY);
-//    }
-
-
 }
