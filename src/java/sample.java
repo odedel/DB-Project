@@ -3,9 +3,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.System;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
+import java.util.*;
 
 
 class Row {
@@ -46,7 +44,20 @@ enum Attribute {
     SECOND_ENTITY
 }
 
+abstract class Callback {
+
+    abstract void run(Row row);
+}
+
+class Country {
+    public String name;
+}
+
 class Sample {
+
+    static int i = 0;
+
+    public static Map<String, Country> map = new HashMap<>();
 
     static String COUNTRY_TYPE = "<wikicat_Countries>";
     static String PREF_LABEL = "skos:prefLabel";
@@ -56,26 +67,31 @@ class Sample {
     }
 
     public static void main(String args[]) throws Exception {
-        Collection<String> countries = collectCountries();
-        System.out.println(countries);
-
-
+        collectCountries();
     }
 
-    private static Collection<String> collectCountries() throws IOException {
+    private static void collectCountries() throws IOException {
         Collection<String> countries = getCountryIDs();
         //Collection<String> countries = Collections.singletonList("<id_1lqi1ft_88c_1ihryd7>");
+        for(String country : countries) {
+            map.put(country, new Country());
+        }
         System.out.println(1);
-        Collection<String> countryNames = getCountryNames(countries);
+        getCountryNames(countries);
         System.out.println(2);
         int i = 2;
-        return countryNames;
     }
 
-    private static Collection<String> getCountryNames(Collection<String> countries) throws IOException {
+    private static void getCountryNames(Collection<String> countries) throws IOException {
         FileInputStream fis = new FileInputStream("c:\\Users\\Tomer\\Documents\\DB-tau\\DB-Project\\yago\\yagoLabels.tsv");
         BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
-        return reduceEntitiesByAttributeFromCollection(reader, PREF_LABEL, Attribute.RELATION_TYPE, countries);
+        reduceEntitiesByAttributeFromCollection(reader, PREF_LABEL, Attribute.RELATION_TYPE, countries, new Callback() {
+            @Override
+            void run(Row row) {
+                map.get(row.entity).name = row.superEntity;
+                System.out.println(i++);
+            }
+        });
     }
 
     private static Collection<String> getCountryIDs() throws IOException {
@@ -98,21 +114,18 @@ class Sample {
         return collection;
     }
 
-    private static Collection<String> reduceEntitiesByAttributeFromCollection(BufferedReader reader, String entityType, Attribute attribute, Collection<String> ids) throws IOException {
+    private static void reduceEntitiesByAttributeFromCollection(BufferedReader reader, String entityType, Attribute attribute, Collection<String> ids, Callback callback) throws IOException {
         String line;
-        Collection<String> collection = new LinkedList<>();
         line = reader.readLine();
-        Collection<String> iids = new LinkedList<>();
         while (line != null) {
             String[] split = line.split("\t");
             if (split[attribute.ordinal()].equals(entityType)) {
                 if (ids.contains(split[1])) {
-                    collection.add(split[Attribute.ID.ordinal()]);
+                    callback.run(new Row(split));
                 }
             }
             line = reader.readLine();
         }
-        return collection;
     }
 
     private static Collection<String> collectEntitiesByRelation(BufferedReader reader, String relationType) throws IOException {
