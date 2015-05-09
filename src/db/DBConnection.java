@@ -10,15 +10,17 @@ public class DBConnection {
 
     private Connection conn;
 
-    /** Opens new connection to the db and initialize conn with it. Returns true if the connection is open */
-    public boolean connect() {
+    /**
+     * Opens new connection to the db and initialize conn with it.
+     * Throws DBException if something bad happened.
+     * */
+    public void connect() throws DBException {
 
         // loading the driver
         try {
             Class.forName(JDBC_DRIVER);
         } catch (ClassNotFoundException e) {
-            System.out.println("Unable to load the MySQL JDBC driver..");
-            return false;
+            throw new DBException("Unable to load the MySQL JDBC driver..");
         }
         System.out.println("Driver loaded successfully");
 
@@ -27,31 +29,28 @@ public class DBConnection {
         try {
             conn = DriverManager.getConnection(String.format(CONNECTION_STRING, DEFAULT_HOST, DEFAULT_SCHEMA), DEFAULT_USER, DEFAULT_PASSWORD);
         } catch (SQLException e) {
-            System.out.println("Unable to connect - " + e.getMessage());
             conn = null;
-            return false;
+            throw new DBException("Unable to connect : " + e.getMessage());
         }
         System.out.println("Connected!");
-        return true;
     }
 
     /**
-     * Disconnect
+     * Disconnect, ignoring errors.
      */
     public void disconnect() {
         try {
             conn.close();
             System.out.println("Connection closed!");
         } catch (SQLException e) {
-            System.out.println("Unable to disconnect the connection - "
-                    + e.getMessage());
         }
     }
 
     /**
      * Upload countries to DB.
+     * @throws DBException - Error while uploading data.
      */
-    public void uploadCountries(Collection<Country> countries) {
+    public void uploadCountries(Collection<Country> countries) throws DBException {
         try (PreparedStatement pstmt = conn
                 .prepareStatement("INSERT INTO country(name) VALUES(?)");) {
 
@@ -72,8 +71,7 @@ public class DBConnection {
             conn.commit();
 
         } catch (SQLException e) {
-            System.out.println("ERROR demoWithPreparedStatement - "
-                    + e.getMessage());
+            throw new DBException("Error while uploading countries to DB : " + e.getMessage());
         } finally {
             safelySetAutoCommit();
         }
@@ -82,19 +80,23 @@ public class DBConnection {
     /**
      * @return How many countries there are in the DB
      */
-    public int getCountOfCountries() throws SQLException {
+    public int getCountOfCountries() throws DBException {
         try (Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM country");) {
             return rs.getInt(1);
+        } catch (SQLException e) {
+            throw new DBException("Error while counting countries : " + e.getMessage());
         }
     }
 
     /**
      * Clears data from DB.
      */
-    public void deleteData() throws SQLException {
+    public void deleteData() throws DBException {
         try (Statement stmt = conn.createStatement()) {
             stmt.executeUpdate("DELETE FROM country");
+        } catch (SQLException e) {
+            throw new DBException("Error while deleting data from country : " + e.getMessage());
         }
     }
 
