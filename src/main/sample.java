@@ -91,9 +91,7 @@ class Sample {
     }
 
     private static void getCountryNames() throws IOException {
-        FileInputStream fis = new FileInputStream("yago\\yagoLabels.tsv");
-        BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
-        reduceEntitiesByAttributeFromCollectionWithMatcher(reader, new Callback() {
+        reduceEntitiesByAttributeFromCollectionWithMatcher("yago\\yagoLabels.tsv", new Callback() {
             @Override
             public void reduce(Row row) {
                 map.get(row.entity).name = row.superEntity;
@@ -108,9 +106,7 @@ class Sample {
     }
 
     private static void getCountryIDs() throws IOException {
-        FileInputStream fis = new FileInputStream("yago\\yagoTypes.tsv");
-        BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
-        reduceEntitiesByAttributeFromCollectionWithMatcher(reader, new Callback() {
+        reduceEntitiesByAttributeFromCollectionWithMatcher("yago\\yagoTypes.tsv", new Callback() {
             @Override
             public void reduce(Row row) {
                 map.put(row.entity, new Country());
@@ -126,8 +122,7 @@ class Sample {
     private static void getCountryFacts() throws IOException {
         String factFiles[] = new String[]{"yago\\yagoDateFacts.tsv", "yago\\yagoFacts.tsv", "yago\\yagoLiteralFacts.tsv",};
         for (String factFile : factFiles) {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(factFile)));
-            reduceEntitiesByAttributeFromCollectionWithMatcher(reader, new Callback() {
+            reduceEntitiesByAttributeFromCollectionWithMatcher(factFile, new Callback() {
                 @Override
                 public void reduce(Row row) {
                     if (map.containsKey(row.entity)) {
@@ -146,9 +141,9 @@ class Sample {
         }
     }
 
-    private static void reduceEntitiesByAttributeFromCollectionWithMatcher(BufferedReader reader, Callback callback) throws IOException {
-        String line;
-        line = reader.readLine();
+    private static void reduceEntitiesByAttributeFromCollectionWithMatcher(String filePath, Callback callback) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)));
+        String line = reader.readLine();
         while (line != null) {
             String[] split = line.split("\t");
             Row row = new Row(split);
