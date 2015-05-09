@@ -1,3 +1,6 @@
-yago/
-bin/
 .idea/
+DB-Project.iml
+out/
+yago/
+DB-Project/bin/
+bin/
