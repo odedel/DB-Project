@@ -5,9 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.System;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 
 class Row {
@@ -65,6 +63,7 @@ abstract class NCallback extends Callback {
 
 class Country {
     public String name;
+    public List<Row> facts = new LinkedList<>();
 }
 
 class Sample {
@@ -87,6 +86,8 @@ class Sample {
     private static void collectCountries() throws IOException {
         getCountryIDs();
         getCountryNames(map.keySet());
+        getCountryFacts(map.keySet());
+        int i = 0;
     }
 
     private static void getCountryNames(final Collection<String> countries) throws IOException {
@@ -120,6 +121,29 @@ class Sample {
                 return row.superEntity.equals(COUNTRY_TYPE);
             }
         });
+    }
+
+    private static void getCountryFacts(final Collection<String> countries) throws IOException {
+        String factFiles[] = new String[]{"c:\\Users\\Tomer\\Documents\\DB-tau\\DB-Project\\yago\\yagoDateFacts.tsv", "c:\\Users\\Tomer\\Documents\\DB-tau\\DB-Project\\yago\\yagoFacts.tsv", "c:\\Users\\Tomer\\Documents\\DB-tau\\DB-Project\\yago\\yagoLiteralFacts.tsv", };
+        for(String factFile : factFiles) {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(factFile)));
+            reduceEntitiesByAttributeFromCollectionWithMatcher(reader, new Callback() {
+                @Override
+                public void reduce(Row row) {
+                    if(map.containsKey(row.entity)) {
+                        map.get(row.entity).facts.add(row);
+                    }
+                    if(map.containsKey(row.superEntity)) {
+                        map.get(row.superEntity).facts.add(row);
+                    }
+                }
+
+                @Override
+                public boolean map(Row row) {
+                    return countries.contains(row.entity) || countries.contains(row.superEntity);
+                }
+            });
+        }
     }
 
     private static void reduceEntitiesByAttributeFromCollectionWithMatcher(BufferedReader reader, Callback callback) throws IOException {
