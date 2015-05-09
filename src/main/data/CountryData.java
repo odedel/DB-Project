@@ -8,9 +8,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by Tomer on 09/05/2015.
- */
 public class CountryData {
     public static Map<String, Country> countries = new HashMap<>();
     static String COUNTRY_TYPE = "<wikicat_Countries>";

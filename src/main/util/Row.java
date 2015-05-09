@@ -1,8 +1,5 @@
 package main.util;
 
-/**
- * Created by Tomer on 09/05/2015.
- */
 public class Row {
     public String id;
     public String entity;
