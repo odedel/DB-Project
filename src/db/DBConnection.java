@@ -1,8 +1,10 @@
 package db;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import main.data.Country;
+
+import java.sql.*;
+import java.util.Collection;
+import java.util.Iterator;
 
 public class DBConnection {
 
@@ -34,15 +36,75 @@ public class DBConnection {
     }
 
     /**
-     * close the connection
+     * Disconnect
      */
-    public void close() {
+    public void disconnect() {
         try {
             conn.close();
             System.out.println("Connection closed!");
         } catch (SQLException e) {
-            System.out.println("Unable to close the connection - "
+            System.out.println("Unable to disconnect the connection - "
                     + e.getMessage());
+        }
+    }
+
+    /**
+     * Upload countries to DB.
+     */
+    public void uploadCountries(Collection<Country> countries) {
+        try (PreparedStatement pstmt = conn
+                .prepareStatement("INSERT INTO country(name) VALUES(?)");) {
+
+            conn.setAutoCommit(false);
+
+            int counter = 0;
+            for (Country country : countries) {
+                if (counter % 10000 == 0) {     // Execute batch once in 10000 iterations
+                    pstmt.executeBatch();
+                }
+                pstmt.setString(1, country.name);
+                pstmt.addBatch();
+
+                counter++;
+            }
+            pstmt.executeBatch();
+
+            conn.commit();
+
+        } catch (SQLException e) {
+            System.out.println("ERROR demoWithPreparedStatement - "
+                    + e.getMessage());
+        } finally {
+            safelySetAutoCommit();
+        }
+    }
+
+    /**
+     * @return How many countries there are in the DB
+     */
+    public int getCountOfCountries() throws SQLException {
+        try (Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM country");) {
+            return rs.getInt(1);
+        }
+    }
+
+    /**
+     * Clears data from DB.
+     */
+    public void deleteData() throws SQLException {
+        try (Statement stmt = conn.createStatement()) {
+            stmt.executeUpdate("DELETE FROM country");
+        }
+    }
+
+    /**
+     * Attempts to set the connection back to auto-commit, ignoring errors.
+     */
+    private void safelySetAutoCommit() {
+        try {
+            conn.setAutoCommit(true);
+        } catch (Exception e) {
         }
     }
 
