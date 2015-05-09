@@ -12,28 +12,27 @@ import java.util.Map;
  * Created by Tomer on 09/05/2015.
  */
 public class CountryData {
-    public static Map<String, Country> map = new HashMap<>();
-    static int i = 0;
+    public static Map<String, Country> countries = new HashMap<>();
     static String COUNTRY_TYPE = "<wikicat_Countries>";
     static String PREF_LABEL = "skos:prefLabel";
 
-    public static void collectCountries() throws IOException {
+    public static Map<String, Country> collectCountries() throws IOException {
         getCountryIDs();
         getCountryNames();
         getCountryFacts();
+        return countries;
     }
 
     private static void getCountryNames() throws IOException {
         Utils.reduceEntitiesByAttributeFromCollectionWithMatcher("yago\\yagoLabels.tsv", new Callback() {
             @Override
             public void reduce(Row row) {
-                map.get(row.entity).name = row.superEntity;
-                System.out.println("Collected country " + i++);
+                countries.get(row.entity).name = row.superEntity;
             }
 
             @Override
             public boolean map(Row row) {
-                return row.relationType.equals(PREF_LABEL) && map.keySet().contains(row.entity);
+                return row.relationType.equals(PREF_LABEL) && countries.keySet().contains(row.entity);
             }
         });
     }
@@ -42,7 +41,7 @@ public class CountryData {
         Utils.reduceEntitiesByAttributeFromCollectionWithMatcher("yago\\yagoTypes.tsv", new Callback() {
             @Override
             public void reduce(Row row) {
-                map.put(row.entity, new Country());
+                countries.put(row.entity, new Country());
             }
 
             @Override
@@ -58,17 +57,17 @@ public class CountryData {
             Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(factFile, new Callback() {
                 @Override
                 public void reduce(Row row) {
-                    if (map.containsKey(row.entity)) {
-                        map.get(row.entity).facts.add(row);
+                    if (countries.containsKey(row.entity)) {
+                        countries.get(row.entity).facts.add(row);
                     }
-                    if (map.containsKey(row.superEntity)) {
-                        map.get(row.superEntity).facts.add(row);
+                    if (countries.containsKey(row.superEntity)) {
+                        countries.get(row.superEntity).facts.add(row);
                     }
                 }
 
                 @Override
                 public boolean map(Row row) {
-                    return map.keySet().contains(row.entity) || map.keySet().contains(row.superEntity);
+                    return countries.keySet().contains(row.entity) || countries.keySet().contains(row.superEntity);
                 }
             });
         }
