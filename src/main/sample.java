@@ -85,12 +85,12 @@ class Sample {
 
     private static void collectCountries() throws IOException {
         getCountryIDs();
-        getCountryNames(map.keySet());
-        getCountryFacts(map.keySet());
+        getCountryNames();
+        getCountryFacts();
         int i = 0;
     }
 
-    private static void getCountryNames(final Collection<String> countries) throws IOException {
+    private static void getCountryNames() throws IOException {
         FileInputStream fis = new FileInputStream("c:\\Users\\Tomer\\Documents\\DB-tau\\DB-Project\\yago\\yagoLabels.tsv");
         BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
         reduceEntitiesByAttributeFromCollectionWithMatcher(reader, new Callback() {
@@ -102,7 +102,7 @@ class Sample {
 
             @Override
             public boolean map(Row row) {
-                return row.relationType.equals(PREF_LABEL) && countries.contains(row.entity);
+                return row.relationType.equals(PREF_LABEL) && map.keySet().contains(row.entity);
             }
         });
     }
@@ -123,7 +123,7 @@ class Sample {
         });
     }
 
-    private static void getCountryFacts(final Collection<String> countries) throws IOException {
+    private static void getCountryFacts() throws IOException {
         String factFiles[] = new String[]{"c:\\Users\\Tomer\\Documents\\DB-tau\\DB-Project\\yago\\yagoDateFacts.tsv", "c:\\Users\\Tomer\\Documents\\DB-tau\\DB-Project\\yago\\yagoFacts.tsv", "c:\\Users\\Tomer\\Documents\\DB-tau\\DB-Project\\yago\\yagoLiteralFacts.tsv", };
         for(String factFile : factFiles) {
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(factFile)));
@@ -140,7 +140,7 @@ class Sample {
 
                 @Override
                 public boolean map(Row row) {
-                    return countries.contains(row.entity) || countries.contains(row.superEntity);
+                    return map.keySet().contains(row.entity) || map.keySet().contains(row.superEntity);
                 }
             });
         }
