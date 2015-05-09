@@ -91,7 +91,7 @@ class Sample {
     }
 
     private static void getCountryNames() throws IOException {
-        FileInputStream fis = new FileInputStream("c:\\Users\\Tomer\\Documents\\DB-tau\\DB-Project\\yago\\yagoLabels.tsv");
+        FileInputStream fis = new FileInputStream("yago\\yagoLabels.tsv");
         BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
         reduceEntitiesByAttributeFromCollectionWithMatcher(reader, new Callback() {
             @Override
@@ -108,7 +108,7 @@ class Sample {
     }
 
     private static void getCountryIDs() throws IOException {
-        FileInputStream fis = new FileInputStream("c:\\Users\\Tomer\\Documents\\DB-tau\\DB-Project\\yago\\yagoTypes.tsv");
+        FileInputStream fis = new FileInputStream("yago\\yagoTypes.tsv");
         BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
         reduceEntitiesByAttributeFromCollectionWithMatcher(reader, new Callback() {
             @Override
@@ -124,7 +124,7 @@ class Sample {
     }
 
     private static void getCountryFacts() throws IOException {
-        String factFiles[] = new String[]{"c:\\Users\\Tomer\\Documents\\DB-tau\\DB-Project\\yago\\yagoDateFacts.tsv", "c:\\Users\\Tomer\\Documents\\DB-tau\\DB-Project\\yago\\yagoFacts.tsv", "c:\\Users\\Tomer\\Documents\\DB-tau\\DB-Project\\yago\\yagoLiteralFacts.tsv", };
+        String factFiles[] = new String[]{"yago\\yagoDateFacts.tsv", "yago\\yagoFacts.tsv", "yago\\yagoLiteralFacts.tsv", };
         for(String factFile : factFiles) {
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(factFile)));
             reduceEntitiesByAttributeFromCollectionWithMatcher(reader, new Callback() {
