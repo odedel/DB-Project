@@ -51,7 +51,17 @@ enum Attribute {
 
 abstract class Callback {
 
-    abstract void run(Row row);
+    public abstract void run(Row row);
+
+    public abstract boolean match(Row row);
+}
+
+abstract class NCallback extends Callback {
+
+    @Override
+    public boolean match(Row row) {
+        return false;
+    }
 }
 
 class Country {
@@ -80,14 +90,19 @@ class Sample {
         getCountryNames(map.keySet());
     }
 
-    private static void getCountryNames(Collection<String> countries) throws IOException {
+    private static void getCountryNames(final Collection<String> countries) throws IOException {
         FileInputStream fis = new FileInputStream("c:\\Users\\Tomer\\Documents\\DB-tau\\DB-Project\\yago\\yagoLabels.tsv");
         BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
-        reduceEntitiesByAttributeFromCollection(reader, PREF_LABEL, Attribute.RELATION_TYPE, countries, new Callback() {
+        reduceEntitiesByAttributeFromCollectionWithMatcher(reader, new Callback() {
             @Override
-            void run(Row row) {
+            public void run(Row row) {
                 map.get(row.entity).name = row.superEntity;
-                System.out.println(i++);
+                System.out.println("Collected country " + i++);
+            }
+
+            @Override
+            public boolean match(Row row) {
+                return row.relationType.equals(PREF_LABEL) && countries.contains(row.entity);
             }
         });
     }
@@ -95,9 +110,9 @@ class Sample {
     private static void getCountryIDs() throws IOException {
         FileInputStream fis = new FileInputStream("c:\\Users\\Tomer\\Documents\\DB-tau\\DB-Project\\yago\\yagoTypes.tsv");
         BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
-        collectEntitiesByAttribute(reader, COUNTRY_TYPE, Attribute.SECOND_ENTITY, Attribute.FIRST_ENTITY, new Callback() {
+        collectEntitiesByAttribute(reader, COUNTRY_TYPE, Attribute.SECOND_ENTITY, Attribute.FIRST_ENTITY, new NCallback() {
             @Override
-            void run(Row row) {
+            public void run(Row row) {
                 map.put(row.entity, new Country());
             }
         });
@@ -124,6 +139,19 @@ class Sample {
                 if (ids.contains(split[1])) {
                     callback.run(new Row(split));
                 }
+            }
+            line = reader.readLine();
+        }
+    }
+
+    private static void reduceEntitiesByAttributeFromCollectionWithMatcher(BufferedReader reader, Callback callback) throws IOException {
+        String line;
+        line = reader.readLine();
+        while (line != null) {
+            String[] split = line.split("\t");
+            Row row = new Row(split);
+            if (callback.match(row)) {
+                callback.run(row);
             }
             line = reader.readLine();
         }
