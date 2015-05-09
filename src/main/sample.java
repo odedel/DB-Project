@@ -76,15 +76,8 @@ class Sample {
     }
 
     private static void collectCountries() throws IOException {
-        Collection<String> countries = getCountryIDs();
-        //Collection<String> countries = Collections.singletonList("<id_1lqi1ft_88c_1ihryd7>");
-        for(String country : countries) {
-            map.put(country, new Country());
-        }
-        System.out.println(1);
-        getCountryNames(countries);
-        System.out.println(2);
-        int i = 2;
+        getCountryIDs();
+        getCountryNames(map.keySet());
     }
 
     private static void getCountryNames(Collection<String> countries) throws IOException {
@@ -99,24 +92,27 @@ class Sample {
         });
     }
 
-    private static Collection<String> getCountryIDs() throws IOException {
+    private static void getCountryIDs() throws IOException {
         FileInputStream fis = new FileInputStream("c:\\Users\\Tomer\\Documents\\DB-tau\\DB-Project\\yago\\yagoTypes.tsv");
         BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
-        return collectEntitiesByAttribute(reader, COUNTRY_TYPE, Attribute.SECOND_ENTITY, Attribute.FIRST_ENTITY);
+        collectEntitiesByAttribute(reader, COUNTRY_TYPE, Attribute.SECOND_ENTITY, Attribute.FIRST_ENTITY, new Callback() {
+            @Override
+            void run(Row row) {
+                map.put(row.entity, new Country());
+            }
+        });
     }
 
-    private static Collection<String> collectEntitiesByAttribute(BufferedReader reader, String entityType, Attribute attribute, Attribute collectedAttribute) throws IOException {
+    private static void collectEntitiesByAttribute(BufferedReader reader, String entityType, Attribute attribute, Attribute collectedAttribute, Callback callback) throws IOException {
         String line;
-        Collection<String> collection = new LinkedList<>();
         line = reader.readLine();
         while (line != null) {
             String[] split = line.split("\t");
             if (split[attribute.ordinal()].equals(entityType)) {
-                collection.add(split[collectedAttribute.ordinal()]);
+                callback.run(new Row(split));
             }
             line = reader.readLine();
         }
-        return collection;
     }
 
     private static void reduceEntitiesByAttributeFromCollection(BufferedReader reader, String entityType, Attribute attribute, Collection<String> ids, Callback callback) throws IOException {
@@ -133,9 +129,9 @@ class Sample {
         }
     }
 
-    private static Collection<String> collectEntitiesByRelation(BufferedReader reader, String relationType) throws IOException {
-        return collectEntitiesByAttribute(reader, PREF_LABEL, Attribute.RELATION_TYPE, Attribute.FIRST_ENTITY);
-    }
+//    private static Collection<String> collectEntitiesByRelation(BufferedReader reader, String relationType) throws IOException {
+//        return collectEntitiesByAttribute(reader, PREF_LABEL, Attribute.RELATION_TYPE, Attribute.FIRST_ENTITY);
+//    }
 
 
 }
