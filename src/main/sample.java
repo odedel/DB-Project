@@ -2,6 +2,8 @@ package main;
 
 import db.DBConnection;
 import db.DBException;
+import main.data.City;
+import main.data.CityData;
 import main.data.Country;
 import main.data.CountryData;
 
@@ -19,19 +21,13 @@ class Sample {
             connection.deleteData();
             assert connection.getCountOfCountries() == 0;
 
-//            Map<String, Country> countries = CountryData.collectCountries();
-
-            Map<String, Country> countries = new HashMap<>();
-            Country c = new Country();
-            c.name = "A";
-            countries.put("a", c);
-            c = new Country();
-            c.name = "B";
-            countries.put("b", c);
-
+            Map<String, Country> countries = CountryData.collectCountries();
             System.out.println(String.format("Collected %d countries", countries.size()));
 
+            Map<String, City> cities = CityData.collectCities(countries);
+
             connection.uploadCountries(countries.values());
+            connection.uploadCities(cities.values());
             assert countries.size() == connection.getCountOfCountries();
         } catch (Exception e) {
             e.printStackTrace();

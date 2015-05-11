@@ -1,5 +1,6 @@
 package db;
 
+import main.data.City;
 import main.data.Country;
 
 import java.sql.*;
@@ -87,6 +88,53 @@ public class DBConnection {
             Iterator<Country> countryIterator = countries.iterator();
             while (rs.next()) {
                 countryIterator.next().id = rs.getInt(1);
+            }
+
+            conn.commit();
+
+        } catch (SQLException e) {
+            throw new DBException("Error while uploading countries to DB : " + e.getMessage());
+        } finally {
+            safelySetAutoCommit();
+            if (rs != null)
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    throw new DBException("Error while uploading countries to DB : " + e.getMessage());
+                }
+        }
+    }
+
+    /**
+     * Upload cities to DB.
+     * @throws DBException - Error while uploading data.
+     */
+    public void uploadCities(Collection<City> cities) throws DBException {
+        ResultSet rs = null;
+        try (PreparedStatement pstmt = conn
+                .prepareStatement("INSERT INTO city(name, country_id) VALUES(?, ?)",
+                        Statement.RETURN_GENERATED_KEYS);) {
+
+            conn.setAutoCommit(false);
+
+            int counter = 0;
+            for (City city : cities) {
+//                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
+//                                                        //  think if you want that, if so - add the generated keys
+//                    pstmt.executeBatch();
+//                }
+                pstmt.setString(1, city.name);
+                pstmt.setInt(2, city.country.id);
+                pstmt.addBatch();
+
+                counter++;
+            }
+            pstmt.executeBatch();
+
+            rs = pstmt.getGeneratedKeys();
+            Iterator<City> cityIterator = cities.iterator();
+            while (rs.next()) {
+                cityIterator.next().id = rs.getInt(1);
             }
 
             conn.commit();
