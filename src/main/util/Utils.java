@@ -17,4 +17,16 @@ public class Utils {
             line = reader.readLine();
         }
     }
+
+    public static float parseFloatFromString(String s) {
+        return Float.parseFloat(s.substring(1, s.indexOf("^") - 1));
+    }
+
+    public static int parseIntFromString(String s) {
+        return Integer.parseInt(s.substring(1, s.indexOf("^") - 1));
+    }
+
+    public static String parseNameFromPrefLabel(String s) {
+        return s.substring(1, s.lastIndexOf("@") - 1);
+    }
 }

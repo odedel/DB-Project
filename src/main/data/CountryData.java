@@ -24,19 +24,11 @@ public class CountryData {
         return countries;
     }
 
-    public static float parseFloatFromString(String s) {
-        return Float.parseFloat(s.substring(1, s.indexOf("^") - 1));
-    }
-
-    public static int parseIntFromString(String s) {
-        return Integer.parseInt(s.substring(1, s.indexOf("^") - 1));
-    }
-
     private static void getCountryNames() throws IOException {
         Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(Consts.YAGO_LABELS_FILE, new Callback() {
             @Override
             public void reduce(Row row) {
-                countries.get(row.entity).name = row.superEntity.substring(1, row.superEntity.lastIndexOf("@") - 1);
+                countries.get(row.entity).name = Utils.parseNameFromPrefLabel(row.superEntity);
             }
 
             @Override
@@ -142,7 +134,7 @@ public class CountryData {
         Callback economicGrowth = new Callback() {
             @Override
             public void reduce(Row row) {
-                countries.get(row.entity).economicGrowth = CountryData.parseFloatFromString(row.superEntity);
+                countries.get(row.entity).economicGrowth = Utils.parseFloatFromString(row.superEntity);
             }
 
             @Override
@@ -154,7 +146,7 @@ public class CountryData {
         Callback poverty = new Callback() {
             @Override
             public void reduce(Row row) {
-                countries.get(row.entity).poverty = CountryData.parseFloatFromString(row.superEntity);
+                countries.get(row.entity).poverty = Utils.parseFloatFromString(row.superEntity);
             }
 
             @Override
@@ -166,7 +158,7 @@ public class CountryData {
         Callback population = new Callback() {
             @Override
             public void reduce(Row row) {
-                countries.get(row.entity).population = CountryData.parseIntFromString(row.superEntity);
+                countries.get(row.entity).population = Utils.parseIntFromString(row.superEntity);
             }
 
             @Override
@@ -178,7 +170,7 @@ public class CountryData {
         Callback unemployment = new Callback() {
             @Override
             public void reduce(Row row) {
-                countries.get(row.entity).unemployment = CountryData.parseFloatFromString(row.superEntity);
+                countries.get(row.entity).unemployment = Utils.parseFloatFromString(row.superEntity);
             }
 
             @Override
@@ -202,7 +194,7 @@ public class CountryData {
         Callback gini = new Callback() {
             @Override
             public void reduce(Row row) {
-                countries.get(row.entity).gini = CountryData.parseFloatFromString(row.superEntity);
+                countries.get(row.entity).gini = Utils.parseFloatFromString(row.superEntity);
             }
 
             @Override
@@ -238,7 +230,7 @@ public class CountryData {
         Callback inflation = new Callback() {
             @Override
             public void reduce(Row row) {
-                countries.get(row.entity).inflation = CountryData.parseFloatFromString(row.superEntity);
+                countries.get(row.entity).inflation = Utils.parseFloatFromString(row.superEntity);
             }
 
             @Override
@@ -262,7 +254,7 @@ public class CountryData {
         Callback populationDensity = new Callback() {
             @Override
             public void reduce(Row row) {
-                countries.get(row.entity).populationDensity = CountryData.parseFloatFromString(row.superEntity);
+                countries.get(row.entity).populationDensity = Utils.parseFloatFromString(row.superEntity);
             }
 
             @Override
