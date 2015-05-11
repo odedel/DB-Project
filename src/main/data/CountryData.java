@@ -5,24 +5,23 @@ import main.util.Row;
 import main.util.Utils;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 public class CountryData {
     public static Map<String, Country> countries = new HashMap<>();
-    static String COUNTRY_TYPE = "<wikicat_Countries>";
-    static String PREF_LABEL = "skos:prefLabel";
+    private static String COUNTRY_TYPE = "<wikicat_Countries>";
+    private static String PREF_LABEL = "skos:prefLabel";
 
-    public static Collection<Country> collectCountries() throws IOException {
+    public static Map<String, Country> collectCountries() throws IOException {
         getCountryIDs();
         getCountryNames();
         getCountryFacts();
-        return countries.values();
+        return countries;
     }
 
     private static void getCountryNames() throws IOException {
-        Utils.reduceEntitiesByAttributeFromCollectionWithMatcher("yago\\yagoLabels.tsv", new Callback() {
+        Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(Consts.YAGO_LABELS_FILE, new Callback() {
             @Override
             public void reduce(Row row) {
                 countries.get(row.entity).name = row.superEntity;
@@ -36,7 +35,7 @@ public class CountryData {
     }
 
     private static void getCountryIDs() throws IOException {
-        Utils.reduceEntitiesByAttributeFromCollectionWithMatcher("yago\\yagoTypes.tsv", new Callback() {
+        Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(Consts.YAGO_TYPES_FILE, new Callback() {
             @Override
             public void reduce(Row row) {
                 countries.put(row.entity, new Country());
@@ -50,7 +49,7 @@ public class CountryData {
     }
 
     private static void getCountryFacts() throws IOException {
-        String factFiles[] = new String[]{"yago\\yagoDateFacts.tsv", "yago\\yagoFacts.tsv", "yago\\yagoLiteralFacts.tsv",};
+        String factFiles[] = new String[]{Consts.YAGO_DATE_FACTS_FILE, Consts.YAGO_FACTS_FILE, Consts.YAGO_LITERAL_FACTS_FILE};
 
         Callback creationDate = new Callback() {
             @Override
@@ -257,7 +256,9 @@ public class CountryData {
         };
 
         for (String factFile : factFiles) {
-            Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(factFile, creationDate, places, export, expenses, latitude, longitude, economicGrowth, poverty, population, unemployment, revenue, gini, _import, gdp, inflation, tld, populationDensity);
+            Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(factFile, creationDate, places, export, expenses,
+                    latitude, longitude, economicGrowth, poverty, population, unemployment,
+                    revenue, gini, _import, gdp, inflation, tld, populationDensity);
         }
 
 //        for (String factFile : factFiles) {
