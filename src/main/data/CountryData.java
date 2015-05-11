@@ -5,13 +5,17 @@ import main.util.Row;
 import main.util.Utils;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class CountryData {
     public static Map<String, Country> countries = new HashMap<>();
     private static String COUNTRY_TYPE = "<wikicat_Countries>";
     private static String PREF_LABEL = "skos:prefLabel";
+    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH);
 
     public static Map<String, Country> collectCountries() throws IOException {
         getCountries();
@@ -20,11 +24,19 @@ public class CountryData {
         return countries;
     }
 
+    public static float parseFloatFromString(String s) {
+        return Float.parseFloat(s.substring(1, s.indexOf("^") - 1));
+    }
+
+    public static int parseIntFromString(String s) {
+        return Integer.parseInt(s.substring(1, s.indexOf("^") - 1));
+    }
+
     private static void getCountryNames() throws IOException {
         Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(Consts.YAGO_LABELS_FILE, new Callback() {
             @Override
             public void reduce(Row row) {
-                countries.get(row.entity).name = row.superEntity.substring(0, row.superEntity.lastIndexOf("@"));
+                countries.get(row.entity).name = row.superEntity.substring(1, row.superEntity.lastIndexOf("@") - 1);
             }
 
             @Override
@@ -54,12 +66,16 @@ public class CountryData {
         Callback creationDate = new Callback() {
             @Override
             public void reduce(Row row) {
-                countries.get(row.entity).creationDate = row.superEntity;
+                String dateString = row.superEntity.substring(1, row.superEntity.indexOf("^") - 1);
+                countries.get(row.entity).creationDate =
+                        LocalDate.parse(dateString, formatter);
             }
 
             @Override
             public boolean map(Row row) {
-                return row.relationType.equals("<wasCreatedOnDate>") && countries.keySet().contains(row.entity);
+                return row.relationType.equals("<wasCreatedOnDate>") && countries.keySet().contains(row.entity)
+                        && !row.superEntity.contains("#") &&
+                        row.superEntity.substring(1, row.superEntity.indexOf("^") - 1).length() == 10;
             }
         };
 
@@ -75,58 +91,58 @@ public class CountryData {
             }
         };
 
-        Callback export = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                countries.get(row.entity).export = row.superEntity;
-            }
+//        Callback export = new Callback() {
+//            @Override
+//            public void reduce(Row row) {
+//                countries.get(row.entity).export = row.superEntity;
+//            }
+//
+//            @Override
+//            public boolean map(Row row) {
+//                return row.relationType.equals("<hasExport>") && countries.keySet().contains(row.entity);
+//            }
+//        };
 
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<hasExport>") && countries.keySet().contains(row.entity);
-            }
-        };
+//        Callback expenses = new Callback() {
+//            @Override
+//            public void reduce(Row row) {
+//                countries.get(row.entity).expenses = row.superEntity;
+//            }
+//
+//            @Override
+//            public boolean map(Row row) {
+//                return row.relationType.equals("<hasExpenses>") && countries.keySet().contains(row.entity);
+//            }
+//        };
 
-        Callback expenses = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                countries.get(row.entity).expenses = row.superEntity;
-            }
+//        Callback latitude = new Callback() {
+//            @Override
+//            public void reduce(Row row) {
+//                countries.get(row.entity).latitude = row.superEntity;
+//            }
+//
+//            @Override
+//            public boolean map(Row row) {
+//                return row.relationType.equals("<hasLatitude>") && countries.keySet().contains(row.entity);
+//            }
+//        };
 
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<hasExpenses>") && countries.keySet().contains(row.entity);
-            }
-        };
-
-        Callback latitude = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                countries.get(row.entity).latitude = row.superEntity;
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<hasLatitude>") && countries.keySet().contains(row.entity);
-            }
-        };
-
-        Callback longitude = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                countries.get(row.entity).longitude = row.superEntity;
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<hasLongitude>") && countries.keySet().contains(row.entity);
-            }
-        };
+//        Callback longitude = new Callback() {
+//            @Override
+//            public void reduce(Row row) {
+//                countries.get(row.entity).longitude = row.superEntity;
+//            }
+//
+//            @Override
+//            public boolean map(Row row) {
+//                return row.relationType.equals("<hasLongitude>") && countries.keySet().contains(row.entity);
+//            }
+//        };
 
         Callback economicGrowth = new Callback() {
             @Override
             public void reduce(Row row) {
-                countries.get(row.entity).economicGrowth = row.superEntity;
+                countries.get(row.entity).economicGrowth = CountryData.parseFloatFromString(row.superEntity);
             }
 
             @Override
@@ -138,7 +154,7 @@ public class CountryData {
         Callback poverty = new Callback() {
             @Override
             public void reduce(Row row) {
-                countries.get(row.entity).poverty = row.superEntity;
+                countries.get(row.entity).poverty = CountryData.parseFloatFromString(row.superEntity);
             }
 
             @Override
@@ -150,7 +166,7 @@ public class CountryData {
         Callback population = new Callback() {
             @Override
             public void reduce(Row row) {
-                countries.get(row.entity).population = row.superEntity;
+                countries.get(row.entity).population = CountryData.parseIntFromString(row.superEntity);
             }
 
             @Override
@@ -162,7 +178,7 @@ public class CountryData {
         Callback unemployment = new Callback() {
             @Override
             public void reduce(Row row) {
-                countries.get(row.entity).unemployment = row.superEntity;
+                countries.get(row.entity).unemployment = CountryData.parseFloatFromString(row.superEntity);
             }
 
             @Override
@@ -171,22 +187,22 @@ public class CountryData {
             }
         };
 
-        Callback revenue = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                countries.get(row.entity).revenue = row.superEntity;
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<hasRevenue>") && countries.keySet().contains(row.entity);
-            }
-        };
+//        Callback revenue = new Callback() {
+//            @Override
+//            public void reduce(Row row) {
+//                countries.get(row.entity).revenue = row.superEntity;
+//            }
+//
+//            @Override
+//            public boolean map(Row row) {
+//                return row.relationType.equals("<hasRevenue>") && countries.keySet().contains(row.entity);
+//            }
+//        };
 
         Callback gini = new Callback() {
             @Override
             public void reduce(Row row) {
-                countries.get(row.entity).gini = row.superEntity;
+                countries.get(row.entity).gini = CountryData.parseFloatFromString(row.superEntity);
             }
 
             @Override
@@ -195,34 +211,34 @@ public class CountryData {
             }
         };
 
-        Callback _import = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                countries.get(row.entity)._import = row.superEntity;
-            }
+//        Callback _import = new Callback() {
+//            @Override
+//            public void reduce(Row row) {
+//                countries.get(row.entity)._import = row.superEntity;
+//            }
+//
+//            @Override
+//            public boolean map(Row row) {
+//                return row.relationType.equals("<hasImport>") && countries.keySet().contains(row.entity);
+//            }
+//        };
 
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<hasImport>") && countries.keySet().contains(row.entity);
-            }
-        };
-
-        Callback gdp = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                countries.get(row.entity).gdp = row.superEntity;
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<hasGDP>") && countries.keySet().contains(row.entity);
-            }
-        };
+//        Callback gdp = new Callback() {
+//            @Override
+//            public void reduce(Row row) {
+//                countries.get(row.entity).gdp = row.superEntity;
+//            }
+//
+//            @Override
+//            public boolean map(Row row) {
+//                return row.relationType.equals("<hasGDP>") && countries.keySet().contains(row.entity);
+//            }
+//        };
 
         Callback inflation = new Callback() {
             @Override
             public void reduce(Row row) {
-                countries.get(row.entity).inflation = row.superEntity;
+                countries.get(row.entity).inflation = CountryData.parseFloatFromString(row.superEntity);
             }
 
             @Override
@@ -231,22 +247,22 @@ public class CountryData {
             }
         };
 
-        Callback tld = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                countries.get(row.entity).tld = row.superEntity;
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<hasTLD>") && countries.keySet().contains(row.entity);
-            }
-        };
+//        Callback tld = new Callback() {
+//            @Override
+//            public void reduce(Row row) {
+//                countries.get(row.entity).tld = row.superEntity;
+//            }
+//
+//            @Override
+//            public boolean map(Row row) {
+//                return row.relationType.equals("<hasTLD>") && countries.keySet().contains(row.entity);
+//            }
+//        };
 
         Callback populationDensity = new Callback() {
             @Override
             public void reduce(Row row) {
-                countries.get(row.entity).populationDensity = row.superEntity;
+                countries.get(row.entity).populationDensity = CountryData.parseFloatFromString(row.superEntity);
             }
 
             @Override
@@ -256,10 +272,15 @@ public class CountryData {
         };
 
         for (String factFile : factFiles) {
-            Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(factFile, creationDate, places, export, expenses,
-                    latitude, longitude, economicGrowth, poverty, population, unemployment,
-                    revenue, gini, _import, gdp, inflation, tld, populationDensity);
+            Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(factFile, creationDate, places,
+                    economicGrowth, poverty, population, unemployment, gini, inflation, populationDensity);
         }
+
+//        for (String factFile : factFiles) {
+//            Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(factFile, creationDate, places, export, expenses,
+//                    latitude, longitude, economicGrowth, poverty, population, unemployment,
+//                    revenue, gini, _import, gdp, inflation, tld, populationDensity);
+//        }
 
 //        for (String factFile : factFiles) {
 //            Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(factFile, new Callback() {
