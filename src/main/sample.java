@@ -19,12 +19,15 @@ class Sample {
             connection.deleteData();
             assert connection.getCountOfCountries() == 0;
 
-            Map<String, Country> countries = CountryData.collectCountries();
+//            Map<String, Country> countries = CountryData.collectCountries();
 
-//            Map<String, Country> countries = new HashMap<>();
-//            Country c = new Country();
-//            c.name = "A";
-//            countries.put("a", c);
+            Map<String, Country> countries = new HashMap<>();
+            Country c = new Country();
+            c.name = "A";
+            countries.put("a", c);
+            c = new Country();
+            c.name = "B";
+            countries.put("b", c);
 
             System.out.println(String.format("Collected %d countries", countries.size()));
 

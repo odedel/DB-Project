@@ -51,16 +51,19 @@ public class DBConnection {
      * @throws DBException - Error while uploading data.
      */
     public void uploadCountries(Collection<Country> countries) throws DBException {
+        ResultSet rs = null;
         try (PreparedStatement pstmt = conn
-                .prepareStatement("INSERT INTO country(name, creation_date, economic_growth, poverty, population, unemployment, gini, influation, population_density) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)");) {
+                .prepareStatement("INSERT INTO country(name, creation_date, economic_growth, poverty, population, unemployment, gini, influation, population_density) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        Statement.RETURN_GENERATED_KEYS);) {
 
             conn.setAutoCommit(false);
 
             int counter = 0;
             for (Country country : countries) {
-                if (counter % 10000 == 0) {     // Execute batch once in 10000 iterations
-                    pstmt.executeBatch();
-                }
+//                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
+//                                                        //  think if you want that, if so - add the generated keys
+//                    pstmt.executeBatch();
+//                }
                 pstmt.setString(1, country.name);
                 if (country.creationDate != null) {
                     pstmt.setDate(2, Date.valueOf(country.creationDate));
@@ -80,12 +83,24 @@ public class DBConnection {
             }
             pstmt.executeBatch();
 
+            rs = pstmt.getGeneratedKeys();
+            Iterator<Country> countryIterator = countries.iterator();
+            while (rs.next()) {
+                countryIterator.next().id = rs.getInt(1);
+            }
+
             conn.commit();
 
         } catch (SQLException e) {
             throw new DBException("Error while uploading countries to DB : " + e.getMessage());
         } finally {
             safelySetAutoCommit();
+            if (rs != null)
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    throw new DBException("Error while uploading countries to DB : " + e.getMessage());
+                }
         }
     }
 
