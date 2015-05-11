@@ -2,9 +2,12 @@ package main;
 
 import db.DBConnection;
 import db.DBException;
+import main.data.Country;
 import main.data.CountryData;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 class Sample {
 
@@ -16,10 +19,16 @@ class Sample {
             connection.deleteData();
             assert connection.getCountOfCountries() == 0;
 
-            Collection countries = CountryData.collectCountries();
+            Map<String, Country> countries = CountryData.collectCountries();
+
+//            Map<String, Country> countries = new HashMap<>();
+//            Country c = new Country();
+//            c.name = "A";
+//            countries.put("a", c);
+
             System.out.println(String.format("Collected %d countries", countries.size()));
 
-            connection.uploadCountries(countries);
+            connection.uploadCountries(countries.values());
             assert countries.size() == connection.getCountOfCountries();
         } catch (Exception e) {
             e.printStackTrace();
