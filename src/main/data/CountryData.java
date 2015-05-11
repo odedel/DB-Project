@@ -14,7 +14,7 @@ public class CountryData {
     private static String PREF_LABEL = "skos:prefLabel";
 
     public static Map<String, Country> collectCountries() throws IOException {
-        getCountryIDs();
+        getCountries();
         getCountryNames();
         getCountryFacts();
         return countries;
@@ -24,7 +24,7 @@ public class CountryData {
         Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(Consts.YAGO_LABELS_FILE, new Callback() {
             @Override
             public void reduce(Row row) {
-                countries.get(row.entity).name = row.superEntity;
+                countries.get(row.entity).name = row.superEntity.substring(0, row.superEntity.lastIndexOf("@"));
             }
 
             @Override
@@ -34,7 +34,7 @@ public class CountryData {
         });
     }
 
-    private static void getCountryIDs() throws IOException {
+    private static void getCountries() throws IOException {
         Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(Consts.YAGO_TYPES_FILE, new Callback() {
             @Override
             public void reduce(Row row) {
