@@ -25,6 +25,15 @@ class Sample {
             System.out.println(String.format("Collected %d countries", countries.size()));
 
             Map<String, City> cities = CityData.collectCities(countries);
+            System.out.println(String.format("Collected %d cities", cities.size()));
+
+            for (City c : cities.values()) {
+                if (c.country == null || c.country.id == 0) {
+                    assert false;
+                }
+            }
+
+            System.out.println("Uploading ...");
 
             connection.uploadCountries(countries.values());
             connection.uploadCities(cities.values());

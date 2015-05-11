@@ -61,7 +61,7 @@ public class CityData {
 
             @Override
             public boolean map(Row row) {
-                return row.relationType.equals("<isLocatedIn>") && cities.keySet().contains(row.superEntity)
+                return row.relationType.equals("<isLocatedIn>") && cities.keySet().contains(row.entity)
                         && countries.containsKey(row.superEntity);
             }
         });
