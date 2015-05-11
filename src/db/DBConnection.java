@@ -52,7 +52,7 @@ public class DBConnection {
      */
     public void uploadCountries(Collection<Country> countries) throws DBException {
         try (PreparedStatement pstmt = conn
-                .prepareStatement("INSERT INTO country(name) VALUES(?)");) {
+                .prepareStatement("INSERT INTO country(name, creation_date, economic_growth, poverty, population, unemployment, gini, influation, population_density) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)");) {
 
             conn.setAutoCommit(false);
 
@@ -62,6 +62,18 @@ public class DBConnection {
                     pstmt.executeBatch();
                 }
                 pstmt.setString(1, country.name);
+                if (country.creationDate != null) {
+                    pstmt.setDate(2, Date.valueOf(country.creationDate));
+                } else {
+                    pstmt.setDate(2, null);
+                }
+                pstmt.setFloat(3, country.economicGrowth);
+                pstmt.setFloat(4, country.poverty);
+                pstmt.setInt(5, country.population);
+                pstmt.setFloat(6, country.unemployment);
+                pstmt.setFloat(7, country.gini);
+                pstmt.setFloat(8, country.inflation);
+                pstmt.setFloat(9, country.populationDensity);
                 pstmt.addBatch();
 
                 counter++;
