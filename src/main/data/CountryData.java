@@ -15,15 +15,22 @@ public class CountryData {
     static String PREF_LABEL = "skos:prefLabel";
 
     public static Collection<Country> collectCountries() throws IOException {
-        getCityIDs();
-        getCountryIDs();
+        getIDs();
         getNames(countries, cities);
         getFacts(countries, cities);
         return countries.values();
     }
 
-    private static void getCountryIDs() throws IOException {
-        Utils.reduceEntitiesByAttributeFromCollectionWithMatcher("yago\\yagoTypes.tsv", new Callback() {
+
+    private static void getIDs() throws IOException {
+        List<Callback> callbacks = new LinkedList<>();
+        callbacks.add(getCountryIDsCallback());
+        callbacks.add(getCityIDsCallback());
+        Utils.reduceEntitiesByAttributeFromCollectionWithMatcher("yago\\yagoTypes.tsv", callbacks);
+    }
+
+    private static Callback getCountryIDsCallback() throws IOException {
+       return new Callback() {
             @Override
             public void reduce(Row row) {
                 countries.put(row.entity, new Country());
@@ -33,11 +40,11 @@ public class CountryData {
             public boolean map(Row row) {
                 return row.superEntity.equals(COUNTRY_TYPE);
             }
-        });
+        };
     }
 
-    private static void getCityIDs() throws IOException {
-        Utils.reduceEntitiesByAttributeFromCollectionWithMatcher("yago\\yagoTypes.tsv", new Callback() {
+    private static Callback getCityIDsCallback() throws IOException {
+        return new Callback() {
             @Override
             public void reduce(Row row) {
                 cities.put(row.entity, new City());
@@ -47,7 +54,7 @@ public class CountryData {
             public boolean map(Row row) {
                 return row.superEntity.startsWith("<wikicat_Cities");
             }
-        });
+        };
     }
 
     private static void getNames(final Map<String, ? extends Place>... place_maps) throws IOException {
