@@ -9,7 +9,7 @@ public class Country {
     public String name;
 //    public List<Row> facts = new LinkedList<>();
     public LocalDate creationDate;
-//    public List<String> places = new LinkedList<>();
+    public List<String> places = new LinkedList<>();
 //    public String export;
 //    public String expenses;
 //    public String latitude;
