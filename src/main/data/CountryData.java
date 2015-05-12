@@ -13,7 +13,7 @@ import java.util.Map;
 
 public class CountryData {
     public static Map<String, Country> countries = new HashMap<>();
-    private static String COUNTRY_TYPE = "<wikicat_Countries>";
+    private static String COUNTRY_TYPE = "<wordnet_country_108544813>";
     private static String PREF_LABEL = "skos:prefLabel";
     private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH);
 
@@ -47,7 +47,7 @@ public class CountryData {
 
             @Override
             public boolean map(Row row) {
-                return row.superEntity.equals(COUNTRY_TYPE);
+                return row.superEntity.equals(COUNTRY_TYPE) && !countries.keySet().contains(row.entity);
             }
         });
     }
@@ -155,29 +155,29 @@ public class CountryData {
             }
         };
 
-        Callback population = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                countries.get(row.entity).population = Utils.parseIntFromString(row.superEntity);
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<hasNumberOfPeople>") && countries.keySet().contains(row.entity);
-            }
-        };
-
-        Callback unemployment = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                countries.get(row.entity).unemployment = Utils.parseFloatFromString(row.superEntity);
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<hasUnemployment>") && countries.keySet().contains(row.entity);
-            }
-        };
+//        Callback population = new Callback() {
+//            @Override
+//            public void reduce(Row row) {
+//                countries.get(row.entity).population = Utils.parseIntFromString(row.superEntity);
+//            }
+//
+//            @Override
+//            public boolean map(Row row) {
+//                return row.relationType.equals("<hasNumberOfPeople>") && countries.keySet().contains(row.entity);
+//            }
+//        };
+//
+//        Callback unemployment = new Callback() {
+//            @Override
+//            public void reduce(Row row) {
+//                countries.get(row.entity).unemployment = Utils.parseFloatFromString(row.superEntity);
+//            }
+//
+//            @Override
+//            public boolean map(Row row) {
+//                return row.relationType.equals("<hasUnemployment>") && countries.keySet().contains(row.entity);
+//            }
+//        };
 
 //        Callback revenue = new Callback() {
 //            @Override
@@ -265,7 +265,7 @@ public class CountryData {
 
         for (String factFile : factFiles) {
             Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(factFile, creationDate, places,
-                    economicGrowth, poverty, population, unemployment, gini, inflation, populationDensity);
+                    economicGrowth, poverty, gini, inflation, populationDensity);
         }
 
 //        for (String factFile : factFiles) {
