@@ -9,7 +9,7 @@ import java.util.Map;
 import static main.util.Utils.parseName;
 import static main.util.Utils.parseValue;
 
-class GenericCallback extends Callback {
+public class GenericCallback extends Callback {
 
     ValueType valueType;
     String relationType;
