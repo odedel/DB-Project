@@ -14,7 +14,6 @@ public class CountryData {
     public static Map<String, Country> countries = new HashMap<>();
     public static Map<String, City> cities = new HashMap<>();
     static String COUNTRY_TYPE = "<wikicat_Countries>";
-    static String CITY_TYPE = "<wikicat_Cities>";
     static String PREF_LABEL = "skos:prefLabel";
 
     public static Collection<Country> collectCountries() throws IOException {
@@ -23,7 +22,6 @@ public class CountryData {
         getFacts(countries, cities);
         return countries.values();
     }
-
 
     private static void getIDs() throws IOException {
         List<Callback> callbacks = new LinkedList<>();
@@ -136,9 +134,7 @@ public class CountryData {
 
         List<Callback> callbacks = new LinkedList<>();
         Callback[] c = new Callback[]{creationDate, _places, export, expenses, latitude, longitude, economicGrowth, poverty, population, unemployment, revenue, gini, _import, gdp, inflation, populationDensity};
-        for (Callback callback : c) {
-            callbacks.add(callback);
-        }
+        Collections.addAll(callbacks, c);
         return callbacks;
     }
 }
