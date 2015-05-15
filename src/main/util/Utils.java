@@ -1,5 +1,7 @@
 package main.util;
 
+import main.data.ValueType;
+
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -82,4 +84,19 @@ public class Utils {
         }
     }
 
+    public static Object parseValue(String string, ValueType type) {
+        switch (type) {
+            case FLOAT:
+                return parseFloat(string);
+            case LONG:
+                return parseLong(string);
+            case NAME:
+                return parseName(string);
+            case STRING:
+                return parseString(string);
+            case DATE:
+                return parseDate(string);
+        }
+        throw new AssertionError();
+    }
 }
