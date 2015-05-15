@@ -6,6 +6,7 @@ import main.util.Utils;
 
 import java.io.IOException;
 import java.util.*;
+
 import static main.util.Utils.*;
 
 public class CountryData {
@@ -58,9 +59,9 @@ public class CountryData {
         };
     }
 
-    private static void getNames(final Map<String, ? extends Place>... place_maps) throws IOException {
+    private static void getNames(final Map<String, ? extends PopulatedRegion>... place_maps) throws IOException {
         List<Callback> callbacks = new LinkedList<>();
-        for (final Map<String, ? extends Place> places : place_maps) {
+        for (final Map<String, ? extends PopulatedRegion> places : place_maps) {
             callbacks.add(new Callback() {
                 @Override
                 public void reduce(Row row) {
@@ -76,13 +77,15 @@ public class CountryData {
         Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(Consts.YAGO_LABELS_FILE, callbacks);
     }
 
-    private static void getFacts(final Map<String, ? extends Place>... place_maps) throws IOException {
+    private static void getFacts(final Map<String, ? extends PopulatedRegion>... place_maps) throws IOException {
         String factFiles[] = new String[]{Consts.YAGO_DATE_FACTS_FILE, Consts.YAGO_FACTS_FILE, Consts.YAGO_LITERAL_FACTS_FILE,};
 
         List<Callback> callbacks = new LinkedList<>();
-        for (Map<String, ? extends Place> places : place_maps) {
+        for (Map<String, ? extends PopulatedRegion> places : place_maps) {
             callbacks.addAll(getCallbacks(places));
         }
+
+        callbacks.addAll(getCountryCallbacks(countries));
 
         Callback cityLocatedIn = new Callback() {
             @Override
@@ -103,8 +106,28 @@ public class CountryData {
             Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(factFile, callbacks);
         }
     }
+    private static List<Callback> getCountryCallbacks(final Map<String, ? extends Country> places) {
+        Callback tld = new Callback() {
+            @Override
+            public void reduce(Row row) {
+                places.get(parseName(row.entity)).tld = parseString(row.superEntity);
+            }
 
-    private static List<Callback> getCallbacks(final Map<String, ? extends Place> places) {
+            @Override
+            public boolean map(Row row) {
+                return row.relationType.equals("<hasTLD>") && places.keySet().contains(parseName(row.entity));
+            }
+        };
+
+
+        List<Callback> callbacks = new LinkedList<>();
+        Callback[] c = new Callback[]{tld};
+        for (Callback callback : c) {
+            callbacks.add(callback);
+        }
+        return callbacks;
+    }
+    private static List<Callback> getCallbacks(final Map<String, ? extends PopulatedRegion> places) {
 
         Callback creationDate = new Callback() {
             @Override
@@ -286,18 +309,6 @@ public class CountryData {
             }
         };
 
-        Callback tld = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                places.get(parseName(row.entity)).tld = parseString(row.superEntity);
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<hasTLD>") && places.keySet().contains(parseName(row.entity));
-            }
-        };
-
         Callback populationDensity = new Callback() {
             @Override
             public void reduce(Row row) {
@@ -311,7 +322,7 @@ public class CountryData {
         };
 
         List<Callback> callbacks = new LinkedList<>();
-        Callback[] c = new Callback[]{creationDate, _places, export, expenses, latitude, longitude, economicGrowth, poverty, population, unemployment, revenue, gini, _import, gdp, inflation, tld, populationDensity};
+        Callback[] c = new Callback[]{creationDate, _places, export, expenses, latitude, longitude, economicGrowth, poverty, population, unemployment, revenue, gini, _import, gdp, inflation, populationDensity};
         for (Callback callback : c) {
             callbacks.add(callback);
         }
