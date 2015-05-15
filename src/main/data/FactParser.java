@@ -101,23 +101,6 @@ public class FactParser {
     }
 
     private static List<Callback> getCallbacks(final Map<String, ? extends PopulatedRegion> places) {
-
-        Callback creationDate = new GenericCallback(places, ValueType.DATE, "<wasCreatedOnDate>", "creationDate");
-        Callback export = new GenericCallback(places, ValueType.FLOAT, "<hasExport>", "export");
-        Callback expenses = new GenericCallback(places, ValueType.FLOAT, "<hasExpenses>", "expenses");
-        Callback latitude = new GenericCallback(places, ValueType.FLOAT, "<hasLatitude>", "latitude");
-        Callback longitude = new GenericCallback(places, ValueType.FLOAT, "<hasLongitude>", "longitude");
-        Callback economicGrowth = new GenericCallback(places, ValueType.FLOAT, "<hasEconomicGrowth>", "economicGrowth");
-        Callback poverty = new GenericCallback(places, ValueType.FLOAT, "<hasPoverty>", "poverty");
-        Callback population = new GenericCallback(places, ValueType.LONG, "<hasNumberOfPeople>", "population");
-        Callback unemployment = new GenericCallback(places, ValueType.FLOAT, "<hasUnemployment>", "unemployment");
-        Callback revenue = new GenericCallback(places, ValueType.FLOAT, "<hasRevenue>", "revenue");
-        Callback gini = new GenericCallback(places, ValueType.FLOAT, "<hasGini>", "gini");
-        Callback _import = new GenericCallback(places, ValueType.FLOAT, "<hasImport>", "_import");
-        Callback gdp = new GenericCallback(places, ValueType.FLOAT, "<hasGDP>", "gdp");
-        Callback inflation = new GenericCallback(places, ValueType.FLOAT, "<hasInflation>", "inflation");
-        Callback populationDensity = new GenericCallback(places, ValueType.FLOAT, "<hasPopulationDensity>", "populationDensity");
-
         Callback _places = new Callback() {
             @Override
             public void reduce(Row row) {
@@ -130,8 +113,24 @@ public class FactParser {
             }
         };
 
+        Callback[] c = new Callback[]{_places,
+                new GenericCallback(places, ValueType.DATE,  "<wasCreatedOnDate>",     "creationDate"),
+                new GenericCallback(places, ValueType.FLOAT, "<hasExport>",            "export"),
+                new GenericCallback(places, ValueType.FLOAT, "<hasExpenses>",          "expenses"),
+                new GenericCallback(places, ValueType.FLOAT, "<hasLatitude>",          "latitude"),
+                new GenericCallback(places, ValueType.FLOAT, "<hasLongitude>",         "longitude"),
+                new GenericCallback(places, ValueType.FLOAT, "<hasEconomicGrowth>",    "economicGrowth"),
+                new GenericCallback(places, ValueType.FLOAT, "<hasPoverty>",           "poverty"),
+                new GenericCallback(places, ValueType.LONG,  "<hasNumberOfPeople>",    "population"),
+                new GenericCallback(places, ValueType.FLOAT, "<hasUnemployment>",      "unemployment"),
+                new GenericCallback(places, ValueType.FLOAT, "<hasRevenue>",           "revenue"),
+                new GenericCallback(places, ValueType.FLOAT, "<hasGini>",              "gini"),
+                new GenericCallback(places, ValueType.FLOAT, "<hasImport>",            "_import"),
+                new GenericCallback(places, ValueType.FLOAT, "<hasGDP>",               "gdp"),
+                new GenericCallback(places, ValueType.FLOAT, "<hasInflation>",         "inflation"),
+                new GenericCallback(places, ValueType.FLOAT, "<hasPopulationDensity>", "populationDensity"),
+        };
         List<Callback> callbacks = new LinkedList<>();
-        Callback[] c = new Callback[]{creationDate, _places, export, expenses, latitude, longitude, economicGrowth, poverty, population, unemployment, revenue, gini, _import, gdp, inflation, populationDensity};
         Collections.addAll(callbacks, c);
         return callbacks;
     }
