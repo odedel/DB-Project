@@ -1,5 +1,5 @@
 package main.data;
 
-class City extends PopulatedRegion {
+public class City extends PopulatedRegion {
     public String country;
 }
