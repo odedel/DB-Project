@@ -13,8 +13,6 @@ import static main.util.Utils.*;
 public class FactParser {
     public static Map<String, Country> countries = new HashMap<>();
     public static Map<String, City> cities = new HashMap<>();
-    static String COUNTRY_TYPE = "<wikicat_Countries>";
-    static String PREF_LABEL = "skos:prefLabel";
 
     public static Collection<Country> collectCountries() throws IOException {
         getIDs();
@@ -39,7 +37,7 @@ public class FactParser {
 
             @Override
             public boolean map(Row row) {
-                return row.superEntity.equals(COUNTRY_TYPE);
+                return row.superEntity.equals("<wikicat_Countries>");
             }
         };
     }
@@ -62,7 +60,7 @@ public class FactParser {
     private static void getNames(final Map<String, ? extends PopulatedRegion>... place_maps) throws IOException {
         List<Callback> callbacks = new LinkedList<>();
         for (final Map<String, ? extends PopulatedRegion> places : place_maps) {
-            callbacks.add(new GenericCallback(places, ValueType.NAME, PREF_LABEL, "name"));
+            callbacks.add(new GenericCallback(places, ValueType.NAME, "skos:prefLabel", "name"));
         }
         Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(Consts.YAGO_LABELS_FILE, callbacks);
     }
