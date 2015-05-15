@@ -1,14 +1,11 @@
 package main;
 
 import db.DBConnection;
-import db.DBException;
 import main.data.City;
-import main.data.CityData;
 import main.data.Country;
-import main.data.CountryData;
+import main.data.FactParser;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
 class Sample {
@@ -21,7 +18,7 @@ class Sample {
             connection.deleteData();
             assert connection.getCountOfCountries() == 0;
 
-            Map<String, Country> countries = CountryData.collectCountries();
+            Collection<Country> countries = FactParser.collectCountries();
             System.out.println(String.format("Collected %d countries", countries.size()));
 
 //            for (Country c : countries.values()) {
@@ -30,8 +27,8 @@ class Sample {
 //                }
 //            }
 
-            Map<String, City> cities = CityData.collectCities(countries);
-            System.out.println(String.format("Collected %d cities", cities.size()));
+            //Map<String, City> cities = CityData.collectCities(countries);
+            //System.out.println(String.format("Collected %d cities", cities.size()));
 
 //            for (City c : cities.values()) {
 //                if (c.country == null || c.country.id == 0) {
@@ -41,8 +38,8 @@ class Sample {
 
             System.out.println("Uploading ...");
 
-            connection.uploadCountries(countries.values());
-            connection.uploadCities(cities.values());
+            //connection.uploadCountries(countries.values());
+            //connection.uploadCities(cities.values());
             assert countries.size() == connection.getCountOfCountries();
         } catch (Exception e) {
             e.printStackTrace();
