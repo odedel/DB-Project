@@ -7,6 +7,7 @@ import main.util.Utils;
 import java.io.IOException;
 import java.util.*;
 
+import static java.util.Collections.*;
 import static main.util.Utils.*;
 
 public class CountryData {
@@ -98,14 +99,7 @@ public class CountryData {
     }
 
     private static List<Callback> getCountryCallbacks(final Map<String, ? extends Country> places) {
-        Callback tld = new GenericCallback(places, ValueType.STRING, "<hasTLD>", "tld");
-
-        List<Callback> callbacks = new LinkedList<>();
-        Callback[] c = new Callback[]{tld};
-        for (Callback callback : c) {
-            callbacks.add(callback);
-        }
-        return callbacks;
+        return singletonList(new GenericCallback(places, ValueType.STRING, "<hasTLD>", "tld"));
     }
 
     private static List<Callback> getCallbacks(final Map<String, ? extends PopulatedRegion> places) {
