@@ -10,7 +10,7 @@ import java.util.*;
 import static java.util.Collections.*;
 import static main.util.Utils.*;
 
-public class CountryData {
+public class FactParser {
     public static Map<String, Country> countries = new HashMap<>();
     public static Map<String, City> cities = new HashMap<>();
     static String COUNTRY_TYPE = "<wikicat_Countries>";
