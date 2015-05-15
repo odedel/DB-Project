@@ -60,6 +60,7 @@ public class CountryData {
         };
     }
 
+    @SafeVarargs
     private static void getNames(final Map<String, ? extends PopulatedRegion>... place_maps) throws IOException {
         List<Callback> callbacks = new LinkedList<>();
         for (final Map<String, ? extends PopulatedRegion> places : place_maps) {
@@ -68,6 +69,7 @@ public class CountryData {
         Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(Consts.YAGO_LABELS_FILE, callbacks);
     }
 
+    @SafeVarargs
     private static void getFacts(final Map<String, ? extends PopulatedRegion>... place_maps) throws IOException {
         String factFiles[] = new String[]{Consts.YAGO_DATE_FACTS_FILE, Consts.YAGO_FACTS_FILE, Consts.YAGO_LITERAL_FACTS_FILE,};
 
