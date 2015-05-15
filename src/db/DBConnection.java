@@ -73,7 +73,7 @@ public class DBConnection {
                 }
                 pstmt.setFloat(3, country.economicGrowth);
                 pstmt.setFloat(4, country.poverty);
-                pstmt.setInt(5, country.population);
+                pstmt.setLong(5, country.population);
                 pstmt.setFloat(6, country.unemployment);
                 pstmt.setFloat(7, country.gini);
                 pstmt.setFloat(8, country.inflation);
@@ -124,7 +124,8 @@ public class DBConnection {
 //                    pstmt.executeBatch();
 //                }
                 pstmt.setString(1, city.name);
-                pstmt.setInt(2, city.country.id);
+                //FIXME: this relation doesn't exist
+                //pstmt.setInt(2, city.country.id);
                 pstmt.addBatch();
 
                 counter++;
