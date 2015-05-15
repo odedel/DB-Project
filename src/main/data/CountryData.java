@@ -32,7 +32,7 @@ public class CountryData {
     }
 
     private static Callback getCountryIDsCallback() throws IOException {
-       return new Callback() {
+        return new Callback() {
             @Override
             public void reduce(Row row) {
                 countries.put(parseName(row.entity), new Country());
@@ -62,17 +62,7 @@ public class CountryData {
     private static void getNames(final Map<String, ? extends PopulatedRegion>... place_maps) throws IOException {
         List<Callback> callbacks = new LinkedList<>();
         for (final Map<String, ? extends PopulatedRegion> places : place_maps) {
-            callbacks.add(new Callback() {
-                @Override
-                public void reduce(Row row) {
-                    places.get(parseName(row.entity)).name = parseName(row.superEntity);
-                }
-
-                @Override
-                public boolean map(Row row) {
-                    return row.relationType.equals(PREF_LABEL) && places.keySet().contains(parseName(row.entity));
-                }
-            });
+            callbacks.add(new GenericCallback(places, ValueType.NAME, PREF_LABEL, "name"));
         }
         Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(Consts.YAGO_LABELS_FILE, callbacks);
     }
@@ -106,19 +96,9 @@ public class CountryData {
             Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(factFile, callbacks);
         }
     }
+
     private static List<Callback> getCountryCallbacks(final Map<String, ? extends Country> places) {
-        Callback tld = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                places.get(parseName(row.entity)).tld = parseString(row.superEntity);
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<hasTLD>") && places.keySet().contains(parseName(row.entity));
-            }
-        };
-
+        Callback tld = new GenericCallback(places, ValueType.STRING, "<hasTLD>", "tld");
 
         List<Callback> callbacks = new LinkedList<>();
         Callback[] c = new Callback[]{tld};
@@ -127,19 +107,24 @@ public class CountryData {
         }
         return callbacks;
     }
+
     private static List<Callback> getCallbacks(final Map<String, ? extends PopulatedRegion> places) {
 
-        Callback creationDate = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                places.get(parseName(row.entity)).creationDate = parseDate(row.superEntity);
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<wasCreatedOnDate>") && places.keySet().contains(parseName(row.entity));
-            }
-        };
+        Callback creationDate = new GenericCallback(places, ValueType.DATE, "<wasCreatedOnDate>", "creationDate");
+        Callback export = new GenericCallback(places, ValueType.FLOAT, "<hasExport>", "export");
+        Callback expenses = new GenericCallback(places, ValueType.FLOAT, "<hasExpenses>", "expenses");
+        Callback latitude = new GenericCallback(places, ValueType.FLOAT, "<hasLatitude>", "latitude");
+        Callback longitude = new GenericCallback(places, ValueType.FLOAT, "<hasLongitude>", "longitude");
+        Callback economicGrowth = new GenericCallback(places, ValueType.FLOAT, "<hasEconomicGrowth>", "economicGrowth");
+        Callback poverty = new GenericCallback(places, ValueType.FLOAT, "<hasPoverty>", "poverty");
+        Callback population = new GenericCallback(places, ValueType.LONG, "<hasNumberOfPeople>", "population");
+        Callback unemployment = new GenericCallback(places, ValueType.FLOAT, "<hasUnemployment>", "unemployment");
+        Callback revenue = new GenericCallback(places, ValueType.FLOAT, "<hasRevenue>", "revenue");
+        Callback gini = new GenericCallback(places, ValueType.FLOAT, "<hasGini>", "gini");
+        Callback _import = new GenericCallback(places, ValueType.FLOAT, "<hasImport>", "_import");
+        Callback gdp = new GenericCallback(places, ValueType.FLOAT, "<hasGDP>", "gdp");
+        Callback inflation = new GenericCallback(places, ValueType.FLOAT, "<hasInflation>", "inflation");
+        Callback populationDensity = new GenericCallback(places, ValueType.FLOAT, "<hasPopulationDensity>", "populationDensity");
 
         Callback _places = new Callback() {
             @Override
@@ -150,174 +135,6 @@ public class CountryData {
             @Override
             public boolean map(Row row) {
                 return row.relationType.equals("<isLocatedIn>") && places.keySet().contains(parseName(row.superEntity));
-            }
-        };
-
-        Callback export = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                places.get(parseName(row.entity)).export = parseFloat(row.superEntity);
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<hasExport>") && places.keySet().contains(parseName(row.entity));
-            }
-        };
-
-        Callback expenses = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                places.get(parseName(row.entity)).expenses = parseFloat(row.superEntity);
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<hasExpenses>") && places.keySet().contains(parseName(row.entity));
-            }
-        };
-
-        Callback latitude = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                places.get(parseName(row.entity)).latitude = parseFloat(row.superEntity);
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<hasLatitude>") && places.keySet().contains(parseName(row.entity));
-            }
-        };
-
-        Callback longitude = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                places.get(parseName(row.entity)).longitude = parseFloat(row.superEntity);
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<hasLongitude>") && places.keySet().contains(parseName(row.entity));
-            }
-        };
-
-        Callback economicGrowth = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                places.get(parseName(row.entity)).economicGrowth = parseFloat(row.superEntity);
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<hasEconomicGrowth>") && places.keySet().contains(parseName(row.entity));
-            }
-        };
-
-        Callback poverty = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                places.get(parseName(row.entity)).poverty = parseFloat(row.superEntity);
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<hasPoverty>") && places.keySet().contains(parseName(row.entity));
-            }
-        };
-
-        Callback population = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                places.get(parseName(row.entity)).population = parseLong(row.superEntity);
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<hasNumberOfPeople>") && places.keySet().contains(parseName(row.entity));
-            }
-        };
-
-        Callback unemployment = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                places.get(parseName(row.entity)).unemployment = parseFloat(row.superEntity);
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<hasUnemployment>") && places.keySet().contains(parseName(row.entity));
-            }
-        };
-
-        Callback revenue = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                places.get(parseName(row.entity)).revenue = parseFloat(row.superEntity);
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<hasRevenue>") && places.keySet().contains(parseName(row.entity));
-            }
-        };
-
-        Callback gini = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                places.get(parseName(row.entity)).gini = parseFloat(row.superEntity);
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<hasGini>") && places.keySet().contains(parseName(row.entity));
-            }
-        };
-
-        Callback _import = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                places.get(parseName(row.entity))._import = parseFloat(row.superEntity);
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<hasImport>") && places.keySet().contains(parseName(row.entity));
-            }
-        };
-
-        Callback gdp = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                places.get(parseName(row.entity)).gdp = parseFloat(row.superEntity);
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<hasGDP>") && places.keySet().contains(parseName(row.entity));
-            }
-        };
-
-        Callback inflation = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                places.get(parseName(row.entity)).inflation = parseFloat(row.superEntity);
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<hasInflation>") && places.keySet().contains(parseName(row.entity));
-            }
-        };
-
-        Callback populationDensity = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                places.get(parseName(row.entity)).populationDensity = parseFloat(row.superEntity);
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<hasPopulationDensity>") && places.keySet().contains(parseName(row.entity));
             }
         };
 
