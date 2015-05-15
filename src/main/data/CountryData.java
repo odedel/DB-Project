@@ -5,292 +5,136 @@ import main.util.Row;
 import main.util.Utils;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
+
+import static java.util.Collections.*;
+import static main.util.Utils.*;
 
 public class CountryData {
     public static Map<String, Country> countries = new HashMap<>();
-    private static String COUNTRY_TYPE = "<wordnet_country_108544813>";
-    private static String PREF_LABEL = "skos:prefLabel";
-    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH);
+    public static Map<String, City> cities = new HashMap<>();
+    static String COUNTRY_TYPE = "<wikicat_Countries>";
+    static String PREF_LABEL = "skos:prefLabel";
 
-    public static Map<String, Country> collectCountries() throws IOException {
-        getCountries();
-        getCountryNames();
-        getCountryFacts();
-        return countries;
+    public static Collection<Country> collectCountries() throws IOException {
+        getIDs();
+        getNames(countries, cities);
+        getFacts(countries, cities);
+        return countries.values();
     }
 
-    private static void getCountryNames() throws IOException {
-        Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(Consts.YAGO_LABELS_FILE, new Callback() {
-            @Override
-            public void reduce(Row row) {
-                countries.get(row.entity).name = Utils.parseNameFromPrefLabel(row.superEntity);
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals(PREF_LABEL) && countries.keySet().contains(row.entity);
-            }
-        });
+    private static void getIDs() throws IOException {
+        List<Callback> callbacks = new LinkedList<>();
+        callbacks.add(getCountryIDsCallback());
+        callbacks.add(getCityIDsCallback());
+        Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(Consts.YAGO_TYPES_FILE, callbacks);
     }
 
-    private static void getCountries() throws IOException {
-        Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(Consts.YAGO_TYPES_FILE, new Callback() {
+    private static Callback getCountryIDsCallback() throws IOException {
+        return new Callback() {
             @Override
             public void reduce(Row row) {
-                countries.put(row.entity, new Country());
+                countries.put(parseName(row.entity), new Country());
             }
 
             @Override
             public boolean map(Row row) {
-                return row.superEntity.equals(COUNTRY_TYPE) && !countries.keySet().contains(row.entity);
+                return row.superEntity.equals(COUNTRY_TYPE);
             }
-        });
+        };
     }
 
-    private static void getCountryFacts() throws IOException {
-        String factFiles[] = new String[]{Consts.YAGO_DATE_FACTS_FILE, Consts.YAGO_FACTS_FILE, Consts.YAGO_LITERAL_FACTS_FILE};
-
-        Callback creationDate = new Callback() {
+    private static Callback getCityIDsCallback() throws IOException {
+        return new Callback() {
             @Override
             public void reduce(Row row) {
-                String dateString = row.superEntity.substring(1, row.superEntity.indexOf("^") - 1);
-                countries.get(row.entity).creationDate =
-                        LocalDate.parse(dateString, formatter);
+                cities.put(parseName(row.entity), new City());
             }
 
             @Override
             public boolean map(Row row) {
-                return row.relationType.equals("<wasCreatedOnDate>") && countries.keySet().contains(row.entity)
-                        && !row.superEntity.contains("#") &&
-                        row.superEntity.substring(1, row.superEntity.indexOf("^") - 1).length() == 10;
+                return row.superEntity.startsWith("<wikicat_Cities");
             }
         };
+    }
 
-        Callback places = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                countries.get(row.superEntity).places.add(row.entity);
-            }
+    @SafeVarargs
+    private static void getNames(final Map<String, ? extends PopulatedRegion>... place_maps) throws IOException {
+        List<Callback> callbacks = new LinkedList<>();
+        for (final Map<String, ? extends PopulatedRegion> places : place_maps) {
+            callbacks.add(new GenericCallback(places, ValueType.NAME, PREF_LABEL, "name"));
+        }
+        Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(Consts.YAGO_LABELS_FILE, callbacks);
+    }
 
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<isLocatedIn>") && countries.keySet().contains(row.superEntity);
-            }
-        };
+    @SafeVarargs
+    private static void getFacts(final Map<String, ? extends PopulatedRegion>... place_maps) throws IOException {
+        String factFiles[] = new String[]{Consts.YAGO_DATE_FACTS_FILE, Consts.YAGO_FACTS_FILE, Consts.YAGO_LITERAL_FACTS_FILE,};
 
-//        Callback export = new Callback() {
-//            @Override
-//            public void reduce(Row row) {
-//                countries.get(row.entity).export = row.superEntity;
-//            }
-//
-//            @Override
-//            public boolean map(Row row) {
-//                return row.relationType.equals("<hasExport>") && countries.keySet().contains(row.entity);
-//            }
-//        };
-
-//        Callback expenses = new Callback() {
-//            @Override
-//            public void reduce(Row row) {
-//                countries.get(row.entity).expenses = row.superEntity;
-//            }
-//
-//            @Override
-//            public boolean map(Row row) {
-//                return row.relationType.equals("<hasExpenses>") && countries.keySet().contains(row.entity);
-//            }
-//        };
-
-//        Callback latitude = new Callback() {
-//            @Override
-//            public void reduce(Row row) {
-//                countries.get(row.entity).latitude = row.superEntity;
-//            }
-//
-//            @Override
-//            public boolean map(Row row) {
-//                return row.relationType.equals("<hasLatitude>") && countries.keySet().contains(row.entity);
-//            }
-//        };
-
-//        Callback longitude = new Callback() {
-//            @Override
-//            public void reduce(Row row) {
-//                countries.get(row.entity).longitude = row.superEntity;
-//            }
-//
-//            @Override
-//            public boolean map(Row row) {
-//                return row.relationType.equals("<hasLongitude>") && countries.keySet().contains(row.entity);
-//            }
-//        };
-
-        Callback economicGrowth = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                countries.get(row.entity).economicGrowth = Utils.parseFloatFromString(row.superEntity);
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<hasEconomicGrowth>") && countries.keySet().contains(row.entity);
-            }
-        };
-
-        Callback poverty = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                countries.get(row.entity).poverty = Utils.parseFloatFromString(row.superEntity);
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<hasPoverty>") && countries.keySet().contains(row.entity);
-            }
-        };
-
-//        Callback population = new Callback() {
-//            @Override
-//            public void reduce(Row row) {
-//                countries.get(row.entity).population = Utils.parseIntFromString(row.superEntity);
-//            }
-//
-//            @Override
-//            public boolean map(Row row) {
-//                return row.relationType.equals("<hasNumberOfPeople>") && countries.keySet().contains(row.entity);
-//            }
-//        };
-//
-//        Callback unemployment = new Callback() {
-//            @Override
-//            public void reduce(Row row) {
-//                countries.get(row.entity).unemployment = Utils.parseFloatFromString(row.superEntity);
-//            }
-//
-//            @Override
-//            public boolean map(Row row) {
-//                return row.relationType.equals("<hasUnemployment>") && countries.keySet().contains(row.entity);
-//            }
-//        };
-
-//        Callback revenue = new Callback() {
-//            @Override
-//            public void reduce(Row row) {
-//                countries.get(row.entity).revenue = row.superEntity;
-//            }
-//
-//            @Override
-//            public boolean map(Row row) {
-//                return row.relationType.equals("<hasRevenue>") && countries.keySet().contains(row.entity);
-//            }
-//        };
-
-        Callback gini = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                countries.get(row.entity).gini = Utils.parseFloatFromString(row.superEntity);
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<hasGini>") && countries.keySet().contains(row.entity);
-            }
-        };
-
-//        Callback _import = new Callback() {
-//            @Override
-//            public void reduce(Row row) {
-//                countries.get(row.entity)._import = row.superEntity;
-//            }
-//
-//            @Override
-//            public boolean map(Row row) {
-//                return row.relationType.equals("<hasImport>") && countries.keySet().contains(row.entity);
-//            }
-//        };
-
-//        Callback gdp = new Callback() {
-//            @Override
-//            public void reduce(Row row) {
-//                countries.get(row.entity).gdp = row.superEntity;
-//            }
-//
-//            @Override
-//            public boolean map(Row row) {
-//                return row.relationType.equals("<hasGDP>") && countries.keySet().contains(row.entity);
-//            }
-//        };
-
-        Callback inflation = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                countries.get(row.entity).inflation = Utils.parseFloatFromString(row.superEntity);
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<hasInflation>") && countries.keySet().contains(row.entity);
-            }
-        };
-
-//        Callback tld = new Callback() {
-//            @Override
-//            public void reduce(Row row) {
-//                countries.get(row.entity).tld = row.superEntity;
-//            }
-//
-//            @Override
-//            public boolean map(Row row) {
-//                return row.relationType.equals("<hasTLD>") && countries.keySet().contains(row.entity);
-//            }
-//        };
-
-        Callback populationDensity = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                countries.get(row.entity).populationDensity = Utils.parseFloatFromString(row.superEntity);
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<hasPopulationDensity>") && countries.keySet().contains(row.entity);
-            }
-        };
-
-        for (String factFile : factFiles) {
-            Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(factFile, creationDate, places,
-                    economicGrowth, poverty, gini, inflation, populationDensity);
+        List<Callback> callbacks = new LinkedList<>();
+        for (Map<String, ? extends PopulatedRegion> places : place_maps) {
+            callbacks.addAll(getCallbacks(places));
         }
 
-//        for (String factFile : factFiles) {
-//            Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(factFile, creationDate, places, export, expenses,
-//                    latitude, longitude, economicGrowth, poverty, population, unemployment,
-//                    revenue, gini, _import, gdp, inflation, tld, populationDensity);
-//        }
+        callbacks.addAll(getCountryCallbacks(countries));
 
-//        for (String factFile : factFiles) {
-//            Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(factFile, new Callback() {
-//                @Override
-//                public void reduce(Row row) {
-//                    if (countries.containsKey(row.entity)) {
-//                        countries.get(row.entity).facts.add(row);
-//                    }
-//                    if (countries.containsKey(row.superEntity)) {
-//                        countries.get(row.superEntity).facts.add(row);
-//                    }
-//                }
-//
-//                @Override
-//                public boolean map(Row row) {
-//                    return countries.keySet().contains(row.entity) || countries.keySet().contains(row.superEntity);
-//                }
-//            });
-//        }
+        Callback cityLocatedIn = new Callback() {
+            @Override
+            public void reduce(Row row) {
+                //Assignment is for a String and not an object since it will be put into the DB
+                cities.get(parseName(row.entity)).country = parseName(row.superEntity);
+            }
+
+            @Override
+            public boolean map(Row row) {
+                return row.relationType.equals("<isLocatedIn>") && cities.keySet().contains(parseName(row.entity)) &&
+                        countries.keySet().contains(parseName(row.superEntity));
+            }
+        };
+        callbacks.add(cityLocatedIn);
+
+        for (String factFile : factFiles) {
+            Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(factFile, callbacks);
+        }
+    }
+
+    private static List<Callback> getCountryCallbacks(final Map<String, ? extends Country> places) {
+        return singletonList(new GenericCallback(places, ValueType.STRING, "<hasTLD>", "tld"));
+    }
+
+    private static List<Callback> getCallbacks(final Map<String, ? extends PopulatedRegion> places) {
+
+        Callback creationDate = new GenericCallback(places, ValueType.DATE, "<wasCreatedOnDate>", "creationDate");
+        Callback export = new GenericCallback(places, ValueType.FLOAT, "<hasExport>", "export");
+        Callback expenses = new GenericCallback(places, ValueType.FLOAT, "<hasExpenses>", "expenses");
+        Callback latitude = new GenericCallback(places, ValueType.FLOAT, "<hasLatitude>", "latitude");
+        Callback longitude = new GenericCallback(places, ValueType.FLOAT, "<hasLongitude>", "longitude");
+        Callback economicGrowth = new GenericCallback(places, ValueType.FLOAT, "<hasEconomicGrowth>", "economicGrowth");
+        Callback poverty = new GenericCallback(places, ValueType.FLOAT, "<hasPoverty>", "poverty");
+        Callback population = new GenericCallback(places, ValueType.LONG, "<hasNumberOfPeople>", "population");
+        Callback unemployment = new GenericCallback(places, ValueType.FLOAT, "<hasUnemployment>", "unemployment");
+        Callback revenue = new GenericCallback(places, ValueType.FLOAT, "<hasRevenue>", "revenue");
+        Callback gini = new GenericCallback(places, ValueType.FLOAT, "<hasGini>", "gini");
+        Callback _import = new GenericCallback(places, ValueType.FLOAT, "<hasImport>", "_import");
+        Callback gdp = new GenericCallback(places, ValueType.FLOAT, "<hasGDP>", "gdp");
+        Callback inflation = new GenericCallback(places, ValueType.FLOAT, "<hasInflation>", "inflation");
+        Callback populationDensity = new GenericCallback(places, ValueType.FLOAT, "<hasPopulationDensity>", "populationDensity");
+
+        Callback _places = new Callback() {
+            @Override
+            public void reduce(Row row) {
+                places.get(parseName(row.superEntity)).places.add(parseName(row.entity));
+            }
+
+            @Override
+            public boolean map(Row row) {
+                return row.relationType.equals("<isLocatedIn>") && places.keySet().contains(parseName(row.superEntity));
+            }
+        };
+
+        List<Callback> callbacks = new LinkedList<>();
+        Callback[] c = new Callback[]{creationDate, _places, export, expenses, latitude, longitude, economicGrowth, poverty, population, unemployment, revenue, gini, _import, gdp, inflation, populationDensity};
+        Collections.addAll(callbacks, c);
+        return callbacks;
     }
 }

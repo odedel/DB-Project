@@ -6,7 +6,7 @@ public class Row {
     public String relationType;
     public String superEntity;
 
-    public Row(String[] split) {
+    public Row(String split[]) {
         this.id = split[0];
         this.entity = split[1];
         this.relationType = split[2];
