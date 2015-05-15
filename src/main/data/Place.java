@@ -2,6 +2,7 @@ package main.data;
 
 import main.util.Row;
 
+import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -9,21 +10,21 @@ public class Place {
 
     public String name;
     public List<Row> facts = new LinkedList<>();
-    public String creationDate;
+    public LocalDate creationDate;
     public List<String> places = new LinkedList<>();
-    public String export;
-    public String expenses;
-    public String latitude;
-    public String longitude;
-    public String economicGrowth;
-    public String poverty;
-    public String population;
-    public String unemployment;
-    public String revenue;
-    public String gini;
-    public String _import;
-    public String gdp;
-    public String inflation;
-    public String populationDensity;
+    public float export;            // Dollar
+    public float expenses;          // Dollar
+    public float latitude;          // Degress
+    public float longitude;         // Degress
+    public float economicGrowth;    // %
+    public float poverty;           // %
+    public long population;
+    public float unemployment;      // %
+    public float revenue;           // Dollar
+    public float gini;
+    public float _import;           // Dollar
+    public float gdp;               // Dollar
+    public float inflation;         // %
+    public float populationDensity; // 1/km^2
     public String tld;
 }
