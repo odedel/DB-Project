@@ -28,7 +28,7 @@ public class FactParser {
         Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(Consts.YAGO_TYPES_FILE, callbacks);
     }
 
-    private static Callback getCountryIDsCallback() throws IOException {
+    private static Callback getCountryIDsCallback() {
         return new Callback() {
             @Override
             public void reduce(Row row) {
@@ -42,7 +42,7 @@ public class FactParser {
         };
     }
 
-    private static Callback getCityIDsCallback() throws IOException {
+    private static Callback getCityIDsCallback() {
         return new Callback() {
             @Override
             public void reduce(Row row) {
@@ -75,8 +75,19 @@ public class FactParser {
         }
 
         callbacks.addAll(getCountryCallbacks(countries));
+        callbacks.addAll(getCityCallbacks(cities, countries));
 
-        Callback cityLocatedIn = new Callback() {
+        for (String factFile : factFiles) {
+            Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(factFile, callbacks);
+        }
+    }
+
+    private static List<Callback> getCountryCallbacks(final Map<String, ? extends Country> places) {
+        return singletonList(new GenericCallback(places, ValueType.STRING, "<hasTLD>", "tld"));
+    }
+
+    private static List<Callback> getCityCallbacks(final Map<String, ? extends City> cities, Map<String, Country> countries) {
+        return singletonList(new Callback() {
             @Override
             public void reduce(Row row) {
                 //Assignment is for a String and not an object since it will be put into the DB
@@ -88,16 +99,7 @@ public class FactParser {
                 return row.relationType.equals("<isLocatedIn>") && cities.keySet().contains(parseName(row.entity)) &&
                         countries.keySet().contains(parseName(row.superEntity));
             }
-        };
-        callbacks.add(cityLocatedIn);
-
-        for (String factFile : factFiles) {
-            Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(factFile, callbacks);
-        }
-    }
-
-    private static List<Callback> getCountryCallbacks(final Map<String, ? extends Country> places) {
-        return singletonList(new GenericCallback(places, ValueType.STRING, "<hasTLD>", "tld"));
+        });
     }
 
     private static List<Callback> getCallbacks(final Map<String, ? extends PopulatedRegion> places) {
