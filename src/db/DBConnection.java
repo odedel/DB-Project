@@ -4,9 +4,9 @@ import main.data.City;
 import main.data.Country;
 
 import java.sql.*;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.sql.Date;
+import java.time.LocalDate;
+import java.util.*;
 
 public class DBConnection {
 
@@ -179,6 +179,81 @@ public class DBConnection {
         } catch (SQLException e) {
             throw new DBException("Error while counting countries : " + e.getMessage());
         }
+    }
+
+    public int getCountOfCities() throws DBException {
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM city");) {
+            return rs.getInt(1);
+        } catch (SQLException e) {
+            throw new DBException("Error while counting countries : " + e.getMessage());
+        }
+    }
+
+    public Map<Integer, Country> getAllCountriesData() throws DBException {
+        Map<Integer, Country> countries = new HashMap<>();
+
+        try (Statement stmt = conn.createStatement()) {
+            ResultSet rs = stmt.executeQuery("SELECT * FROM COUNTRY");
+
+            while (rs.next()) {
+                Country country = new Country();
+
+                country.id = rs.getInt("id");
+                country.name = rs.getString("name");
+
+                Date creationDate = rs.getDate("creation_date");
+                if (creationDate != null) {
+                    country.creationDate = creationDate.toLocalDate();
+                }
+                country.economicGrowth = rs.getFloat("economic_growth");
+                country.poverty = rs.getFloat("poverty");
+                country.population = rs.getLong("population");
+                country.unemployment = rs.getFloat("unemployment");
+                country.gini = rs.getFloat("gini");
+                country.inflation = rs.getFloat("inflation");
+                country.populationDensity = rs.getFloat("population_density");
+
+                countries.put(country.id, country);
+            }
+
+        } catch (SQLException e) {
+            throw new DBException("Error while fetching countries data : " + e.getMessage());
+        }
+        return countries;
+    }
+
+    public Map<Integer, City> getAllCitiesData(Map<Integer, Country> countries) throws DBException {
+        Map<Integer, City> cities = new HashMap<>();
+
+        try (Statement stmt = conn.createStatement()) {
+            ResultSet rs = stmt.executeQuery("SELECT * FROM CITY");
+
+            while (rs.next()) {
+                City city = new City();
+
+                city.id = rs.getInt("id");
+                city.name = rs.getString("name");
+                city.country = countries.get(rs.getInt("country_id"));
+                Date creationDate = rs.getDate("creation_date");
+                if (creationDate != null) {
+                    city.creationDate = creationDate.toLocalDate();
+                }
+                city.economicGrowth = rs.getFloat("economic_growth");
+                city.poverty = rs.getFloat("poverty");
+                city.population = rs.getLong("population");
+                city.unemployment = rs.getFloat("unemployment");
+                city.gini = rs.getFloat("gini");
+                city.inflation = rs.getFloat("inflation");
+                city.populationDensity = rs.getFloat("population_density");
+
+                cities.put(city.id, city);
+            }
+
+        } catch (SQLException e) {
+            throw new DBException("Error while fetching cities data : " + e.getMessage());
+        }
+        return cities;
     }
 
     /**
