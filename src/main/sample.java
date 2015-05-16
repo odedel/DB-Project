@@ -1,6 +1,7 @@
 package main;
 
 import db.DBConnection;
+import db.User;
 import main.data.City;
 import main.data.Country;
 import main.data.DataCollector;
@@ -13,7 +14,7 @@ class Sample {
     public static void main(String args[]) {
         DBConnection connection = new DBConnection();
         try {
-            connection.connect();
+            connection.connect(User.MODIFIER);
 
             connection.deleteData();
             assert connection.getCountOfCountries() == 0;

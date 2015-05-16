@@ -16,7 +16,7 @@ public class DBConnection {
      * Opens new connection to the db and initialize conn with it.
      * Throws DBException if something bad happened.
      * */
-    public void connect() throws DBException {
+    public void connect(User user) throws DBException {
 
         // loading the driver
         try {
@@ -29,7 +29,7 @@ public class DBConnection {
         // creating the connection
         System.out.print("Trying to connect... ");
         try {
-            conn = DriverManager.getConnection(String.format(CONNECTION_STRING, DEFAULT_HOST, DEFAULT_SCHEMA), DEFAULT_USER, DEFAULT_PASSWORD);
+            conn = DriverManager.getConnection(String.format(CONNECTION_STRING, DEFAULT_HOST, DEFAULT_SCHEMA), user.toString(), user.toString());
         } catch (SQLException e) {
             conn = null;
             throw new DBException("Unable to connect : " + e.getMessage());
@@ -192,6 +192,4 @@ public class DBConnection {
     private static String CONNECTION_STRING = "jdbc:mysql://%s/%s";
     private static String DEFAULT_HOST = "localhost:3306";
     private static String DEFAULT_SCHEMA = "toyt";
-    private static String DEFAULT_USER = "root";
-    private static String DEFAULT_PASSWORD = "root";
 }
