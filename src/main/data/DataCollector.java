@@ -14,10 +14,11 @@ import static main.util.Utils.*;
 public class DataCollector {
     private Map<String, Country> countries = new HashMap<>();
     private Map<String, City> cities = new HashMap<>();
+    private Map<String, Politician> politicians = new HashMap<>();
 
     public void collectData() throws IOException {
         getIDs();
-        getNames(countries, cities);
+        getNames(countries, cities, politicians);
         getFacts(countries, cities);
 
         deleteCitiesWithoutCountries();
@@ -35,6 +36,7 @@ public class DataCollector {
         List<Callback> callbacks = new LinkedList<>();
         callbacks.add(getCountryIDsCallback());
         callbacks.add(getCityIDsCallback());
+        callbacks.add(getPoliticianIDsCallback());
         Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(Consts.YAGO_TYPES_FILE, callbacks);
     }
 
@@ -62,14 +64,28 @@ public class DataCollector {
             @Override
             public boolean map(Row row) {
                 return row.superEntity.startsWith("<wordnet_city_108524735>");
-            }   // Should change this
+            }
         };
     }
 
-    private void getNames(final Map<String, ? extends PopulatedRegion>... place_maps) throws IOException {
+    private Callback getPoliticianIDsCallback() {
+        return new Callback() {
+            @Override
+            public void reduce(Row row) {
+                politicians.put((row.entity), new Politician());
+            }
+
+            @Override
+            public boolean map(Row row) {
+                return row.superEntity.startsWith("<wordnet_politician_110450303>");
+            }
+        };
+    }
+
+    private void getNames(final Map<String, ? extends Entity>... entities_maps) throws IOException {
         List<Callback> callbacks = new LinkedList<>();
-        for (final Map<String, ? extends PopulatedRegion> places : place_maps) {
-            callbacks.add(new GenericCallback(places, ValueType.NAME, "skos:prefLabel", "name"));
+        for (final Map<String, ? extends Entity> entities : entities_maps) {
+            callbacks.add(new GenericCallback(entities, ValueType.NAME, "skos:prefLabel", "name"));
         }
         Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(Consts.YAGO_LABELS_FILE, callbacks);
     }

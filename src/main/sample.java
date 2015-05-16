@@ -14,20 +14,25 @@ import java.util.Map;
 
 class Sample {
 
-    public static void main(String args[]) {
-        DBConnection connection = new DBConnection();
-        try {
-            connection.connect(User.PLAYER);
+    public static void main(String args[]) throws IOException {
 
-            Map<Integer, Country> countries = connection.getAllCountriesData();
-            Map<Integer, City> cities = connection.getAllCitiesData(countries);
-            assert countries.size() == connection.getCountOfCountries();
-            assert cities.size() == connection.getCountOfCities();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            connection.disconnect();
-        }
+        DataCollector dataCollector = new DataCollector();
+
+        dataCollector.collectData();
+
+//        DBConnection connection = new DBConnection();
+//        try {
+//            connection.connect(User.PLAYER);
+//
+//            Map<Integer, Country> countries = connection.getAllCountriesData();
+//            Map<Integer, City> cities = connection.getAllCitiesData(countries);
+//            assert countries.size() == connection.getCountOfCountries();
+//            assert cities.size() == connection.getCountOfCities();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        } finally {
+//            connection.disconnect();
+//        }
     }
 
     public static void insertData(DBConnection connection) throws DBException, IOException {

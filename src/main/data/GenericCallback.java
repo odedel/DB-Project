@@ -14,15 +14,15 @@ public class GenericCallback extends Callback {
     ValueType valueType;
     String relationType;
     String keyName;
-    final Map<String, ? extends PopulatedRegion> places;
+    final Map<String, ? extends Entity> entities;
     Field field;
 
-    public GenericCallback(final Map<String, ? extends PopulatedRegion> places, ValueType valueType, String relationType, String keyName) {
-        this.places = places;
+    public GenericCallback(final Map<String, ? extends Entity> entities, ValueType valueType, String relationType, String keyName) {
+        this.entities = entities;
         this.valueType = valueType;
         this.relationType = relationType;
         this.keyName = keyName;
-        Class<?> clazz = places.values().iterator().next().getClass();
+        Class<?> clazz = entities.values().iterator().next().getClass();
         try {
             field = clazz.getField(keyName);
         } catch (NoSuchFieldException e) {
@@ -33,7 +33,7 @@ public class GenericCallback extends Callback {
     @Override
     public void reduce(Row row) {
         try {
-            field.set(places.get(row.entity), parseValue(row.superEntity, valueType));
+            field.set(entities.get(row.entity), parseValue(row.superEntity, valueType));
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
@@ -41,6 +41,6 @@ public class GenericCallback extends Callback {
 
     @Override
     public boolean map(Row row) {
-        return row.relationType.equals(relationType) && places.keySet().contains(row.entity);
+        return row.relationType.equals(relationType) && entities.keySet().contains(row.entity);
     }
 }
