@@ -29,7 +29,8 @@ public class DBConnection {
         // creating the connection
         System.out.print("Trying to connect... ");
         try {
-            conn = DriverManager.getConnection(String.format(CONNECTION_STRING, DEFAULT_HOST, DEFAULT_SCHEMA), user.toString(), user.toString());
+            conn = DriverManager.getConnection(String.format(CONNECTION_STRING, DEFAULT_HOST, DEFAULT_SCHEMA),
+                    user.toString().toLowerCase(), user.toString().toLowerCase());
         } catch (SQLException e) {
             conn = null;
             throw new DBException("Unable to connect : " + e.getMessage());
