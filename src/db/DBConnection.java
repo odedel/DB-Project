@@ -6,6 +6,7 @@ import main.data.Country;
 import java.sql.*;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 public class DBConnection {
 
@@ -51,7 +52,7 @@ public class DBConnection {
      * Upload countries to DB.
      * @throws DBException - Error while uploading data.
      */
-    public void uploadCountries(Collection<Country> countries) throws DBException {
+    public void uploadCountries(List<Country> countries) throws DBException {
         ResultSet rs = null;
         try (PreparedStatement pstmt = conn
                 .prepareStatement("INSERT INTO country(name, creation_date, economic_growth, poverty, population, unemployment, gini, influation, population_density) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)",
@@ -109,7 +110,7 @@ public class DBConnection {
      * Upload cities to DB.
      * @throws DBException - Error while uploading data.
      */
-    public void uploadCities(Collection<City> cities) throws DBException {
+    public void uploadCities(List<City> cities) throws DBException {
         ResultSet rs = null;
         try (PreparedStatement pstmt = conn
                 .prepareStatement("INSERT INTO city(name, country_id) VALUES(?, ?)",

@@ -6,6 +6,7 @@ import main.data.Country;
 import main.data.DataCollector;
 
 import java.util.Collection;
+import java.util.LinkedList;
 
 class Sample {
 
@@ -25,8 +26,8 @@ class Sample {
             System.out.println(String.format("Collected %d cities", cities.size()));
 
             System.out.println("Uploading ...");
-            connection.uploadCountries(countries);
-            connection.uploadCities(cities);
+            connection.uploadCountries(new LinkedList<>(countries));
+            connection.uploadCities(new LinkedList<>(cities));
             assert countries.size() == connection.getCountOfCountries();
         } catch (Exception e) {
             e.printStackTrace();
