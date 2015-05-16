@@ -58,7 +58,7 @@ public class DBConnection {
     public void uploadCountries(List<Country> countries) throws DBException {
         ResultSet rs = null;
         try (PreparedStatement pstmt = conn
-                .prepareStatement("INSERT INTO country(name, creation_date, economic_growth, poverty, population, unemployment, gini, influation, population_density) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                .prepareStatement("INSERT INTO country(name, creation_date, economic_growth, poverty, population, unemployment, gini, inflation, population_density) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)",
                         Statement.RETURN_GENERATED_KEYS);) {
 
             conn.setAutoCommit(false);
@@ -116,7 +116,8 @@ public class DBConnection {
     public void uploadCities(List<City> cities) throws DBException {
         ResultSet rs = null;
         try (PreparedStatement pstmt = conn
-                .prepareStatement("INSERT INTO city(name, country_id) VALUES(?, ?)",
+                .prepareStatement("INSERT INTO city(name, country_id, creation_date, economic_growth, poverty, population, unemployment, gini, inflation, population_density) " +
+                                "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                         Statement.RETURN_GENERATED_KEYS);) {
 
             conn.setAutoCommit(false);
@@ -129,6 +130,18 @@ public class DBConnection {
 //                }
                 pstmt.setString(1, city.name);
                 pstmt.setInt(2, city.country.id);
+                if (city.creationDate != null) {
+                    pstmt.setDate(3, Date.valueOf(city.creationDate));
+                } else {
+                    pstmt.setDate(3, null);
+                }
+                pstmt.setFloat(4, city.economicGrowth);
+                pstmt.setFloat(5, city.poverty);
+                pstmt.setLong(6, city.population);
+                pstmt.setFloat(7, city.unemployment);
+                pstmt.setFloat(8, city.gini);
+                pstmt.setFloat(9, city.inflation);
+                pstmt.setFloat(10, city.populationDensity);
                 pstmt.addBatch();
 
                 counter++;
