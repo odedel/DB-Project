@@ -42,7 +42,9 @@ public class DBConnection {
      */
     public void disconnect() {
         try {
-            conn.close();
+            if (!conn.isClosed()) {
+                conn.close();
+            }
             System.out.println("Connection closed!");
         } catch (SQLException e) {
         }
