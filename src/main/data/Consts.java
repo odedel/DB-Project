@@ -5,7 +5,7 @@ public class Consts {
 
     public static final String YAGO_LABELS_FILE = "yago\\yagoLabels.tsv";
 
-    public static final String YAGO_TYPES_FILE = "yago\\yagoTypes.tsv";
+    public static final String YAGO_TYPES_FILE = "yago\\yagoTransitiveType.tsv";
 
     public static final String YAGO_DATE_FACTS_FILE = "yago\\yagoDateFacts.tsv";
 
