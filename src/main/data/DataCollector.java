@@ -13,19 +13,19 @@ import static main.util.Utils.*;
 public class DataCollector {
     private Map<String, Country> countries = new HashMap<>();
     private Map<String, City> cities = new HashMap<>();
-    
+
     public void collectData() throws IOException {
         getIDs();
         getNames(countries, cities);
         getFacts(countries, cities);
     }
 
-    public Map<String, Country> getCountries() {
-        return countries;
+    public Collection<Country> getCountries() {
+        return countries.values();
     }
 
-    public Map<String, City> getCities() {
-        return cities;
+    public Collection<City> getCities() {
+        return cities.values();
     }
 
     private void getIDs() throws IOException {
