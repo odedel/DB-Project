@@ -10,25 +10,32 @@ import java.util.*;
 import static java.util.Collections.*;
 import static main.util.Utils.*;
 
-public class FactParser {
-    public static Map<String, Country> countries = new HashMap<>();
-    public static Map<String, City> cities = new HashMap<>();
-
-    public static Collection<Country> collectCountries() throws IOException {
+public class DataCollector {
+    private Map<String, Country> countries = new HashMap<>();
+    private Map<String, City> cities = new HashMap<>();
+    
+    public void collectData() throws IOException {
         getIDs();
         getNames(countries, cities);
         getFacts(countries, cities);
-        return countries.values();
     }
 
-    private static void getIDs() throws IOException {
+    public Map<String, Country> getCountries() {
+        return countries;
+    }
+
+    public Map<String, City> getCities() {
+        return cities;
+    }
+
+    private void getIDs() throws IOException {
         List<Callback> callbacks = new LinkedList<>();
         callbacks.add(getCountryIDsCallback());
         callbacks.add(getCityIDsCallback());
         Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(Consts.YAGO_TYPES_FILE, callbacks);
     }
 
-    private static Callback getCountryIDsCallback() {
+    private Callback getCountryIDsCallback() {
         return new Callback() {
             @Override
             public void reduce(Row row) {
@@ -37,12 +44,12 @@ public class FactParser {
 
             @Override
             public boolean map(Row row) {
-                return row.superEntity.equals("<wikicat_Countries>");
+                return row.superEntity.equals("<wordnet_country_108544813>");
             }
         };
     }
 
-    private static Callback getCityIDsCallback() {
+    private Callback getCityIDsCallback() {
         return new Callback() {
             @Override
             public void reduce(Row row) {
@@ -56,8 +63,7 @@ public class FactParser {
         };
     }
 
-    @SafeVarargs
-    private static void getNames(final Map<String, ? extends PopulatedRegion>... place_maps) throws IOException {
+    private void getNames(final Map<String, ? extends PopulatedRegion>... place_maps) throws IOException {
         List<Callback> callbacks = new LinkedList<>();
         for (final Map<String, ? extends PopulatedRegion> places : place_maps) {
             callbacks.add(new GenericCallback(places, ValueType.NAME, "skos:prefLabel", "name"));
@@ -65,8 +71,7 @@ public class FactParser {
         Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(Consts.YAGO_LABELS_FILE, callbacks);
     }
 
-    @SafeVarargs
-    private static void getFacts(final Map<String, ? extends PopulatedRegion>... place_maps) throws IOException {
+    private void getFacts(final Map<String, ? extends PopulatedRegion>... place_maps) throws IOException {
         String factFiles[] = new String[]{Consts.YAGO_DATE_FACTS_FILE, Consts.YAGO_FACTS_FILE, Consts.YAGO_LITERAL_FACTS_FILE,};
 
         List<Callback> callbacks = new LinkedList<>();
@@ -82,11 +87,11 @@ public class FactParser {
         }
     }
 
-    private static List<Callback> getCountryCallbacks(final Map<String, ? extends Country> places) {
+    private List<Callback> getCountryCallbacks(final Map<String, ? extends Country> places) {
         return singletonList(new GenericCallback(places, ValueType.STRING, "<hasTLD>", "tld"));
     }
 
-    private static List<Callback> getCityCallbacks(final Map<String, ? extends City> cities, Map<String, Country> countries) {
+    private List<Callback> getCityCallbacks(final Map<String, ? extends City> cities, Map<String, Country> countries) {
         return singletonList(new Callback() {
             @Override
             public void reduce(Row row) {
@@ -102,7 +107,7 @@ public class FactParser {
         });
     }
 
-    private static List<Callback> getCallbacks(final Map<String, ? extends PopulatedRegion> places) {
+    private List<Callback> getCallbacks(final Map<String, ? extends PopulatedRegion> places) {
         Callback _places = new Callback() {
             @Override
             public void reduce(Row row) {

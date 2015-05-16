@@ -1,12 +1,10 @@
 package main;
 
 import db.DBConnection;
-import main.data.City;
 import main.data.Country;
-import main.data.FactParser;
+import main.data.DataCollector;
 
 import java.util.Collection;
-import java.util.Map;
 
 class Sample {
 
@@ -18,7 +16,7 @@ class Sample {
             connection.deleteData();
             assert connection.getCountOfCountries() == 0;
 
-            Collection<Country> countries = FactParser.collectCountries();
+            Collection<Country> countries = DataCollector.collectData();
             System.out.println(String.format("Collected %d countries", countries.size()));
 
 //            for (Country c : countries.values()) {
