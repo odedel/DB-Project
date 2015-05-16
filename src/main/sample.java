@@ -1,6 +1,7 @@
 package main;
 
 import db.DBConnection;
+import main.data.City;
 import main.data.Country;
 import main.data.DataCollector;
 
@@ -19,13 +20,14 @@ class Sample {
             DataCollector dataCollector = new DataCollector();
             dataCollector.collectData();
             Collection<Country> countries = dataCollector.getCountries();
+            Collection<City> cities = dataCollector.getCities();
             System.out.println(String.format("Collected %d countries", countries.size()));
+            System.out.println(String.format("Collected %d cities", cities.size()));
 
-//            System.out.println("Uploading ...");
-
-            //connection.uploadCountries(countries.values());
-            //connection.uploadCities(cities.values());
-//            assert countries.size() == connection.getCountOfCountries();
+            System.out.println("Uploading ...");
+            connection.uploadCountries(countries);
+            connection.uploadCities(cities);
+            assert countries.size() == connection.getCountOfCountries();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

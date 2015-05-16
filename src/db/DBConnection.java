@@ -124,8 +124,7 @@ public class DBConnection {
 //                    pstmt.executeBatch();
 //                }
                 pstmt.setString(1, city.name);
-                //FIXME: this relation doesn't exist
-                //pstmt.setInt(2, city.country.id);
+                pstmt.setInt(2, city.country.id);
                 pstmt.addBatch();
 
                 counter++;

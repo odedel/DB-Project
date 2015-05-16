@@ -6,6 +6,7 @@ import main.util.Utils;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.*;
 import static main.util.Utils.*;
@@ -18,6 +19,8 @@ public class DataCollector {
         getIDs();
         getNames(countries, cities);
         getFacts(countries, cities);
+
+        deleteCitiesWithoutCountries();
     }
 
     public Collection<Country> getCountries() {
@@ -39,12 +42,12 @@ public class DataCollector {
         return new Callback() {
             @Override
             public void reduce(Row row) {
-                countries.put(parseName(row.entity), new Country());
+                countries.put((row.entity), new Country());
             }
 
             @Override
             public boolean map(Row row) {
-                return row.superEntity.equals("<wordnet_country_108544813>");
+                return row.superEntity.equals("<wikicat_Countries>");
             }
         };
     }
@@ -53,13 +56,13 @@ public class DataCollector {
         return new Callback() {
             @Override
             public void reduce(Row row) {
-                cities.put(parseName(row.entity), new City());
+                cities.put((row.entity), new City());
             }
 
             @Override
             public boolean map(Row row) {
-                return row.superEntity.startsWith("<wikicat_Cities");
-            }
+                return row.superEntity.startsWith("<wikicat_Capitals_in_Europe>");
+            }   // Should change this
         };
     }
 
@@ -95,14 +98,13 @@ public class DataCollector {
         return singletonList(new Callback() {
             @Override
             public void reduce(Row row) {
-                //Assignment is for a String and not an object since it will be put into the DB
-                cities.get(parseName(row.entity)).country = parseName(row.superEntity);
+                cities.get(row.entity).country = countries.get(row.superEntity);
             }
 
             @Override
             public boolean map(Row row) {
-                return row.relationType.equals("<isLocatedIn>") && cities.keySet().contains(parseName(row.entity)) &&
-                        countries.keySet().contains(parseName(row.superEntity));
+                return row.relationType.equals("<isLocatedIn>") && cities.containsKey(row.entity) &&
+                        countries.containsKey(row.superEntity);
             }
         });
     }
@@ -140,5 +142,14 @@ public class DataCollector {
         List<Callback> callbacks = new LinkedList<>();
         Collections.addAll(callbacks, c);
         return callbacks;
+    }
+
+    private void deleteCitiesWithoutCountries() {
+        List<String> citiesToRemove = new ArrayList<>();
+
+        citiesToRemove.addAll(cities.entrySet().stream().filter(entry -> entry.getValue().country == null).map(Map.Entry<String, City>::getKey).collect(Collectors.toList()));
+        citiesToRemove.forEach(cities::remove);
+
+        System.out.println(String.format("Deleted %d cities", citiesToRemove.size()));
     }
 }

@@ -33,7 +33,7 @@ public class GenericCallback extends Callback {
     @Override
     public void reduce(Row row) {
         try {
-            field.set(places.get(parseName(row.entity)), parseValue(row.superEntity, valueType));
+            field.set(places.get(row.entity), parseValue(row.superEntity, valueType));
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
@@ -41,6 +41,6 @@ public class GenericCallback extends Callback {
 
     @Override
     public boolean map(Row row) {
-        return row.relationType.equals(relationType) && places.keySet().contains(parseName(row.entity));
+        return row.relationType.equals(relationType) && places.keySet().contains(row.entity);
     }
 }
