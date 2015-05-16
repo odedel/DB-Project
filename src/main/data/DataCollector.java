@@ -61,7 +61,7 @@ public class DataCollector {
 
             @Override
             public boolean map(Row row) {
-                return row.superEntity.startsWith("<wikicat_Capitals_in_Europe>");
+                return row.superEntity.startsWith("<wordnet_city_108524735>");
             }   // Should change this
         };
     }
