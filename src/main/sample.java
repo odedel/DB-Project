@@ -7,6 +7,7 @@ import main.data.City;
 import main.data.Country;
 import main.data.DataCollector;
 
+import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -16,23 +17,16 @@ class Sample {
 
     public static void main(String args[]) throws IOException {
 
-        DataCollector dataCollector = new DataCollector();
-
-        dataCollector.collectData();
-
-//        DBConnection connection = new DBConnection();
-//        try {
-//            connection.connect(User.PLAYER);
-//
-//            Map<Integer, Country> countries = connection.getAllCountriesData();
-//            Map<Integer, City> cities = connection.getAllCitiesData(countries);
-//            assert countries.size() == connection.getCountOfCountries();
-//            assert cities.size() == connection.getCountOfCities();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        } finally {
-//            connection.disconnect();
-//        }
+        DBConnection connection = new DBConnection();
+        try {
+            DataCollector dataCollector = new DataCollector();
+            dataCollector.collectData();
+            System.out.println("Hi");
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            connection.disconnect();
+        }
     }
 
     public static void insertData(DBConnection connection) throws DBException, IOException {
@@ -52,5 +46,14 @@ class Sample {
         connection.uploadCountries(new LinkedList<>(countries));
         connection.uploadCities(new LinkedList<>(cities));
         assert countries.size() == connection.getCountOfCountries();
+    }
+
+    public static void queryData(DBConnection connection) throws DBException {
+        connection.connect(User.PLAYER);
+
+        Map<Integer, Country> countries = connection.getAllCountriesData();
+        Map<Integer, City> cities = connection.getAllCitiesData(countries);
+        assert countries.size() == connection.getCountOfCountries();
+        assert cities.size() == connection.getCountOfCities();
     }
 }

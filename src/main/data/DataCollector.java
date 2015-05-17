@@ -19,7 +19,7 @@ public class DataCollector {
     public void collectData() throws IOException {
         getIDs();
         getNames(countries, cities, politicians);
-        getFacts(countries, cities);
+        getFacts(politicians, countries, cities);
 
         deleteCitiesWithoutCountries();
     }
@@ -63,7 +63,7 @@ public class DataCollector {
 
             @Override
             public boolean map(Row row) {
-                return row.superEntity.startsWith("<wordnet_city_108524735>");
+                return row.superEntity.equals("<wordnet_city_108524735>");
             }
         };
     }
@@ -77,7 +77,7 @@ public class DataCollector {
 
             @Override
             public boolean map(Row row) {
-                return row.superEntity.startsWith("<wordnet_politician_110450303>");
+                return row.superEntity.equals("<wordnet_politician_110450303>");
             }
         };
     }
@@ -90,7 +90,7 @@ public class DataCollector {
         Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(Consts.YAGO_LABELS_FILE, callbacks);
     }
 
-    private void getFacts(final Map<String, ? extends PopulatedRegion>... place_maps) throws IOException {
+    private void getFacts(Map<String, Politician> politicians, final Map<String, ? extends PopulatedRegion>... place_maps) throws IOException {
         String factFiles[] = new String[]{Consts.YAGO_DATE_FACTS_FILE, Consts.YAGO_FACTS_FILE, Consts.YAGO_LITERAL_FACTS_FILE,};
 
         List<Callback> callbacks = new LinkedList<>();
@@ -100,6 +100,7 @@ public class DataCollector {
 
         callbacks.addAll(getCountryCallbacks(countries));
         callbacks.addAll(getCityCallbacks(cities, countries));
+        callbacks.addAll(getPoliticianCallback(politicians, cities, countries));
 
         for (String factFile : factFiles) {
             Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(factFile, callbacks);
@@ -108,6 +109,62 @@ public class DataCollector {
 
     private List<Callback> getCountryCallbacks(final Map<String, ? extends Country> places) {
         return singletonList(new GenericCallback(places, ValueType.STRING, "<hasTLD>", "tld"));
+    }
+
+    private List<Callback> getPoliticianCallback(Map<String, Politician> politicians, Map<String, City> cities, Map<String, Country> countries) {
+        Callback bornInCallback = new Callback() {
+            @Override
+            public void reduce(Row row) {
+                politicians.get(row.entity).birthCity = cities.get(row.superEntity);
+            }
+
+            @Override
+            public boolean map(Row row) {
+                return row.relationType.equals("<wasBornIn>") && politicians.containsKey(row.entity) && cities.containsKey(row.superEntity);
+            }
+        };
+
+        Callback diedInCallback = new Callback() {
+            @Override
+            public void reduce(Row row) {
+                politicians.get(row.entity).deathCity = cities.get(row.superEntity);
+            }
+
+            @Override
+            public boolean map(Row row) {
+                return row.relationType.equals("<diedIn>") && politicians.containsKey(row.entity) && cities.containsKey(row.superEntity);
+            }
+        };
+
+        Callback politicianOfCountriesCallback = new Callback() {
+            @Override
+            public void reduce(Row row) {
+                politicians.get(row.entity).politicianOfCountries.add(countries.get(row.superEntity));
+            }
+
+            @Override
+            public boolean map(Row row) {
+                return row.relationType.equals("<isPoliticianOf>") && politicians.containsKey(row.entity) && countries.containsKey(row.superEntity);
+            }
+        };
+
+        Callback politicianOfCitiesCallback = new Callback() {
+            @Override
+            public void reduce(Row row) {
+                politicians.get(row.entity).politicianOfCities.add(cities.get(row.superEntity));
+            }
+
+            @Override
+            public boolean map(Row row) {
+                return row.relationType.equals("<isPoliticianOf>") && politicians.containsKey(row.entity) && cities.containsKey(row.superEntity);
+            }
+        };
+
+        List<Callback> callbackList = new LinkedList<>();
+        Callback[] callbacks = new Callback[] {bornInCallback, diedInCallback,
+                politicianOfCountriesCallback, politicianOfCitiesCallback};
+        Collections.addAll(callbackList, callbacks);
+        return callbackList;
     }
 
     private List<Callback> getCityCallbacks(final Map<String, ? extends City> cities, Map<String, Country> countries) {
@@ -129,12 +186,12 @@ public class DataCollector {
         Callback _places = new Callback() {
             @Override
             public void reduce(Row row) {
-                places.get(parseName(row.superEntity)).places.add(parseName(row.entity));
+                places.get(parseName(row.superEntity)).places.add(row.entity);
             }
 
             @Override
             public boolean map(Row row) {
-                return row.relationType.equals("<isLocatedIn>") && places.keySet().contains(parseName(row.superEntity));
+                return row.relationType.equals("<isLocatedIn>") && places.containsKey(row.superEntity);
             }
         };
 
