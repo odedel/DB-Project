@@ -2,46 +2,55 @@ package main;
 
 import db.DBConnection;
 import db.DBException;
+import db.User;
 import main.data.City;
-import main.data.CityData;
 import main.data.Country;
-import main.data.CountryData;
+import main.data.DataCollector;
 
+import java.io.IOException;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 class Sample {
 
-    public static void main(String args[]) {
-        DBConnection connection = new DBConnection();
-        try {
-            connection.connect();
+    public static void main(String args[]) throws IOException {
 
-            connection.deleteData();
-            assert connection.getCountOfCountries() == 0;
+        DataCollector dataCollector = new DataCollector();
 
-            Map<String, Country> countries = CountryData.collectCountries();
-            System.out.println(String.format("Collected %d countries", countries.size()));
+        dataCollector.collectData();
 
-            Map<String, City> cities = CityData.collectCities(countries);
-            System.out.println(String.format("Collected %d cities", cities.size()));
+//        DBConnection connection = new DBConnection();
+//        try {
+//            connection.connect(User.PLAYER);
+//
+//            Map<Integer, Country> countries = connection.getAllCountriesData();
+//            Map<Integer, City> cities = connection.getAllCitiesData(countries);
+//            assert countries.size() == connection.getCountOfCountries();
+//            assert cities.size() == connection.getCountOfCities();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        } finally {
+//            connection.disconnect();
+//        }
+    }
 
-            for (City c : cities.values()) {
-                if (c.country == null || c.country.id == 0) {
-                    assert false;
-                }
-            }
+    public static void insertData(DBConnection connection) throws DBException, IOException {
+        connection.connect(User.MODIFIER);
 
-            System.out.println("Uploading ...");
+        connection.deleteData();
+        assert connection.getCountOfCountries() == 0;
 
-            connection.uploadCountries(countries.values());
-            connection.uploadCities(cities.values());
-            assert countries.size() == connection.getCountOfCountries();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            connection.disconnect();
-        }
+        DataCollector dataCollector = new DataCollector();
+        dataCollector.collectData();
+        Collection<Country> countries = dataCollector.getCountries();
+        Collection<City> cities = dataCollector.getCities();
+        System.out.println(String.format("Collected %d countries", countries.size()));
+        System.out.println(String.format("Collected %d cities", cities.size()));
+
+        System.out.println("Uploading ...");
+        connection.uploadCountries(new LinkedList<>(countries));
+        connection.uploadCities(new LinkedList<>(cities));
+        assert countries.size() == connection.getCountOfCountries();
     }
 }
