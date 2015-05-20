@@ -12,6 +12,7 @@ import static java.util.Collections.*;
 import static main.util.Utils.*;
 
 public class DataCollector {
+
     private Map<String, Country> countries = new HashMap<>();
     private Map<String, City> cities = new HashMap<>();
     private Map<String, Politician> politicians = new HashMap<>();
@@ -21,7 +22,8 @@ public class DataCollector {
         getNames(countries, cities, politicians);
         getFacts(politicians, countries, cities);
 
-        deleteCitiesWithoutCountries();
+        postCitiesProcessor();
+        postPoliticiansProcessor();
     }
 
     public Collection<Country> getCountries() {
@@ -32,11 +34,17 @@ public class DataCollector {
         return cities.values();
     }
 
+    public Collection<Politician> getPoliticians() {
+        return politicians.values();
+    }
+
     private void getIDs() throws IOException {
         List<Callback> callbacks = new LinkedList<>();
         callbacks.add(getCountryIDsCallback());
+
         callbacks.add(getCityIDsCallback());
         callbacks.add(getPoliticianIDsCallback());
+
         Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(Consts.YAGO_TYPES_FILE, callbacks);
     }
 
@@ -139,7 +147,7 @@ public class DataCollector {
         Callback politicianOfCountriesCallback = new Callback() {
             @Override
             public void reduce(Row row) {
-                politicians.get(row.entity).politicianOfCountries.add(countries.get(row.superEntity));
+                politicians.get(row.entity).countries.add(countries.get(row.superEntity));
             }
 
             @Override
@@ -148,21 +156,12 @@ public class DataCollector {
             }
         };
 
-        Callback politicianOfCitiesCallback = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                politicians.get(row.entity).politicianOfCities.add(cities.get(row.superEntity));
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<isPoliticianOf>") && politicians.containsKey(row.entity) && cities.containsKey(row.superEntity);
-            }
-        };
-
         List<Callback> callbackList = new LinkedList<>();
         Callback[] callbacks = new Callback[] {bornInCallback, diedInCallback,
-                politicianOfCountriesCallback, politicianOfCitiesCallback};
+                politicianOfCountriesCallback,
+                new GenericCallback(politicians, ValueType.DATE,  "<diedOnDate>",     "deathDate"),
+                new GenericCallback(politicians, ValueType.DATE,  "<wasBornOnDate>",     "birthDate"),
+        };
         Collections.addAll(callbackList, callbacks);
         return callbackList;
     }
@@ -211,18 +210,41 @@ public class DataCollector {
                 new GenericCallback(places, ValueType.FLOAT, "<hasGDP>",               "gdp"),
                 new GenericCallback(places, ValueType.FLOAT, "<hasInflation>",         "inflation"),
                 new GenericCallback(places, ValueType.FLOAT, "<hasPopulationDensity>", "populationDensity"),
+
         };
         List<Callback> callbacks = new LinkedList<>();
         Collections.addAll(callbacks, c);
         return callbacks;
     }
 
-    private void deleteCitiesWithoutCountries() {
+    private void postCitiesProcessor() {
         List<String> citiesToRemove = new ArrayList<>();
 
         citiesToRemove.addAll(cities.entrySet().stream().filter(entry -> entry.getValue().country == null).map(Map.Entry<String, City>::getKey).collect(Collectors.toList()));
         citiesToRemove.forEach(cities::remove);
 
         System.out.println(String.format("Deleted %d cities", citiesToRemove.size()));
+    }
+
+    private void postPoliticiansProcessor() {
+        List<String> politiciansToRemove = new ArrayList<>();
+
+        for (Map.Entry<String, Politician> politicianEntry: politicians.entrySet()) {
+            if (politicianEntry.getValue().countries.isEmpty()) {
+                politiciansToRemove.add(politicianEntry.getKey());
+            }
+            if (politicianEntry.getValue().birthCity != null &&
+                    !cities.containsKey(politicianEntry.getValue().birthCity.name)) {
+                politicianEntry.getValue().birthCity = null;
+            }
+            if (politicianEntry.getValue().deathCity != null &&
+                     !cities.containsKey(politicianEntry.getValue().deathCity.name)) {
+                politicianEntry.getValue().deathCity = null;
+            }
+        }
+
+        politiciansToRemove.forEach(politicians::remove);
+
+        System.out.println(String.format("Deleted %d politicians", politiciansToRemove.size()));
     }
 }

@@ -2,10 +2,10 @@ package db;
 
 import main.data.City;
 import main.data.Country;
+import main.data.Politician;
 
 import java.sql.*;
 import java.sql.Date;
-import java.time.LocalDate;
 import java.util.*;
 
 public class DBConnection {
@@ -166,6 +166,107 @@ public class DBConnection {
                 } catch (SQLException e) {
                     throw new DBException("Error while uploading countries to DB : " + e.getMessage());
                 }
+        }
+    }
+
+    // TODO: is it OK that we are not insert the relation in the same transaction?
+    public void uploadPoliticians(List<Politician> politicians) throws DBException {
+        uploadPoliticiansEntities(politicians);
+        uploadPoliticianCountryRelation(politicians);
+    }
+
+    private void uploadPoliticiansEntities(List<Politician> politicians) throws DBException {
+        ResultSet rs = null;
+        try (PreparedStatement pstmt = conn
+                .prepareStatement("INSERT INTO politician(name, birth_city_id, birth_date, death_city_id, death_date) " +
+                                "VALUES(?, ?, ?, ?, ?)",
+                        Statement.RETURN_GENERATED_KEYS);) {
+
+            conn.setAutoCommit(false);
+
+            int counter = 0;
+            for (Politician politician : politicians) {
+//                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
+//                                                        //  think if you want that, if so - add the generated keys
+//                    pstmt.executeBatch();
+//                }
+                pstmt.setString(1, politician.name);
+
+                if (politician.birthCity != null) {
+                    pstmt.setInt(2, politician.birthCity.id);
+                } else {
+                    pstmt.setNull(2, java.sql.Types.INTEGER);
+                }
+                if (politician.birthDate != null) {
+                    pstmt.setDate(3, Date.valueOf(politician.birthDate));
+                } else {
+                    pstmt.setDate(3, null);
+                }
+
+                if (politician.deathCity != null) {
+                    pstmt.setInt(4, politician.deathCity.id);
+                } else {
+                    pstmt.setNull(4, java.sql.Types.INTEGER);
+                }
+                if (politician.deathDate != null) {
+                    pstmt.setDate(5, Date.valueOf(politician.deathDate));
+                } else {
+                    pstmt.setDate(5, null);
+                }
+
+                pstmt.addBatch();
+                counter++;
+            }
+            pstmt.executeBatch();
+
+            rs = pstmt.getGeneratedKeys();
+            Iterator<Politician> politicianIterator = politicians.iterator();
+            while (rs.next()) {
+                politicianIterator.next().id = rs.getInt(1);
+            }
+
+            conn.commit();
+
+        } catch (SQLException e) {
+            throw new DBException("Error while uploading politicians to DB : " + e.getMessage());
+        } finally {
+            safelySetAutoCommit();
+            if (rs != null)
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    throw new DBException("Error while uploading politicians to DB : " + e.getMessage());
+                }
+        }
+    }
+
+    private void uploadPoliticianCountryRelation(List<Politician> politicians) throws DBException {
+        try (PreparedStatement pstmt = conn
+                .prepareStatement("INSERT INTO Politician_Country_Relation(country_id, politician_id) " +
+                                "VALUES(?, ?)")) {
+
+            conn.setAutoCommit(false);
+
+            int counter = 0;
+            for (Politician politician : politicians) {
+//                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
+//                                                        //  think if you want that, if so - add the generated keys
+//                    pstmt.executeBatch();
+//                }
+                for (Country country : politician.countries) {
+                    pstmt.setInt(1, country.id);
+                    pstmt.setInt(2, politician.id);
+                    pstmt.addBatch();
+                }
+                counter++;
+            }
+
+            pstmt.executeBatch();
+            conn.commit();
+        } catch (SQLException e) {
+            throw new DBException("Error while uploading politicians to DB : " + e.getMessage());
+        } finally {
+            safelySetAutoCommit();
         }
     }
 
