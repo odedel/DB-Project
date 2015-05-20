@@ -3,6 +3,7 @@ package db;
 import main.data.City;
 import main.data.Country;
 import main.data.Politician;
+import main.data.University;
 
 import java.sql.*;
 import java.sql.Date;
@@ -169,10 +170,127 @@ public class DBConnection {
         }
     }
 
+    // TODO: One transaction?
+    public void uploadUniversities(List<University> universities) throws DBException {
+        uploadUniversitiesEntities(universities);
+        uploadUniversityCountryRelation(universities);
+        uploadUniversityCityRelation(universities);
+    }
+
+    private void uploadUniversitiesEntities(List<University> universities) throws DBException {
+        ResultSet rs = null;
+        try (PreparedStatement pstmt = conn
+                .prepareStatement("INSERT INTO university(name, creation_date) " +
+                                "VALUES(?, ?)",
+                        Statement.RETURN_GENERATED_KEYS);) {
+
+            conn.setAutoCommit(false);
+
+            int counter = 0;
+            for (University university : universities) {
+//                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
+//                                                        //  think if you want that, if so - add the generated keys
+//                    pstmt.executeBatch();
+//                }
+                pstmt.setString(1, university.name);
+
+                if (university.creationDate != null) {
+                    pstmt.setDate(2, Date.valueOf(university.creationDate));
+                } else {
+                    pstmt.setDate(2, null);
+                }
+
+                pstmt.addBatch();
+                counter++;
+            }
+            pstmt.executeBatch();
+
+            rs = pstmt.getGeneratedKeys();
+            Iterator<University> universityIterator = universities.iterator();
+            while (rs.next()) {
+                universityIterator.next().id = rs.getInt(1);
+            }
+
+            conn.commit();
+
+        } catch (SQLException e) {
+            throw new DBException("Error while uploading universities to DB : " + e.getMessage());
+        } finally {
+            safelySetAutoCommit();
+            if (rs != null)
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    throw new DBException("Error while uploading universities to DB : " + e.getMessage());
+                }
+        }
+    }
+
+    private void uploadUniversityCountryRelation(List<University> universities) throws DBException {
+        try (PreparedStatement pstmt = conn
+                .prepareStatement("INSERT INTO University_Country_Relation(university_id, country_id) " +
+                        "VALUES(?, ?)")) {
+
+            conn.setAutoCommit(false);
+
+            int counter = 0;
+            for (University university : universities) {
+//                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
+//                                                        //  think if you want that, if so - add the generated keys
+//                    pstmt.executeBatch();
+//                }
+                for (Country country : university.countries) {
+                    pstmt.setInt(1, university.id);
+                    pstmt.setInt(2, country.id);
+                    pstmt.addBatch();
+                }
+                counter++;
+            }
+
+            pstmt.executeBatch();
+            conn.commit();
+        } catch (SQLException e) {
+            throw new DBException("Error while uploading politicians to DB : " + e.getMessage());
+        } finally {
+            safelySetAutoCommit();
+        }
+    }
+
+    private void uploadUniversityCityRelation(List<University> universities) throws DBException {
+        try (PreparedStatement pstmt = conn
+                .prepareStatement("INSERT INTO University_City_Relation(university_id, city_id) " +
+                        "VALUES(?, ?)")) {
+
+            conn.setAutoCommit(false);
+
+            int counter = 0;
+            for (University university : universities) {
+//                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
+//                                                        //  think if you want that, if so - add the generated keys
+//                    pstmt.executeBatch();
+//                }
+                for (City city : university.cities) {
+                    pstmt.setInt(1, university.id);
+                    pstmt.setInt(2, city.id);
+                    pstmt.addBatch();
+                }
+                counter++;
+            }
+
+            pstmt.executeBatch();
+            conn.commit();
+        } catch (SQLException e) {
+            throw new DBException("Error while uploading politicians to DB : " + e.getMessage());
+        } finally {
+            safelySetAutoCommit();
+        }
+    }
+
     // TODO: is it OK that we are not insert the relation in the same transaction?
     public void uploadPoliticians(List<Politician> politicians) throws DBException {
         uploadPoliticiansEntities(politicians);
         uploadPoliticianCountryRelation(politicians);
+        uploadPoliticianUniversityRelation(politicians);
     }
 
     private void uploadPoliticiansEntities(List<Politician> politicians) throws DBException {
@@ -256,6 +374,36 @@ public class DBConnection {
                 for (Country country : politician.countries) {
                     pstmt.setInt(1, country.id);
                     pstmt.setInt(2, politician.id);
+                    pstmt.addBatch();
+                }
+                counter++;
+            }
+
+            pstmt.executeBatch();
+            conn.commit();
+        } catch (SQLException e) {
+            throw new DBException("Error while uploading politicians to DB : " + e.getMessage());
+        } finally {
+            safelySetAutoCommit();
+        }
+    }
+
+    private void uploadPoliticianUniversityRelation(List<Politician> politicians) throws DBException {
+        try (PreparedStatement pstmt = conn
+                .prepareStatement("INSERT INTO University_Politician_Relation(politician_id, university_id) " +
+                        "VALUES(?, ?)")) {
+
+            conn.setAutoCommit(false);
+
+            int counter = 0;
+            for (Politician politician : politicians) {
+//                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
+//                                                        //  think if you want that, if so - add the generated keys
+//                    pstmt.executeBatch();
+//                }
+                for (University university : politician.universities) {
+                    pstmt.setInt(1, politician.id);
+                    pstmt.setInt(2, university.id);
                     pstmt.addBatch();
                 }
                 counter++;
@@ -362,6 +510,9 @@ public class DBConnection {
      */
     public void deleteData() throws DBException {
         try (Statement stmt = conn.createStatement()) {
+            stmt.executeUpdate("DELETE FROM UNIVERSITY");
+            stmt.executeUpdate("DELETE FROM CITY");
+            stmt.executeUpdate("DELETE FROM POLITICIAN");
             stmt.executeUpdate("DELETE FROM country");
         } catch (SQLException e) {
             throw new DBException("Error while deleting data from country : " + e.getMessage());

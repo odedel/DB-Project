@@ -3,10 +3,7 @@ package main;
 import db.DBConnection;
 import db.DBException;
 import db.User;
-import main.data.City;
-import main.data.Country;
-import main.data.DataCollector;
-import main.data.Politician;
+import main.data.*;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -37,17 +34,20 @@ class Sample {
         dataCollector.collectData();
         Collection<Country> countries = dataCollector.getCountries();
         Collection<City> cities = dataCollector.getCities();
+        Collection<University> universities = dataCollector.getUniversities();
         Collection<Politician> politicians = dataCollector.getPoliticians();
 
         System.out.println();
         System.out.println(String.format("Collected %d countries", countries.size()));
         System.out.println(String.format("Collected %d cities", cities.size()));
+        System.out.println(String.format("Collected %d universities", universities.size()));
         System.out.println(String.format("Collected %d politicians", politicians.size()));
 
         System.out.println("Uploading ...");
 
         connection.uploadCountries(new LinkedList<>(countries));
         connection.uploadCities(new LinkedList<>(cities));
+        connection.uploadUniversities(new LinkedList<>(universities));
         connection.uploadPoliticians(new LinkedList<>(politicians));
     }
 
