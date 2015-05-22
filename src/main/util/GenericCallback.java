@@ -44,12 +44,9 @@ public class GenericCallback extends Callback {
         Class<?> collectionClass = Collection.class;
         try {
             field = clazz.getField(keyName);
-            Method[] methods = collectionClass.getMethods();
             collectionAdd = collectionClass.getMethod("add", Object.class);
-        } catch (NoSuchFieldException e) {
+        } catch (NoSuchFieldException|NoSuchMethodException e) {
             throw new RuntimeException(e);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
         }
     }
 
