@@ -61,13 +61,13 @@ public class DataCollector {
     private void getIDs() throws IOException {
         List<Callback> callbacks = new LinkedList<>();
         Callback[] c = new Callback[]{
-                new GenericEntityCallback<>(artifacts, Artifact.class, "<wordnet_artifact"),
-                new GenericEntityCallback<>(creators, Creator.class, "<wordnet_creator"),
-                new GenericEntityCallback<>(businesses, Business.class, "<wordnet_business"),
-                new GenericEntityCallback<>(countries, Country.class, "<wikicat_Countries"),
-                new GenericEntityCallback<>(cities, City.class, "<wikicat_Cities"),
-                new GenericEntityCallback<>(politicians, Politician.class, "<wordnet_politician"),
-                new GenericEntityCallback<>(universities, University.class, "<wordnet_university"),
+                new GenericEntityCallback<>(artifacts,      Artifact.class,     "<wordnet_artifact"),
+                new GenericEntityCallback<>(creators,       Creator.class,      "<wordnet_creator"),
+                new GenericEntityCallback<>(businesses,     Business.class,     "<wordnet_business"),
+                new GenericEntityCallback<>(countries,      Country.class,      "<wikicat_Countries"),
+                new GenericEntityCallback<>(cities,         City.class,         "<wikicat_Cities"),
+                new GenericEntityCallback<>(politicians,    Politician.class,   "<wordnet_politician"),
+                new GenericEntityCallback<>(universities,   University.class,   "<wordnet_university"),
         };
         Collections.addAll(callbacks, c);
         //FIXME: do we need to use the other attributes file?
