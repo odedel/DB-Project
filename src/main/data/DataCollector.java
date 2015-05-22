@@ -19,7 +19,9 @@ public class DataCollector {
     public void collectData() throws IOException {
         getIDs();
         getNames( countries, cities);
+        //noinspection unchecked
         getNames(artifacts, creators, businesses, countries, cities, politicians, universities);
+        //noinspection unchecked
         getFacts(countries, cities);
 
         postCitiesProcessor();
@@ -75,7 +77,8 @@ public class DataCollector {
     }
 
 
-    private void getNames(final Map<String, ? extends Entity>... entities_maps) throws IOException {
+    @SafeVarargs
+    private final void getNames(final Map<String, ? extends Entity>... entities_maps) throws IOException {
         List<Callback> callbacks = new LinkedList<>();
         for (final Map<String, ? extends Entity> entities : entities_maps) {
             callbacks.add(new GenericCallback(entities, ValueType.NAME, "skos:prefLabel", "name"));
@@ -83,7 +86,8 @@ public class DataCollector {
         Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(Consts.YAGO_LABELS_FILE, callbacks);
     }
 
-    private void getFacts(final Map<String, ? extends PopulatedRegion>... place_maps) throws IOException {
+    @SafeVarargs
+    private final void getFacts(final Map<String, ? extends PopulatedRegion>... place_maps) throws IOException {
         String factFiles[] = new String[]{Consts.YAGO_DATE_FACTS_FILE, Consts.YAGO_FACTS_FILE, Consts.YAGO_LITERAL_FACTS_FILE,};
 
         List<Callback> callbacks = new LinkedList<>();
