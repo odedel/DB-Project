@@ -1,9 +1,6 @@
 package db;
 
-import main.data.City;
-import main.data.Country;
-import main.data.Politician;
-import main.data.University;
+import main.data.*;
 
 import java.sql.*;
 import java.sql.Date;
@@ -418,6 +415,370 @@ public class DBConnection {
         }
     }
 
+    // TODO: one transaction?
+    public void uploadCreators(List<Creator> creators) throws DBException {
+        uploadCreatorsEntity(creators);
+        uploadCreatorUniversityRelation(creators);
+        uploadBusinessCreatorRelation(creators);
+    }
+
+    private void uploadCreatorsEntity(List<Creator> creators) throws DBException {
+        ResultSet rs = null;
+        try (PreparedStatement pstmt = conn
+                .prepareStatement("INSERT INTO creator(name, birth_city_id, birth_date, death_city_id, death_date) " +
+                                "VALUES(?, ?, ?, ?, ?)",
+                        Statement.RETURN_GENERATED_KEYS);) {
+
+            conn.setAutoCommit(false);
+
+            int counter = 0;
+            for (Creator creator : creators) {
+//                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
+//                                                        //  think if you want that, if so - add the generated keys
+//                    pstmt.executeBatch();
+//                }
+                pstmt.setString(1, creator.name);
+
+                if (creator.birthCity != null) {
+                    pstmt.setInt(2, creator.birthCity.id);
+                } else {
+                    pstmt.setNull(2, java.sql.Types.INTEGER);
+                }
+                if (creator.birthDate != null) {
+                    pstmt.setDate(3, Date.valueOf(creator.birthDate));
+                } else {
+                    pstmt.setDate(3, null);
+                }
+
+                if (creator.deathCity != null) {
+                    pstmt.setInt(4, creator.deathCity.id);
+                } else {
+                    pstmt.setNull(4, java.sql.Types.INTEGER);
+                }
+                if (creator.deathDate != null) {
+                    pstmt.setDate(5, Date.valueOf(creator.deathDate));
+                } else {
+                    pstmt.setDate(5, null);
+                }
+
+                pstmt.addBatch();
+                counter++;
+            }
+            pstmt.executeBatch();
+
+            rs = pstmt.getGeneratedKeys();
+            Iterator<Creator> creatorIterator = creators.iterator();
+            while (rs.next()) {
+                creatorIterator.next().id = rs.getInt(1);
+            }
+
+            conn.commit();
+
+        } catch (SQLException e) {
+            throw new DBException("Error while uploading creators to DB : " + e.getMessage());
+        } finally {
+            safelySetAutoCommit();
+            if (rs != null)
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    throw new DBException("Error while uploading creators to DB : " + e.getMessage());
+                }
+        }
+    }
+
+    private void uploadCreatorUniversityRelation(List<Creator> creators) throws DBException {
+        try (PreparedStatement pstmt = conn
+                .prepareStatement("INSERT INTO University_Creator_Relation(creator_id, university_id) " +
+                        "VALUES(?, ?)")) {
+
+            conn.setAutoCommit(false);
+
+            int counter = 0;
+            for (Creator creator : creators) {
+//                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
+//                                                        //  think if you want that, if so - add the generated keys
+//                    pstmt.executeBatch();
+//                }
+                for (University university : creator.universities) {
+                    pstmt.setInt(1, creator.id);
+                    pstmt.setInt(2, university.id);
+                    pstmt.addBatch();
+                }
+                counter++;
+            }
+
+            pstmt.executeBatch();
+            conn.commit();
+        } catch (SQLException e) {
+            throw new DBException("Error while uploading creators to DB : " + e.getMessage());
+        } finally {
+            safelySetAutoCommit();
+        }
+    }
+
+    private void uploadBusinessCreatorRelation(List<Creator> creators) throws DBException {
+        try (PreparedStatement pstmt = conn
+                .prepareStatement("INSERT INTO Business_Creator_Relation(creator_id, business_id) " +
+                        "VALUES(?, ?)")) {
+
+            conn.setAutoCommit(false);
+
+            int counter = 0;
+            for (Creator creator : creators) {
+//                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
+//                                                        //  think if you want that, if so - add the generated keys
+//                    pstmt.executeBatch();
+//                }
+                for (Business business : creator.businesses) {
+                    pstmt.setInt(1, creator.id);
+                    pstmt.setInt(2, business.id);
+                    pstmt.addBatch();
+                }
+                counter++;
+            }
+
+            pstmt.executeBatch();
+            conn.commit();
+        } catch (SQLException e) {
+            throw new DBException("Error while uploading creators to DB : " + e.getMessage());
+        } finally {
+            safelySetAutoCommit();
+        }
+    }
+
+    private void uploadArtifactCreatorRelation(List<Artifact> artifacts) throws DBException {
+        try (PreparedStatement pstmt = conn
+                .prepareStatement("INSERT INTO Artifact_Creator_Relation(creator_id, artifact_id) " +
+                        "VALUES(?, ?)")) {
+
+            conn.setAutoCommit(false);
+
+            int counter = 0;
+            for (Artifact artifact : artifacts) {
+//                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
+//                                                        //  think if you want that, if so - add the generated keys
+//                    pstmt.executeBatch();
+//                }
+                for (Creator creator : artifact.creators) {
+                    pstmt.setInt(1, creator.id);
+                    pstmt.setInt(2, artifact.id);
+                    pstmt.addBatch();
+                }
+                counter++;
+            }
+
+            pstmt.executeBatch();
+            conn.commit();
+        } catch (SQLException e) {
+            throw new DBException("Error while uploading creators to DB : " + e.getMessage());
+        } finally {
+            safelySetAutoCommit();
+        }
+    }
+
+    public void uploadBusinesses(List<Business> businesses) throws DBException {
+        uploadBusinessesEntity(businesses);
+        uploadBusinessCityRelation(businesses);
+        uploadBusinessCountryRelation(businesses);
+    }
+
+    private void uploadBusinessesEntity(List<Business> businesses) throws DBException {
+        ResultSet rs = null;
+        try (PreparedStatement pstmt = conn
+                .prepareStatement("INSERT INTO business(name, creation_date, number_of_employees) " +
+                                "VALUES(?, ?, ?)",
+                        Statement.RETURN_GENERATED_KEYS);) {
+
+            conn.setAutoCommit(false);
+
+            int counter = 0;
+            for (Business business : businesses) {
+//                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
+//                                                        //  think if you want that, if so - add the generated keys
+//                    pstmt.executeBatch();
+//                }
+                pstmt.setString(1, business.name);
+
+                if (business.creationDate != null) {
+                    pstmt.setDate(2, Date.valueOf(business.creationDate));
+                } else {
+                    pstmt.setDate(2, null);
+                }
+
+                pstmt.setLong(3, business.numberOfEmployees);
+
+                pstmt.addBatch();
+                counter++;
+            }
+            pstmt.executeBatch();
+
+            rs = pstmt.getGeneratedKeys();
+            Iterator<Business> businessIterator = businesses.iterator();
+            while (rs.next()) {
+                businessIterator.next().id = rs.getInt(1);
+            }
+
+            conn.commit();
+
+        } catch (SQLException e) {
+            throw new DBException("Error while uploading creators to DB : " + e.getMessage());
+        } finally {
+            safelySetAutoCommit();
+            if (rs != null)
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    throw new DBException("Error while uploading creators to DB : " + e.getMessage());
+                }
+        }
+    }
+
+    private void uploadBusinessCityRelation(List<Business> businesses) throws DBException {
+        try (PreparedStatement pstmt = conn
+                .prepareStatement("INSERT INTO Business_City_Relation(business_id, city_id) " +
+                        "VALUES(?, ?)")) {
+
+            conn.setAutoCommit(false);
+
+            int counter = 0;
+            for (Business business : businesses) {
+//                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
+//                                                        //  think if you want that, if so - add the generated keys
+//                    pstmt.executeBatch();
+//                }
+                for (City city : business.cities) {
+                    pstmt.setInt(1, business.id);
+                    pstmt.setInt(2, city.id);
+                    pstmt.addBatch();
+                }
+                counter++;
+            }
+
+            pstmt.executeBatch();
+            conn.commit();
+        } catch (SQLException e) {
+            throw new DBException("Error while uploading businesses to DB : " + e.getMessage());
+        } finally {
+            safelySetAutoCommit();
+        }
+    }
+
+    private void uploadBusinessCountryRelation(List<Business> businesses) throws DBException {
+        try (PreparedStatement pstmt = conn
+                .prepareStatement("INSERT INTO Business_Country_Relation(country_id, business_id) " +
+                        "VALUES(?, ?)")) {
+
+            conn.setAutoCommit(false);
+
+            int counter = 0;
+            for (Business business : businesses) {
+//                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
+//                                                        //  think if you want that, if so - add the generated keys
+//                    pstmt.executeBatch();
+//                }
+                for (Country country : business.countries) {
+                    pstmt.setInt(1, country.id);
+                    pstmt.setInt(2, business.id);
+                    pstmt.addBatch();
+                }
+                counter++;
+            }
+
+            pstmt.executeBatch();
+            conn.commit();
+        } catch (SQLException e) {
+            throw new DBException("Error while uploading creators to DB : " + e.getMessage());
+        } finally {
+            safelySetAutoCommit();
+        }
+    }
+
+    private void uploadBusinessArtifactRelation(List<Artifact> artifacts) throws DBException {
+        try (PreparedStatement pstmt = conn
+                .prepareStatement("INSERT INTO Business_Artifact_Relation(business_id, artifact_id) " +
+                        "VALUES(?, ?)")) {
+
+            conn.setAutoCommit(false);
+
+            int counter = 0;
+            for (Artifact artifact : artifacts) {
+//                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
+//                                                        //  think if you want that, if so - add the generated keys
+//                    pstmt.executeBatch();
+//                }
+                for (Business business : artifact.businesses) {
+                    pstmt.setInt(1, business.id);
+                    pstmt.setInt(2, artifact.id);
+                    pstmt.addBatch();
+                }
+                counter++;
+            }
+
+            pstmt.executeBatch();
+            conn.commit();
+        } catch (SQLException e) {
+            throw new DBException("Error while uploading businesses to DB : " + e.getMessage());
+        } finally {
+            safelySetAutoCommit();
+        }
+    }
+
+    public void uploadArtifacts(List<Artifact> artifacts) throws DBException {
+        uploadArtifactsEntity(artifacts);
+        uploadArtifactCreatorRelation(artifacts);
+        uploadBusinessArtifactRelation(artifacts);
+    }
+
+    private void uploadArtifactsEntity(List<Artifact> artifacts) throws DBException {
+        ResultSet rs = null;
+        try (PreparedStatement pstmt = conn
+                .prepareStatement("INSERT INTO artifact(name, creation_date) " +
+                                "VALUES(?, ?)",
+                        Statement.RETURN_GENERATED_KEYS);) {
+
+            conn.setAutoCommit(false);
+
+            int counter = 0;
+            for (Artifact artifact : artifacts) {
+//                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
+//                                                        //  think if you want that, if so - add the generated keys
+//                    pstmt.executeBatch();
+//                }
+                pstmt.setString(1, artifact.name);
+
+                if (artifact.creationDate != null) {
+                    pstmt.setDate(2, Date.valueOf(artifact.creationDate));
+                } else {
+                    pstmt.setDate(2, null);
+                }
+
+                pstmt.addBatch();
+                counter++;
+            }
+            pstmt.executeBatch();
+
+            rs = pstmt.getGeneratedKeys();
+            Iterator<Artifact> artifactIterator = artifacts.iterator();
+            while (rs.next()) {
+                artifactIterator.next().id = rs.getInt(1);
+            }
+
+            conn.commit();
+
+        } catch (SQLException e) {
+            throw new DBException("Error while uploading artifacts to DB : " + e.getMessage());
+        } finally {
+            safelySetAutoCommit();
+            if (rs != null)
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    throw new DBException("Error while uploading artifacts to DB : " + e.getMessage());
+                }
+        }
+    }
+
     /**
      * @return How many countries there are in the DB
      */
@@ -513,6 +874,9 @@ public class DBConnection {
             stmt.executeUpdate("DELETE FROM UNIVERSITY");
             stmt.executeUpdate("DELETE FROM CITY");
             stmt.executeUpdate("DELETE FROM POLITICIAN");
+            stmt.executeUpdate("DELETE FROM BUSINESS");
+            stmt.executeUpdate("DELETE FROM ARTIFACT");
+            stmt.executeUpdate("DELETE FROM CREATOR");
             stmt.executeUpdate("DELETE FROM country");
         } catch (SQLException e) {
             throw new DBException("Error while deleting data from country : " + e.getMessage());

@@ -17,15 +17,21 @@ public class DataCollector {
     private Map<String, City> cities = new HashMap<>();
     private Map<String, Politician> politicians = new HashMap<>();
     private Map<String, University> universities = new HashMap<>();
+    private Map<String, Business> businesses = new HashMap<>();
+    private Map<String, Creator> creators = new HashMap<>();
+    private Map<String, Artifact> artifacts = new HashMap<>();
 
     public void collectData() throws IOException {
         getIDs();
-        getNames(countries, cities, politicians, universities);
-        getFacts(politicians, universities, countries, cities);
+        getNames(artifacts, creators, businesses, countries, cities, politicians, universities);
+        getFacts(artifacts, creators, businesses, politicians, universities, countries, cities);
 
         postCitiesProcessor();
         postUniversitiesProcessor();
         postPoliticiansProcessor();
+        postBusinessesProcessor();
+        postCreatorsProcessor();
+        postArtifactProcessor();
     }
 
     public Collection<Country> getCountries() {
@@ -42,14 +48,65 @@ public class DataCollector {
 
     public Collection<University> getUniversities() { return universities.values(); }
 
+    public Collection<Business> getBusinesses() { return businesses.values(); }
+
+    public Collection<Creator> getCreators() { return creators.values(); }
+
+    public Collection<Artifact> getArtifacts() { return artifacts.values(); }
+
     private void getIDs() throws IOException {
         List<Callback> callbacks = new LinkedList<>();
         callbacks.add(getCountryIDsCallback());
         callbacks.add(getCityIDsCallback());
         callbacks.add(getPoliticianIDsCallback());
         callbacks.add(getUniversitiesIDsCallback());
+        callbacks.add(getBusinessesIDsCallback());
+        callbacks.add(getCreatorsIDsCallback());
+        callbacks.add(getArtifactIDsCallback());
 
         Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(Consts.YAGO_TYPES_FILE, callbacks);
+    }
+
+    private Callback getArtifactIDsCallback() {
+        return new Callback() {
+            @Override
+            public void reduce(Row row) {
+                artifacts.put((row.entity), new Artifact(row.entity));
+            }
+
+            @Override
+            public boolean map(Row row) {
+                return row.superEntity.equals("<wordnet_artifact_100021939>");
+            }
+        };
+    }
+
+    private Callback getCreatorsIDsCallback() {
+        return new Callback() {
+            @Override
+            public void reduce(Row row) {
+                creators.put((row.entity), new Creator(row.entity));
+            }
+
+            @Override
+            public boolean map(Row row) {
+                return row.superEntity.equals("<wordnet_creator_109614315>");
+            }
+        };
+    }
+
+    private Callback getBusinessesIDsCallback() {
+        return new Callback() {
+            @Override
+            public void reduce(Row row) {
+                businesses.put((row.entity), new Business(row.entity));
+            }
+
+            @Override
+            public boolean map(Row row) {
+                return row.superEntity.equals("<wordnet_business_108061042>");
+            }
+        };
     }
 
     private Callback getCountryIDsCallback() {
@@ -116,7 +173,9 @@ public class DataCollector {
         Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(Consts.YAGO_LABELS_FILE, callbacks);
     }
 
-    private void getFacts(Map<String, Politician> politicians, Map<String, University> universities,
+    private void getFacts(Map<String, Artifact> artifacts, Map<String, Creator> creators, Map<String, Business> businesses,
+                          Map<String, Politician> politicians,
+                          Map<String, University> universities,
                           final Map<String, ? extends PopulatedRegion>... place_maps) throws IOException {
         String factFiles[] = new String[]{Consts.YAGO_DATE_FACTS_FILE, Consts.YAGO_FACTS_FILE, Consts.YAGO_LITERAL_FACTS_FILE,};
 
@@ -128,11 +187,85 @@ public class DataCollector {
         callbacks.addAll(getCountryCallbacks(countries));
         callbacks.addAll(getCityCallbacks(cities, countries));
         callbacks.addAll(getUniversitiesCallback(universities, cities, countries));
-        callbacks.addAll(getPoliticianCallback(politicians, universities, cities, countries));
+        callbacks.addAll(getPersonCallback(politicians, universities, cities));
+        callbacks.addAll(getPersonCallback(creators, universities, cities));
+        callbacks.addAll(getBusinessesCallback(businesses, cities, countries));
+        callbacks.add(getPoliticianCallback(politicians, countries));
+        callbacks.addAll(getCreatorCallback(creators, businesses, artifacts));
+        callbacks.addAll(getArtifactCallback(artifacts));
 
         for (String factFile : factFiles) {
             Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(factFile, callbacks);
         }
+    }
+
+    private List<Callback> getArtifactCallback(Map<String, Artifact> artifacts) {
+        Callback businessCreatedArtifactCallback = new Callback() {
+            @Override
+            public void reduce(Row row) {
+                artifacts.get(row.superEntity).businesses.add(businesses.get(row.entity));
+            }
+
+            @Override
+            public boolean map(Row row) {
+                return row.relationType.equals("<created>") && artifacts.containsKey(row.superEntity) && businesses.containsKey(row.entity);
+            }
+        };
+
+        Callback creatorsCreatedArtifactCallback = new Callback() {
+            @Override
+            public void reduce(Row row) {
+                artifacts.get(row.superEntity).creators.add(creators.get(row.entity));
+            }
+
+            @Override
+            public boolean map(Row row) {
+                return row.relationType.equals("<created>") && artifacts.containsKey(row.superEntity) && creators.containsKey(row.entity);
+            }
+        };
+
+        Callback[] c = new Callback[]{businessCreatedArtifactCallback, creatorsCreatedArtifactCallback,
+                new GenericCallback(artifacts, ValueType.DATE, "<wasCreatedOnDate>", "creationDate")
+        };
+        List<Callback> callbacks = new LinkedList<>();
+        Collections.addAll(callbacks, c);
+        return callbacks;
+    }
+
+    private List<Callback> getBusinessesCallback(Map<String, Business> businesses, Map<String, City> cities, Map<String, Country> countries) {
+        Callback locatedInCountryCallback = new Callback() {
+            @Override
+            public void reduce(Row row) {
+                businesses.get(row.entity).countries.add(countries.get(row.superEntity));
+            }
+
+            @Override
+            public boolean map(Row row) {
+                return row.relationType.equals("<isLocatedIn>") && businesses.containsKey(row.entity) &&
+                        countries.containsKey(row.superEntity);
+            }
+        };
+
+        Callback locatedInCityCallback = new Callback() {
+            @Override
+            public void reduce(Row row) {
+                businesses.get(row.entity).cities.add(cities.get(row.superEntity));
+            }
+
+            @Override
+            public boolean map(Row row) {
+                return row.relationType.equals("<isLocatedIn>") && businesses.containsKey(row.entity) &&
+                        cities.containsKey(row.superEntity);
+            }
+        };
+
+        Callback[] c = new Callback[]{locatedInCountryCallback, locatedInCityCallback,
+                new GenericCallback(businesses, ValueType.DATE, "<wasCreatedOnDate>", "creationDate"),
+                new GenericCallback(businesses, ValueType.LONG, "<hasNumberOfPeople>", "numberOfEmployees")
+        };
+        List<Callback> callbacks = new LinkedList<>();
+        Collections.addAll(callbacks, c);
+        return callbacks;
     }
 
     private List<Callback> getUniversitiesCallback(Map<String, University> universities,
@@ -175,33 +308,55 @@ public class DataCollector {
         return singletonList(new GenericCallback(places, ValueType.STRING, "<hasTLD>", "tld"));
     }
 
-    private List<Callback> getPoliticianCallback(Map<String, Politician> politicians, Map<String, University> universities,
-                                                 Map<String, City> cities, Map<String, Country> countries) {
+    private List<Callback> getPersonCallback(Map<String, ? extends Person> persons, Map<String, University> universities,
+                                             Map<String, City> cities) {
         Callback bornInCallback = new Callback() {
             @Override
             public void reduce(Row row) {
-                politicians.get(row.entity).birthCity = cities.get(row.superEntity);
+                persons.get(row.entity).birthCity = cities.get(row.superEntity);
             }
 
             @Override
             public boolean map(Row row) {
-                return row.relationType.equals("<wasBornIn>") && politicians.containsKey(row.entity) && cities.containsKey(row.superEntity);
+                return row.relationType.equals("<wasBornIn>") && persons.containsKey(row.entity) && cities.containsKey(row.superEntity);
             }
         };
 
         Callback diedInCallback = new Callback() {
             @Override
             public void reduce(Row row) {
-                politicians.get(row.entity).deathCity = cities.get(row.superEntity);
+                persons.get(row.entity).deathCity = cities.get(row.superEntity);
             }
 
             @Override
             public boolean map(Row row) {
-                return row.relationType.equals("<diedIn>") && politicians.containsKey(row.entity) && cities.containsKey(row.superEntity);
+                return row.relationType.equals("<diedIn>") && persons.containsKey(row.entity) && cities.containsKey(row.superEntity);
             }
         };
 
-        Callback politicianOfCountriesCallback = new Callback() {
+        Callback universitiesCallback = new Callback() {
+            @Override
+            public void reduce(Row row) {
+                persons.get(row.entity).universities.add(universities.get(row.superEntity));
+            }
+
+            @Override
+            public boolean map(Row row) {
+                return row.relationType.equals("<graduatedFrom>") && persons.containsKey(row.entity) && universities.containsKey(row.superEntity);
+            }
+        };
+
+        List<Callback> callbackList = new LinkedList<>();
+        Callback[] callbacks = new Callback[] {bornInCallback, diedInCallback, universitiesCallback,
+                new GenericCallback(persons, ValueType.DATE,  "<diedOnDate>",     "deathDate"),
+                new GenericCallback(persons, ValueType.DATE,  "<wasBornOnDate>",     "birthDate"),
+        };
+        Collections.addAll(callbackList, callbacks);
+        return callbackList;
+    }
+
+    private Callback getPoliticianCallback(Map<String, Politician> politicians, Map<String, Country> countries) {
+        return new Callback() {
             @Override
             public void reduce(Row row) {
                 politicians.get(row.entity).countries.add(countries.get(row.superEntity));
@@ -212,25 +367,23 @@ public class DataCollector {
                 return row.relationType.equals("<isPoliticianOf>") && politicians.containsKey(row.entity) && countries.containsKey(row.superEntity);
             }
         };
+    }
 
-        Callback universitiesCallback = new Callback() {
+    private List<Callback> getCreatorCallback(Map<String, Creator> creators, Map<String, Business> businesses, Map<String, Artifact> artifacts) {
+        Callback createdBusinessCallback = new Callback() {
             @Override
             public void reduce(Row row) {
-                politicians.get(row.entity).universities.add(universities.get(row.superEntity));
+                creators.get(row.entity).businesses.add(businesses.get(row.superEntity));
             }
 
             @Override
             public boolean map(Row row) {
-                return row.relationType.equals("<graduatedFrom>") && politicians.containsKey(row.entity) && universities.containsKey(row.superEntity);
+                return row.relationType.equals("<created>") && creators.containsKey(row.entity) && businesses.containsKey(row.superEntity);
             }
         };
 
         List<Callback> callbackList = new LinkedList<>();
-        Callback[] callbacks = new Callback[] {bornInCallback, diedInCallback,
-                politicianOfCountriesCallback, universitiesCallback,
-                new GenericCallback(politicians, ValueType.DATE,  "<diedOnDate>",     "deathDate"),
-                new GenericCallback(politicians, ValueType.DATE,  "<wasBornOnDate>",     "birthDate"),
-        };
+        Callback[] callbacks = new Callback[] {createdBusinessCallback};
         Collections.addAll(callbackList, callbacks);
         return callbackList;
     }
@@ -296,7 +449,7 @@ public class DataCollector {
     }
 
     private void postUniversitiesProcessor() {
-        List<University> universitiesToRemove = new ArrayList<>();
+        List<String> universitiesToRemove = new ArrayList<>();
 
         for (Map.Entry<String, University> universitiesEntry: universities.entrySet()) {
             List<City> citiesToBeRemoved = new LinkedList<>();
@@ -311,13 +464,35 @@ public class DataCollector {
             }
 
             if (universitiesEntry.getValue().cities.isEmpty() && universitiesEntry.getValue().countries.isEmpty()) {
-                universitiesToRemove.add(universitiesEntry.getValue());
+                universitiesToRemove.add(universitiesEntry.getKey());
             }
         }
 
         universitiesToRemove.forEach(universities::remove);
 
         System.out.println(String.format("Deleted %d universities", universitiesToRemove.size()));
+    }
+
+    private void postPersonProcessor(Map<String, ? extends Person> persons) {
+        for (Map.Entry<String, ? extends Person> personEntry : persons.entrySet()) {
+            if (personEntry.getValue().birthCity != null &&
+                    !cities.containsKey(personEntry.getValue().birthCity.entity)) {
+                personEntry.getValue().birthCity = null;
+            }
+            if (personEntry.getValue().deathCity != null &&
+                    !cities.containsKey(personEntry.getValue().deathCity.entity)) {
+                personEntry.getValue().deathCity = null;
+            }
+            List<University> universitiesToBeRemoved = new LinkedList<>();
+            for (University university : personEntry.getValue().universities) {
+                if (!universities.containsKey(university.entity)) {
+                    universitiesToBeRemoved.add(university);
+                }
+            }
+            for (University university : universitiesToBeRemoved) {
+                personEntry.getValue().universities.remove(university);
+            }
+        }
     }
 
     private void postPoliticiansProcessor() {
@@ -327,27 +502,94 @@ public class DataCollector {
             if (politicianEntry.getValue().countries.isEmpty()) {
                 politiciansToRemove.add(politicianEntry.getKey());
             }
-            if (politicianEntry.getValue().birthCity != null &&
-                    !cities.containsKey(politicianEntry.getValue().birthCity.entity)) {
-                politicianEntry.getValue().birthCity = null;
+        }
+        politiciansToRemove.forEach(politicians::remove);
+
+        postPersonProcessor(politicians);
+
+        System.out.println(String.format("Deleted %d politicians", politiciansToRemove.size()));
+    }
+
+    private void postCreatorsProcessor() {
+        postPersonProcessor(creators);
+
+        List<String> creatorsToRemove = new ArrayList<>();
+        for (Map.Entry<String, Creator> creatorEntry: creators.entrySet()) {
+            if (creatorEntry.getValue().birthCity == null && creatorEntry.getValue().deathCity == null) {
+                creatorsToRemove.add(creatorEntry.getKey());
             }
-            if (politicianEntry.getValue().deathCity != null &&
-                     !cities.containsKey(politicianEntry.getValue().deathCity.entity)) {
-                politicianEntry.getValue().deathCity = null;
-            }
-            List<University> universitiesToBeRemoved = new LinkedList<>();
-            for (University university : politicianEntry.getValue().universities) {
-                if (!universities.containsKey(university.entity)) {
-                    universitiesToBeRemoved.add(university);
+
+            List<Business> businessesToBeRemoved = new LinkedList<>();
+            for (Business business : creatorEntry.getValue().businesses) {
+                if (!businesses.containsKey(business.entity)) {
+                    businessesToBeRemoved.add(business);
                 }
             }
-            for (University university : universitiesToBeRemoved) {
-                politicianEntry.getValue().universities.remove(university);
+            for (Business business : businessesToBeRemoved) {
+                creatorEntry.getValue().businesses.remove(business);
+            }
+
+        }
+        creatorsToRemove.forEach(creators::remove);
+
+        System.out.println(String.format("Deleted %d creators", creatorsToRemove.size()));
+    }
+
+    private void postBusinessesProcessor() {
+        List<String> businessesToRemove = new ArrayList<>();
+
+        for (Map.Entry<String, Business> businessEntry: businesses.entrySet()) {
+            List<City> citiesToBeRemoved = new LinkedList<>();
+            for (City city : businessEntry.getValue().cities) {
+                if (!cities.containsKey(city.entity)) {
+                    citiesToBeRemoved.add(city);
+                }
+            }
+            for (City city : citiesToBeRemoved) {
+                businessEntry.getValue().cities.remove(city);
+            }
+
+            if (businessEntry.getValue().countries.isEmpty() && businessEntry.getValue().cities.isEmpty()) {
+                businessesToRemove.add(businessEntry.getKey());
             }
         }
 
-        politiciansToRemove.forEach(politicians::remove);
+        businessesToRemove.forEach(businesses::remove);
 
-        System.out.println(String.format("Deleted %d politicians", politiciansToRemove.size()));
+        System.out.println(String.format("Deleted %d businesses", businessesToRemove.size()));
+    }
+
+    private void postArtifactProcessor() {
+        List<String> artifactsToRemove = new ArrayList<>();
+
+        for (Map.Entry<String, Artifact> artifactEntry: artifacts.entrySet()) {
+            List<Business> businessesToBeRemoves = new LinkedList<>();
+            for (Business business : artifactEntry.getValue().businesses) {
+                if (!businesses.containsKey(business.entity)) {
+                    businessesToBeRemoves.add(business);
+                }
+            }
+            for (Business business : businessesToBeRemoves) {
+                artifactEntry.getValue().businesses.remove(business);
+            }
+
+            List<Creator> creatorsToBeRemoved = new ArrayList<>();
+            for (Creator creator : artifactEntry.getValue().creators) {
+                if (!creators.containsKey(creator.entity)) {
+                    creatorsToBeRemoved.add(creator);
+                }
+            }
+            for (Creator creator : creatorsToBeRemoved) {
+                artifactEntry.getValue().creators.remove(creator);
+            }
+
+            if (artifactEntry.getValue().creators.isEmpty() && artifactEntry.getValue().businesses.isEmpty()) {
+                artifactsToRemove.add(artifactEntry.getKey());
+            }
+        }
+
+        artifactsToRemove.forEach(artifacts::remove);
+
+        System.out.println(String.format("Deleted %d artifacts", artifactsToRemove.size()));
     }
 }
