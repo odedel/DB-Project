@@ -108,31 +108,9 @@ public class DataCollector {
     }
 
     private List<Callback> getArtifactCallback(Map<String, Artifact> artifacts) {
-        Callback businessCreatedArtifactCallback = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                artifacts.get(row.superEntity).businesses.add(businesses.get(row.entity));
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<created>") && artifacts.containsKey(row.superEntity) && businesses.containsKey(row.entity);
-            }
-        };
-
-        Callback creatorsCreatedArtifactCallback = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                artifacts.get(row.superEntity).creators.add(creators.get(row.entity));
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<created>") && artifacts.containsKey(row.superEntity) && creators.containsKey(row.entity);
-            }
-        };
-
-        Callback[] c = new Callback[]{businessCreatedArtifactCallback, creatorsCreatedArtifactCallback,
+        Callback[] c = new Callback[]{
+                new GenericObjectLinkCallback(artifacts, businesses, Artifact.class, "<created>", "businesses", true, true),
+                new GenericObjectLinkCallback(artifacts, creators, Artifact.class, "<created>", "creators", true, true),
                 new GenericCallback(artifacts, ValueType.DATE, "<wasCreatedOnDate>", "creationDate")
         };
         List<Callback> callbacks = new LinkedList<>();
@@ -141,33 +119,9 @@ public class DataCollector {
     }
 
     private List<Callback> getBusinessesCallback(Map<String, Business> businesses, Map<String, City> cities, Map<String, Country> countries) {
-        Callback locatedInCountryCallback = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                businesses.get(row.entity).countries.add(countries.get(row.superEntity));
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<isLocatedIn>") && businesses.containsKey(row.entity) &&
-                        countries.containsKey(row.superEntity);
-            }
-        };
-
-        Callback locatedInCityCallback = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                businesses.get(row.entity).cities.add(cities.get(row.superEntity));
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<isLocatedIn>") && businesses.containsKey(row.entity) &&
-                        cities.containsKey(row.superEntity);
-            }
-        };
-
-        Callback[] c = new Callback[]{locatedInCountryCallback, locatedInCityCallback,
+        Callback[] c = new Callback[]{
+                new GenericObjectLinkCallback(businesses, countries, Business.class, "<isLocatedIn>", "countries"),
+                new GenericObjectLinkCallback(businesses, cities, Business.class, "<isLocatedIn>", "cities"),
                 new GenericCallback(businesses, ValueType.DATE, "<wasCreatedOnDate>", "creationDate"),
                 new GenericCallback(businesses, ValueType.LONG, "<hasNumberOfPeople>", "numberOfEmployees")
         };
@@ -178,33 +132,9 @@ public class DataCollector {
 
     private List<Callback> getUniversitiesCallback(Map<String, University> universities,
                                                    Map<String, City> cities, Map<String, Country> countries) {
-        Callback countriesCallback = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                universities.get(row.entity).countries.add(countries.get(row.superEntity));
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<isLocatedIn>") && universities.containsKey(row.entity) &&
-                        countries.containsKey(row.superEntity);
-            }
-        };
-
-        Callback citiesCallback = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                universities.get(row.entity).cities.add(cities.get(row.superEntity));
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<isLocatedIn>") && universities.containsKey(row.entity) &&
-                        cities.containsKey(row.superEntity);
-            }
-        };
-
-        Callback[] c = new Callback[]{countriesCallback, citiesCallback,
+        Callback[] c = new Callback[]{
+                new GenericObjectLinkCallback(universities, countries, University.class, "<isLocatedIn>", "countries"),
+                new GenericObjectLinkCallback(universities, cities, University.class, "<isLocatedIn>", "cities"),
                 new GenericCallback(universities, ValueType.DATE,  "<wasCreatedOnDate>",     "creationDate"),
         };
         List<Callback> callbacks = new LinkedList<>();
@@ -218,44 +148,11 @@ public class DataCollector {
 
     private List<Callback> getPersonCallback(Map<String, ? extends Person> persons, Map<String, University> universities,
                                              Map<String, City> cities) {
-        Callback bornInCallback = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                persons.get(row.entity).birthCity = cities.get(row.superEntity);
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<wasBornIn>") && persons.containsKey(row.entity) && cities.containsKey(row.superEntity);
-            }
-        };
-
-        Callback diedInCallback = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                persons.get(row.entity).deathCity = cities.get(row.superEntity);
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<diedIn>") && persons.containsKey(row.entity) && cities.containsKey(row.superEntity);
-            }
-        };
-
-        Callback universitiesCallback = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                persons.get(row.entity).universities.add(universities.get(row.superEntity));
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<graduatedFrom>") && persons.containsKey(row.entity) && universities.containsKey(row.superEntity);
-            }
-        };
-
         List<Callback> callbackList = new LinkedList<>();
-        Callback[] callbacks = new Callback[] {bornInCallback, diedInCallback, universitiesCallback,
+        Callback[] callbacks = new Callback[]{
+                new GenericObjectLinkCallback(persons, cities, Person.class, "<wasBornIn>", "birthCity", false, false),
+                new GenericObjectLinkCallback(persons, cities, Person.class, "<diedIn>", "deathCity", false, false),
+                new GenericObjectLinkCallback(persons, universities, Person.class, "<graduatedFrom>", "universities"),
                 new GenericCallback(persons, ValueType.DATE,  "<diedOnDate>",     "deathDate"),
                 new GenericCallback(persons, ValueType.DATE,  "<wasBornOnDate>",     "birthDate"),
         };
@@ -264,51 +161,19 @@ public class DataCollector {
     }
 
     private Callback getPoliticianCallback(Map<String, Politician> politicians, Map<String, Country> countries) {
-        return new Callback() {
-            @Override
-            public void reduce(Row row) {
-                politicians.get(row.entity).countries.add(countries.get(row.superEntity));
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<isPoliticianOf>") && politicians.containsKey(row.entity) && countries.containsKey(row.superEntity);
-            }
-        };
+        return new GenericObjectLinkCallback(politicians, countries, Politician.class, "<isPoliticianOf>", "countries");
     }
 
     private List<Callback> getCreatorCallback(Map<String, Creator> creators, Map<String, Business> businesses, Map<String, Artifact> artifacts) {
-        Callback createdBusinessCallback = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                creators.get(row.entity).businesses.add(businesses.get(row.superEntity));
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<created>") && creators.containsKey(row.entity) && businesses.containsKey(row.superEntity);
-            }
-        };
-
         List<Callback> callbackList = new LinkedList<>();
-        Callback[] callbacks = new Callback[] {createdBusinessCallback};
+        Callback[] callbacks = new Callback[]{new GenericObjectLinkCallback(creators, businesses, Creator.class, "<created>", "businesses")};
         Collections.addAll(callbackList, callbacks);
         return callbackList;
     }
 
     private List<Callback> getCityCallbacks(final Map<String, ? extends City> cities, Map<String, Country> countries) {
-        return singletonList(new Callback() {
-            @Override
-            public void reduce(Row row) {
-                cities.get(row.entity).country = countries.get(row.superEntity);
-            }
 
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<isLocatedIn>") && cities.containsKey(row.entity) &&
-                        countries.containsKey(row.superEntity);
-            }
-        });
+        return singletonList(new GenericObjectLinkCallback(cities, countries, City.class, "<isLocatedIn>", "country", false, false));
     }
 
     private List<Callback> getCallbacks(final Map<String, ? extends PopulatedRegion> places) {
