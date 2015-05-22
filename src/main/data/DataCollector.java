@@ -18,7 +18,6 @@ public class DataCollector {
 
     public void collectData() throws IOException {
         getIDs();
-        getNames( countries, cities);
         //noinspection unchecked
         getNames(artifacts, creators, businesses, countries, cities, politicians, universities);
         //noinspection unchecked
