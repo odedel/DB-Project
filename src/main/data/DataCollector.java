@@ -23,14 +23,10 @@ public class DataCollector {
         getNames(artifacts, creators, businesses, countries, cities, politicians, universities);
         //noinspection unchecked
         getFacts(countries, cities);
-
-        postCitiesProcessor();
-        postUniversitiesProcessor();
-        postPoliticiansProcessor();
-        postBusinessesProcessor();
-        postCreatorsProcessor();
-        postArtifactProcessor();
+        postProcessData();
     }
+
+    /* -------------------- Get Methods -------------------- */
 
     public Collection<Country> getCountries() {
         return countries.values();
@@ -59,6 +55,8 @@ public class DataCollector {
     public Collection<Artifact> getArtifacts() {
         return artifacts.values();
     }
+
+    /* -------------------- Data Collection Callbacks -------------------- */
 
     private void getIDs() throws IOException {
         List<Callback> callbacks = new LinkedList<>();
@@ -147,6 +145,17 @@ public class DataCollector {
         for (String factFile : factFiles) {
             Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(factFile, callbacks);
         }
+    }
+
+    /* -------------------- Data Post Processing -------------------- */
+
+    private void postProcessData() {
+        postCitiesProcessor();
+        postUniversitiesProcessor();
+        postPoliticiansProcessor();
+        postBusinessesProcessor();
+        postCreatorsProcessor();
+        postArtifactProcessor();
     }
 
     private void postCitiesProcessor() {
