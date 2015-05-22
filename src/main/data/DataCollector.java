@@ -19,6 +19,7 @@ public class DataCollector {
     public void collectData() throws IOException {
         getIDs();
         getNames( countries, cities);
+        getNames(artifacts, creators, businesses, countries, cities, politicians, universities);
         getFacts(countries, cities);
 
         postCitiesProcessor();
