@@ -63,13 +63,13 @@ public class DataCollector {
     private void getIDs() throws IOException {
         List<Callback> callbacks = new LinkedList<>();
         Callback[] c = new Callback[]{
-            new GenericEntityCallback<>(artifacts,      Artifact.class,     "<wordnet_artifact"),
-            new GenericEntityCallback<>(creators,       Creator.class,      "<wordnet_creator"),
-            new GenericEntityCallback<>(businesses,     Business.class,     "<wordnet_business"),
-            new GenericEntityCallback<>(countries,      Country.class,      "<wikicat_Countries"),
-            new GenericEntityCallback<>(cities,         City.class,         "<wikicat_Cities"),
-            new GenericEntityCallback<>(politicians,    Politician.class,   "<wordnet_politician"),
-            new GenericEntityCallback<>(universities,   University.class,   "<wordnet_university"),
+                new GenericEntityCallback<>(artifacts, Artifact.class, "<wordnet_artifact"),
+                new GenericEntityCallback<>(creators, Creator.class, "<wordnet_creator"),
+                new GenericEntityCallback<>(businesses, Business.class, "<wordnet_business"),
+                new GenericEntityCallback<>(countries, Country.class, "<wikicat_Countries"),
+                new GenericEntityCallback<>(cities, City.class, "<wikicat_Cities"),
+                new GenericEntityCallback<>(politicians, Politician.class, "<wordnet_politician"),
+                new GenericEntityCallback<>(universities, University.class, "<wordnet_university"),
         };
         Collections.addAll(callbacks, c);
         //FIXME: do we need to use the other attributes file?
@@ -152,7 +152,7 @@ public class DataCollector {
     private void postCitiesProcessor() {
         List<String> citiesToRemove = new ArrayList<>();
 
-        citiesToRemove.addAll(cities.entrySet().stream().filter(entry -> entry.getValue().country == null).map(Map.Entry<String, City>::getKey).collect(Collectors.toList()));
+        citiesToRemove.addAll(cities.entrySet().stream().filter(entry -> entry.getValue().country == null).map(Map.Entry::getKey).collect(Collectors.toList()));
         citiesToRemove.forEach(cities::remove);
 
         System.out.println(String.format("Deleted %d cities", citiesToRemove.size()));
@@ -161,25 +161,16 @@ public class DataCollector {
     private void postUniversitiesProcessor() {
         List<String> universitiesToRemove = new ArrayList<>();
 
-        for (Map.Entry<String, University> universitiesEntry: universities.entrySet()) {
-            List<City> citiesToBeRemoved = new LinkedList<>();
-
-            for (City city : universitiesEntry.getValue().cities) {
-                if (!cities.containsKey(city.entity)) {
-                    citiesToBeRemoved.add(city);
-                }
-            }
-            for (City city : citiesToBeRemoved) {
-                universitiesEntry.getValue().cities.remove(city);
-            }
-
+        for (Map.Entry<String, University> universitiesEntry : universities.entrySet()) {
+            List<City> citiesToBeRemoved = universitiesEntry.getValue().cities.stream().
+                    filter(city -> !cities.containsKey(city.entity)).
+                    collect(Collectors.toCollection(LinkedList::new));
+            citiesToBeRemoved.forEach(universitiesEntry.getValue().cities::remove);
             if (universitiesEntry.getValue().cities.isEmpty() && universitiesEntry.getValue().countries.isEmpty()) {
                 universitiesToRemove.add(universitiesEntry.getKey());
             }
         }
-
         universitiesToRemove.forEach(universities::remove);
-
         System.out.println(String.format("Deleted %d universities", universitiesToRemove.size()));
     }
 
@@ -193,113 +184,71 @@ public class DataCollector {
                     !cities.containsKey(personEntry.getValue().deathCity.entity)) {
                 personEntry.getValue().deathCity = null;
             }
-            List<University> universitiesToBeRemoved = new LinkedList<>();
-            for (University university : personEntry.getValue().universities) {
-                if (!universities.containsKey(university.entity)) {
-                    universitiesToBeRemoved.add(university);
-                }
-            }
-            for (University university : universitiesToBeRemoved) {
-                personEntry.getValue().universities.remove(university);
-            }
+            List<University> universitiesToBeRemoved = personEntry.getValue().universities.stream().
+                    filter(university -> !universities.containsKey(university.entity)).
+                    collect(Collectors.toCollection(LinkedList::new));
+            universitiesToBeRemoved.forEach(personEntry.getValue().universities::remove);
         }
     }
 
     private void postPoliticiansProcessor() {
-        List<String> politiciansToRemove = new ArrayList<>();
-
-        for (Map.Entry<String, Politician> politicianEntry: politicians.entrySet()) {
-            if (politicianEntry.getValue().countries.isEmpty()) {
-                politiciansToRemove.add(politicianEntry.getKey());
-            }
-        }
+        List<String> politiciansToRemove = politicians.entrySet().stream().
+                filter(politicianEntry -> politicianEntry.getValue().countries.isEmpty()).
+                map(Map.Entry::getKey).collect(Collectors.toList());
         politiciansToRemove.forEach(politicians::remove);
-
         postPersonProcessor(politicians);
-
         System.out.println(String.format("Deleted %d politicians", politiciansToRemove.size()));
     }
 
     private void postCreatorsProcessor() {
         postPersonProcessor(creators);
-
         List<String> creatorsToRemove = new ArrayList<>();
-        for (Map.Entry<String, Creator> creatorEntry: creators.entrySet()) {
+        for (Map.Entry<String, Creator> creatorEntry : creators.entrySet()) {
             if (creatorEntry.getValue().birthCity == null && creatorEntry.getValue().deathCity == null) {
                 creatorsToRemove.add(creatorEntry.getKey());
             }
 
-            List<Business> businessesToBeRemoved = new LinkedList<>();
-            for (Business business : creatorEntry.getValue().businesses) {
-                if (!businesses.containsKey(business.entity)) {
-                    businessesToBeRemoved.add(business);
-                }
-            }
-            for (Business business : businessesToBeRemoved) {
-                creatorEntry.getValue().businesses.remove(business);
-            }
-
+            List<Business> businessesToBeRemoved = creatorEntry.getValue().businesses.stream().
+                    filter(business -> !businesses.containsKey(business.entity)).
+                    collect(Collectors.toCollection(LinkedList::new));
+            businessesToBeRemoved.forEach(creatorEntry.getValue().businesses::remove);
         }
         creatorsToRemove.forEach(creators::remove);
-
         System.out.println(String.format("Deleted %d creators", creatorsToRemove.size()));
     }
 
     private void postBusinessesProcessor() {
         List<String> businessesToRemove = new ArrayList<>();
 
-        for (Map.Entry<String, Business> businessEntry: businesses.entrySet()) {
-            List<City> citiesToBeRemoved = new LinkedList<>();
-            for (City city : businessEntry.getValue().cities) {
-                if (!cities.containsKey(city.entity)) {
-                    citiesToBeRemoved.add(city);
-                }
-            }
-            for (City city : citiesToBeRemoved) {
-                businessEntry.getValue().cities.remove(city);
-            }
-
+        for (Map.Entry<String, Business> businessEntry : businesses.entrySet()) {
+            List<City> citiesToBeRemoved = businessEntry.getValue().cities.stream().
+                    filter(city -> !cities.containsKey(city.entity)).
+                    collect(Collectors.toCollection(LinkedList::new));
+            citiesToBeRemoved.forEach(businessEntry.getValue().cities::remove);
             if (businessEntry.getValue().countries.isEmpty() && businessEntry.getValue().cities.isEmpty()) {
                 businessesToRemove.add(businessEntry.getKey());
             }
         }
-
         businessesToRemove.forEach(businesses::remove);
-
         System.out.println(String.format("Deleted %d businesses", businessesToRemove.size()));
     }
 
     private void postArtifactProcessor() {
         List<String> artifactsToRemove = new ArrayList<>();
-
-        for (Map.Entry<String, Artifact> artifactEntry: artifacts.entrySet()) {
-            List<Business> businessesToBeRemoves = new LinkedList<>();
-            for (Business business : artifactEntry.getValue().businesses) {
-                if (!businesses.containsKey(business.entity)) {
-                    businessesToBeRemoves.add(business);
-                }
-            }
-            for (Business business : businessesToBeRemoves) {
-                artifactEntry.getValue().businesses.remove(business);
-            }
-
-            List<Creator> creatorsToBeRemoved = new ArrayList<>();
-            for (Creator creator : artifactEntry.getValue().creators) {
-                if (!creators.containsKey(creator.entity)) {
-                    creatorsToBeRemoved.add(creator);
-                }
-            }
-            for (Creator creator : creatorsToBeRemoved) {
-                artifactEntry.getValue().creators.remove(creator);
-            }
-
+        for (Map.Entry<String, Artifact> artifactEntry : artifacts.entrySet()) {
+            List<Business> businessesToBeRemoves = artifactEntry.getValue().businesses.stream().
+                    filter(business -> !businesses.containsKey(business.entity)).
+                    collect(Collectors.toCollection(LinkedList::new));
+            businessesToBeRemoves.forEach(artifactEntry.getValue().businesses::remove);
+            List<Creator> creatorsToBeRemoved = artifactEntry.getValue().creators.stream().
+                    filter(creator -> !creators.containsKey(creator.entity)).
+                    collect(Collectors.toList());
+            creatorsToBeRemoved.forEach(artifactEntry.getValue().creators::remove);
             if (artifactEntry.getValue().creators.isEmpty() && artifactEntry.getValue().businesses.isEmpty()) {
                 artifactsToRemove.add(artifactEntry.getKey());
             }
         }
-
         artifactsToRemove.forEach(artifacts::remove);
-
         System.out.println(String.format("Deleted %d artifacts", artifactsToRemove.size()));
     }
 }
