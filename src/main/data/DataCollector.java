@@ -94,55 +94,55 @@ public class DataCollector {
 
         //Populated place callbacks
         for (Map<String, ? extends PopulatedRegion> places : place_maps) {
-            callbacks.add(new GenericCallback(places, ValueType.STRING, "<isLocatedIn>", "places", true, true));
-            callbacks.add(new GenericCallback(places, ValueType.DATE, "<wasCreatedOnDate>", "creationDate"));
-            callbacks.add(new GenericCallback(places, ValueType.FLOAT, "<hasExport>", "export"));
-            callbacks.add(new GenericCallback(places, ValueType.FLOAT, "<hasExpenses>", "expenses"));
-            callbacks.add(new GenericCallback(places, ValueType.FLOAT, "<hasLatitude>", "latitude"));
-            callbacks.add(new GenericCallback(places, ValueType.FLOAT, "<hasLongitude>", "longitude"));
-            callbacks.add(new GenericCallback(places, ValueType.FLOAT, "<hasEconomicGrowth>", "economicGrowth"));
-            callbacks.add(new GenericCallback(places, ValueType.FLOAT, "<hasPoverty>", "poverty"));
-            callbacks.add(new GenericCallback(places, ValueType.LONG, "<hasNumberOfPeople>", "population"));
-            callbacks.add(new GenericCallback(places, ValueType.FLOAT, "<hasUnemployment>", "unemployment"));
-            callbacks.add(new GenericCallback(places, ValueType.FLOAT, "<hasRevenue>", "revenue"));
-            callbacks.add(new GenericCallback(places, ValueType.FLOAT, "<hasGini>", "gini"));
-            callbacks.add(new GenericCallback(places, ValueType.FLOAT, "<hasImport>", "_import"));
-            callbacks.add(new GenericCallback(places, ValueType.FLOAT, "<hasGDP>", "gdp"));
-            callbacks.add(new GenericCallback(places, ValueType.FLOAT, "<hasInflation>", "inflation"));
-            callbacks.add(new GenericCallback(places, ValueType.FLOAT, "<hasPopulationDensity>", "populationDensity"));
+            callbacks.add(new GenericCallback(places, ValueType.STRING, "<isLocatedIn>",            "places", true, true));
+            callbacks.add(new GenericCallback(places, ValueType.DATE,   "<wasCreatedOnDate>",       "creationDate"));
+            callbacks.add(new GenericCallback(places, ValueType.FLOAT,  "<hasExport>",              "export"));
+            callbacks.add(new GenericCallback(places, ValueType.FLOAT,  "<hasExpenses>",            "expenses"));
+            callbacks.add(new GenericCallback(places, ValueType.FLOAT,  "<hasLatitude>",            "latitude"));
+            callbacks.add(new GenericCallback(places, ValueType.FLOAT,  "<hasLongitude>",           "longitude"));
+            callbacks.add(new GenericCallback(places, ValueType.FLOAT,  "<hasEconomicGrowth>",      "economicGrowth"));
+            callbacks.add(new GenericCallback(places, ValueType.FLOAT,  "<hasPoverty>",             "poverty"));
+            callbacks.add(new GenericCallback(places, ValueType.LONG,   "<hasNumberOfPeople>",      "population"));
+            callbacks.add(new GenericCallback(places, ValueType.FLOAT,  "<hasUnemployment>",        "unemployment"));
+            callbacks.add(new GenericCallback(places, ValueType.FLOAT,  "<hasRevenue>",             "revenue"));
+            callbacks.add(new GenericCallback(places, ValueType.FLOAT,  "<hasGini>",                "gini"));
+            callbacks.add(new GenericCallback(places, ValueType.FLOAT,  "<hasImport>",              "_import"));
+            callbacks.add(new GenericCallback(places, ValueType.FLOAT,  "<hasGDP>",                 "gdp"));
+            callbacks.add(new GenericCallback(places, ValueType.FLOAT,  "<hasInflation>",           "inflation"));
+            callbacks.add(new GenericCallback(places, ValueType.FLOAT,  "<hasPopulationDensity>",   "populationDensity"));
         }
         //Country callbacks
-        callbacks.add(new GenericCallback(countries, ValueType.STRING, "<hasTLD>", "tld"));
+        callbacks.add(new GenericCallback(countries,    ValueType.STRING,   "<hasTLD>",             "tld"));
         //City callbacks
-        callbacks.add(new GenericObjectLinkCallback<>(cities, countries, City.class, "<isLocatedIn>", "country", false, false));
+        callbacks.add(new GenericObjectLinkCallback<>(cities,       countries,      City.class,         "<isLocatedIn>",    "country",      false, false));
         //University callbacks
-        callbacks.add(new GenericObjectLinkCallback<>(universities, countries, University.class, "<isLocatedIn>", "countries"));
-        callbacks.add(new GenericObjectLinkCallback<>(universities, cities, University.class, "<isLocatedIn>", "cities"));
-        callbacks.add(new GenericCallback(universities, ValueType.DATE, "<wasCreatedOnDate>", "creationDate"));
+        callbacks.add(new GenericObjectLinkCallback<>(universities, countries,      University.class,   "<isLocatedIn>",    "countries"));
+        callbacks.add(new GenericObjectLinkCallback<>(universities, cities,         University.class,   "<isLocatedIn>",    "cities"));
+        callbacks.add(new GenericCallback(universities, ValueType.DATE,     "<wasCreatedOnDate>",   "creationDate"));
         //Person callbacks
-        callbacks.add(new GenericObjectLinkCallback<>(politicians, cities, Politician.class, "<wasBornIn>", "birthCity", false, false));
-        callbacks.add(new GenericObjectLinkCallback<>(politicians, cities, Politician.class, "<diedIn>", "deathCity", false, false));
-        callbacks.add(new GenericObjectLinkCallback<>(politicians, universities, Politician.class, "<graduatedFrom>", "universities"));
-        callbacks.add(new GenericCallback(politicians, ValueType.DATE, "<diedOnDate>", "deathDate"));
-        callbacks.add(new GenericCallback(politicians, ValueType.DATE, "<wasBornOnDate>", "birthDate"));
-        callbacks.add(new GenericObjectLinkCallback<>(creators, cities, Creator.class, "<wasBornIn>", "birthCity", false, false));
-        callbacks.add(new GenericObjectLinkCallback<>(creators, cities, Creator.class, "<diedIn>", "deathCity", false, false));
-        callbacks.add(new GenericObjectLinkCallback<>(creators, universities, Creator.class, "<graduatedFrom>", "universities"));
-        callbacks.add(new GenericCallback(creators, ValueType.DATE, "<diedOnDate>", "deathDate"));
-        callbacks.add(new GenericCallback(creators, ValueType.DATE, "<wasBornOnDate>", "birthDate"));
+        callbacks.add(new GenericObjectLinkCallback<>(politicians,  cities,         Politician.class,   "<wasBornIn>",      "birthCity",    false, false));
+        callbacks.add(new GenericObjectLinkCallback<>(politicians,  cities,         Politician.class,   "<diedIn>",         "deathCity",    false, false));
+        callbacks.add(new GenericObjectLinkCallback<>(politicians,  universities,   Politician.class,   "<graduatedFrom>",  "universities"));
+        callbacks.add(new GenericCallback(politicians,  ValueType.DATE,     "<diedOnDate>",         "deathDate"));
+        callbacks.add(new GenericCallback(politicians,  ValueType.DATE,     "<wasBornOnDate>",      "birthDate"));
+        callbacks.add(new GenericObjectLinkCallback<>(creators,     cities,         Creator.class,      "<wasBornIn>",      "birthCity",    false, false));
+        callbacks.add(new GenericObjectLinkCallback<>(creators,     cities,         Creator.class,      "<diedIn>",         "deathCity",    false, false));
+        callbacks.add(new GenericObjectLinkCallback<>(creators,     universities,   Creator.class,      "<graduatedFrom>",  "universities"));
+        callbacks.add(new GenericCallback(creators,     ValueType.DATE,     "<diedOnDate>",         "deathDate"));
+        callbacks.add(new GenericCallback(creators,     ValueType.DATE,     "<wasBornOnDate>",      "birthDate"));
         //Business callbacks
-        callbacks.add(new GenericObjectLinkCallback<>(businesses, countries, Business.class, "<isLocatedIn>", "countries"));
-        callbacks.add(new GenericObjectLinkCallback<>(businesses, cities, Business.class, "<isLocatedIn>", "cities"));
-        callbacks.add(new GenericCallback(businesses, ValueType.DATE, "<wasCreatedOnDate>", "creationDate"));
-        callbacks.add(new GenericCallback(businesses, ValueType.LONG, "<hasNumberOfPeople>", "numberOfEmployees"));
+        callbacks.add(new GenericObjectLinkCallback<>(businesses,   countries,      Business.class,     "<isLocatedIn>",    "countries"));
+        callbacks.add(new GenericObjectLinkCallback<>(businesses,   cities,         Business.class,     "<isLocatedIn>",    "cities"));
+        callbacks.add(new GenericCallback(businesses,   ValueType.DATE,     "<wasCreatedOnDate>",   "creationDate"));
+        callbacks.add(new GenericCallback(businesses,   ValueType.LONG,     "<hasNumberOfPeople>",  "numberOfEmployees"));
         //Politician callbacks
-        callbacks.add(new GenericObjectLinkCallback<>(politicians, countries, Politician.class, "<isPoliticianOf>", "countries"));
+        callbacks.add(new GenericObjectLinkCallback<>(politicians,  countries,      Politician.class,   "<isPoliticianOf>", "countries"));
         //Creator callbacks
-        callbacks.add(new GenericObjectLinkCallback<>(creators, businesses, Creator.class, "<created>", "businesses"));
+        callbacks.add(new GenericObjectLinkCallback<>(creators,     businesses,     Creator.class,      "<created>",        "businesses"));
         //Artifact callbacks
-        callbacks.add(new GenericObjectLinkCallback<>(artifacts, businesses, Artifact.class, "<created>", "businesses", true, true));
-        callbacks.add(new GenericObjectLinkCallback<>(artifacts, creators, Artifact.class, "<created>", "creators", true, true));
-        callbacks.add(new GenericCallback(artifacts, ValueType.DATE, "<wasCreatedOnDate>", "creationDate"));
+        callbacks.add(new GenericObjectLinkCallback<>(artifacts,    businesses,     Artifact.class,     "<created>",        "businesses",   true, true));
+        callbacks.add(new GenericObjectLinkCallback<>(artifacts,    creators,       Artifact.class,     "<created>",        "creators",     true, true));
+        callbacks.add(new GenericCallback(artifacts,    ValueType.DATE,     "<wasCreatedOnDate>",   "creationDate"));
 
         for (String factFile : factFiles) {
             Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(factFile, callbacks);
