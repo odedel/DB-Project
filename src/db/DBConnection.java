@@ -57,7 +57,7 @@ public class DBConnection {
         ResultSet rs = null;
         try (PreparedStatement pstmt = conn
                 .prepareStatement("INSERT INTO country(name, creation_date, economic_growth, poverty, population, unemployment, gini, inflation, population_density) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                        Statement.RETURN_GENERATED_KEYS);) {
+                        Statement.RETURN_GENERATED_KEYS)) {
 
             conn.setAutoCommit(false);
 
@@ -116,7 +116,7 @@ public class DBConnection {
         try (PreparedStatement pstmt = conn
                 .prepareStatement("INSERT INTO city(name, country_id, creation_date, economic_growth, poverty, population, unemployment, gini, inflation, population_density) " +
                                 "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                        Statement.RETURN_GENERATED_KEYS);) {
+                        Statement.RETURN_GENERATED_KEYS)) {
 
             conn.setAutoCommit(false);
 
@@ -179,7 +179,7 @@ public class DBConnection {
         try (PreparedStatement pstmt = conn
                 .prepareStatement("INSERT INTO university(name, creation_date) " +
                                 "VALUES(?, ?)",
-                        Statement.RETURN_GENERATED_KEYS);) {
+                        Statement.RETURN_GENERATED_KEYS)) {
 
             conn.setAutoCommit(false);
 
@@ -295,7 +295,7 @@ public class DBConnection {
         try (PreparedStatement pstmt = conn
                 .prepareStatement("INSERT INTO politician(name, birth_city_id, birth_date, death_city_id, death_date) " +
                                 "VALUES(?, ?, ?, ?, ?)",
-                        Statement.RETURN_GENERATED_KEYS);) {
+                        Statement.RETURN_GENERATED_KEYS)) {
 
             conn.setAutoCommit(false);
 
@@ -427,7 +427,7 @@ public class DBConnection {
         try (PreparedStatement pstmt = conn
                 .prepareStatement("INSERT INTO creator(name, birth_city_id, birth_date, death_city_id, death_date) " +
                                 "VALUES(?, ?, ?, ?, ?)",
-                        Statement.RETURN_GENERATED_KEYS);) {
+                        Statement.RETURN_GENERATED_KEYS)) {
 
             conn.setAutoCommit(false);
 
@@ -588,7 +588,7 @@ public class DBConnection {
         try (PreparedStatement pstmt = conn
                 .prepareStatement("INSERT INTO business(name, creation_date, number_of_employees) " +
                                 "VALUES(?, ?, ?)",
-                        Statement.RETURN_GENERATED_KEYS);) {
+                        Statement.RETURN_GENERATED_KEYS)) {
 
             conn.setAutoCommit(false);
 
@@ -735,7 +735,7 @@ public class DBConnection {
         try (PreparedStatement pstmt = conn
                 .prepareStatement("INSERT INTO artifact(name, creation_date) " +
                                 "VALUES(?, ?)",
-                        Statement.RETURN_GENERATED_KEYS);) {
+                        Statement.RETURN_GENERATED_KEYS)) {
 
             conn.setAutoCommit(false);
 
@@ -784,7 +784,7 @@ public class DBConnection {
      */
     public int getCountOfCountries() throws DBException {
         try (Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM country");) {
+            ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM country")) {
             return rs.getInt(1);
         } catch (SQLException e) {
             throw new DBException("Error while counting countries : " + e.getMessage());
@@ -793,7 +793,7 @@ public class DBConnection {
 
     public int getCountOfCities() throws DBException {
         try (Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM city");) {
+             ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM city")) {
             return rs.getInt(1);
         } catch (SQLException e) {
             throw new DBException("Error while counting countries : " + e.getMessage());

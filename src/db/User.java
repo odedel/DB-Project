@@ -1,5 +1,5 @@
 package db;
 
 public enum User {
-    PLAYER, MODIFIER;
+    PLAYER, MODIFIER
 }
