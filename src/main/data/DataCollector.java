@@ -5,11 +5,12 @@ import main.util.Row;
 import main.util.Utils;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.util.Collections.*;
-import static main.util.Utils.*;
+import static java.util.Collections.singletonList;
 
 public class DataCollector {
 
@@ -23,8 +24,8 @@ public class DataCollector {
 
     public void collectData() throws IOException {
         getIDs();
-        getNames(artifacts, creators, businesses, countries, cities, politicians, universities);
-        getFacts(artifacts, creators, businesses, politicians, universities, countries, cities);
+        getNames( countries, cities);
+        getFacts(countries, cities);
 
         postCitiesProcessor();
         postUniversitiesProcessor();
@@ -54,116 +55,52 @@ public class DataCollector {
 
     public Collection<Artifact> getArtifacts() { return artifacts.values(); }
 
+    class GenericEntityCallback<T> extends Callback {
+        private final Map<String, T> map;
+        private final String prefix;
+        Constructor<T> clazzConstructor;
+
+        GenericEntityCallback(Map<String, T> map, Class<T> clazz, String prefix) {
+            this.map = map;
+            this.prefix = prefix;
+            try {
+                clazzConstructor = clazz.getConstructor(String.class);
+            } catch (NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            }
+    }
+
+            @Override
+            public void reduce(Row row) {
+            try {
+                map.put((row.entity), clazzConstructor.newInstance(row.entity));
+            } catch (InstantiationException|IllegalAccessException|InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
+            }
+
+            @Override
+            public boolean map(Row row) {
+            return row.superEntity.startsWith(prefix);
+    }
+            }
     private void getIDs() throws IOException {
         List<Callback> callbacks = new LinkedList<>();
-        callbacks.add(getCountryIDsCallback());
-        callbacks.add(getCityIDsCallback());
-        callbacks.add(getPoliticianIDsCallback());
-        callbacks.add(getUniversitiesIDsCallback());
-        callbacks.add(getBusinessesIDsCallback());
-        callbacks.add(getCreatorsIDsCallback());
-        callbacks.add(getArtifactIDsCallback());
-
+        Callback[] c = new Callback[]{
+            new GenericEntityCallback<>(artifacts,      Artifact.class,     "<wordnet_artifact"),
+            new GenericEntityCallback<>(creators,       Creator.class,      "<wordnet_creator"),
+            new GenericEntityCallback<>(businesses,     Business.class,     "<wordnet_business"),
+            new GenericEntityCallback<>(countries,      Country.class,      "<wikicat_Countries"),
+            new GenericEntityCallback<>(cities,         City.class,         "<wikicat_Cities"),
+            new GenericEntityCallback<>(politicians,    Politician.class,   "<wordnet_politician"),
+            new GenericEntityCallback<>(universities,   University.class,   "<wordnet_university"),
+        };
+        Collections.addAll(callbacks, c);
+        //FIXME: do we need to use the other attributes file?
         Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(Consts.YAGO_TYPES_FILE, callbacks);
     }
 
-    private Callback getArtifactIDsCallback() {
-        return new Callback() {
-            @Override
-            public void reduce(Row row) {
-                artifacts.put((row.entity), new Artifact(row.entity));
-            }
 
-            @Override
-            public boolean map(Row row) {
-                return row.superEntity.equals("<wordnet_artifact_100021939>");
-            }
-        };
-    }
-
-    private Callback getCreatorsIDsCallback() {
-        return new Callback() {
-            @Override
-            public void reduce(Row row) {
-                creators.put((row.entity), new Creator(row.entity));
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.superEntity.equals("<wordnet_creator_109614315>");
-            }
-        };
-    }
-
-    private Callback getBusinessesIDsCallback() {
-        return new Callback() {
-            @Override
-            public void reduce(Row row) {
-                businesses.put((row.entity), new Business(row.entity));
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.superEntity.equals("<wordnet_business_108061042>");
-            }
-        };
-    }
-
-    private Callback getCountryIDsCallback() {
-        return new Callback() {
-            @Override
-            public void reduce(Row row) {
-                countries.put((row.entity), new Country(row.entity));
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.superEntity.equals("<wikicat_Countries>");
-            }
-        };
-    }
-
-    private Callback getCityIDsCallback() {
-        return new Callback() {
-            @Override
-            public void reduce(Row row) {
-                cities.put((row.entity), new City(row.entity));
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.superEntity.equals("<wordnet_city_108524735>");
-            }
-        };
-    }
-
-    private Callback getPoliticianIDsCallback() {
-        return new Callback() {
-            @Override
-            public void reduce(Row row) {
-                politicians.put((row.entity), new Politician(row.entity));
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.superEntity.equals("<wordnet_politician_110450303>");
-            }
-        };
-    }
-
-    private Callback getUniversitiesIDsCallback() {
-        return new Callback() {
-            @Override
-            public void reduce(Row row) {
-                universities.put((row.entity), new University(row.entity));
-            }
-
-            @Override
-            public boolean map(Row row) {
-                return row.superEntity.equals("<wordnet_university_108286569>");
-            }
-        };
-    }
 
     private void getNames(final Map<String, ? extends Entity>... entities_maps) throws IOException {
         List<Callback> callbacks = new LinkedList<>();
@@ -173,10 +110,7 @@ public class DataCollector {
         Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(Consts.YAGO_LABELS_FILE, callbacks);
     }
 
-    private void getFacts(Map<String, Artifact> artifacts, Map<String, Creator> creators, Map<String, Business> businesses,
-                          Map<String, Politician> politicians,
-                          Map<String, University> universities,
-                          final Map<String, ? extends PopulatedRegion>... place_maps) throws IOException {
+    private void getFacts(final Map<String, ? extends PopulatedRegion>... place_maps) throws IOException {
         String factFiles[] = new String[]{Consts.YAGO_DATE_FACTS_FILE, Consts.YAGO_FACTS_FILE, Consts.YAGO_LITERAL_FACTS_FILE,};
 
         List<Callback> callbacks = new LinkedList<>();
@@ -404,19 +338,9 @@ public class DataCollector {
     }
 
     private List<Callback> getCallbacks(final Map<String, ? extends PopulatedRegion> places) {
-        Callback _places = new Callback() {
-            @Override
-            public void reduce(Row row) {
-                places.get(parseName(row.superEntity)).places.add(row.entity);
-            }
 
-            @Override
-            public boolean map(Row row) {
-                return row.relationType.equals("<isLocatedIn>") && places.containsKey(row.superEntity);
-            }
-        };
-
-        Callback[] c = new Callback[]{_places,
+        Callback[] c = new Callback[]{
+                new GenericCallback(places, ValueType.STRING,"<isLocatedIn>",          "places",        true, true),
                 new GenericCallback(places, ValueType.DATE,  "<wasCreatedOnDate>",     "creationDate"),
                 new GenericCallback(places, ValueType.FLOAT, "<hasExport>",            "export"),
                 new GenericCallback(places, ValueType.FLOAT, "<hasExpenses>",          "expenses"),
