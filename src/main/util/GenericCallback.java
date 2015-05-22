@@ -1,5 +1,7 @@
-package main.data;
+package main.util;
 
+import main.data.Entity;
+import main.data.ValueType;
 import main.util.Callback;
 import main.util.Row;
 
