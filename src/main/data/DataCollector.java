@@ -47,13 +47,21 @@ public class DataCollector {
         return politicians.values();
     }
 
-    public Collection<University> getUniversities() { return universities.values(); }
+    public Collection<University> getUniversities() {
+        return universities.values();
+    }
 
-    public Collection<Business> getBusinesses() { return businesses.values(); }
+    public Collection<Business> getBusinesses() {
+        return businesses.values();
+    }
 
-    public Collection<Creator> getCreators() { return creators.values(); }
+    public Collection<Creator> getCreators() {
+        return creators.values();
+    }
 
-    public Collection<Artifact> getArtifacts() { return artifacts.values(); }
+    public Collection<Artifact> getArtifacts() {
+        return artifacts.values();
+    }
 
     class GenericEntityCallback<T> extends Callback {
         private final Map<String, T> map;
@@ -84,6 +92,7 @@ public class DataCollector {
             return row.superEntity.startsWith(prefix);
     }
             }
+
     private void getIDs() throws IOException {
         List<Callback> callbacks = new LinkedList<>();
         Callback[] c = new Callback[]{
@@ -99,7 +108,6 @@ public class DataCollector {
         //FIXME: do we need to use the other attributes file?
         Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(Consts.YAGO_TYPES_FILE, callbacks);
     }
-
 
 
     private void getNames(final Map<String, ? extends Entity>... entities_maps) throws IOException {
