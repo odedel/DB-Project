@@ -10,16 +10,15 @@ public class DataCollector {
 
     private Map<String, Country> countries = new HashMap<>();
     private Map<String, City> cities = new HashMap<>();
-    private Map<String, Politician> politicians = new HashMap<>();
     private Map<String, University> universities = new HashMap<>();
     private Map<String, Business> businesses = new HashMap<>();
-    private Map<String, Creator> creators = new HashMap<>();
     private Map<String, Artifact> artifacts = new HashMap<>();
+    private Map<String, Person> persons = new HashMap<>();
 
     public void collectData() throws IOException {
         getIDs();
         //noinspection unchecked
-        getNames(artifacts, creators, businesses, countries, cities, politicians, universities);
+        getNames(persons, artifacts, businesses, countries, cities, universities);
         //noinspection unchecked
         getFacts(countries, cities);
         postProcessData();
@@ -35,10 +34,6 @@ public class DataCollector {
         return cities.values();
     }
 
-    public Collection<Politician> getPoliticians() {
-        return politicians.values();
-    }
-
     public Collection<University> getUniversities() {
         return universities.values();
     }
@@ -47,13 +42,11 @@ public class DataCollector {
         return businesses.values();
     }
 
-    public Collection<Creator> getCreators() {
-        return creators.values();
-    }
-
     public Collection<Artifact> getArtifacts() {
         return artifacts.values();
     }
+
+    public Collection<Person> getPersons() { return persons.values(); }
 
     /* -------------------- Data Collection Callbacks -------------------- */
 
@@ -61,11 +54,11 @@ public class DataCollector {
         List<Callback> callbacks = new LinkedList<>();
         Callback[] c = new Callback[]{
                 new GenericEntityCallback<>(artifacts,      Artifact.class,     "<wordnet_artifact"),
-                new GenericEntityCallback<>(creators,       Creator.class,      "<wordnet_creator"),
+                new GenericEntityCallback<>(persons,       Person.class,      "<wordnet_creator"),
                 new GenericEntityCallback<>(businesses,     Business.class,     "<wordnet_business"),
                 new GenericEntityCallback<>(countries,      Country.class,      "<wikicat_Countries"),
                 new GenericEntityCallback<>(cities,         City.class,         "<wikicat_Cities"),
-                new GenericEntityCallback<>(politicians,    Politician.class,   "<wordnet_politician"),
+                new GenericEntityCallback<>(persons,    Person.class,   "<wordnet_politician"),
                 new GenericEntityCallback<>(universities,   University.class,   "<wordnet_university"),
         };
         Collections.addAll(callbacks, c);
@@ -117,28 +110,23 @@ public class DataCollector {
         callbacks.add(new GenericObjectLinkCallback<>(universities, cities,         University.class,   "<isLocatedIn>",    "cities"));
         callbacks.add(new GenericCallback(universities, ValueType.DATE,     "<wasCreatedOnDate>",   "creationDate"));
         //Person callbacks
-        callbacks.add(new GenericObjectLinkCallback<>(politicians,  cities,         Politician.class,   "<wasBornIn>",      "birthCity",    false, false));
-        callbacks.add(new GenericObjectLinkCallback<>(politicians,  cities,         Politician.class,   "<diedIn>",         "deathCity",    false, false));
-        callbacks.add(new GenericObjectLinkCallback<>(politicians,  universities,   Politician.class,   "<graduatedFrom>",  "universities"));
-        callbacks.add(new GenericCallback(politicians,  ValueType.DATE,     "<diedOnDate>",         "deathDate"));
-        callbacks.add(new GenericCallback(politicians,  ValueType.DATE,     "<wasBornOnDate>",      "birthDate"));
-        callbacks.add(new GenericObjectLinkCallback<>(creators,     cities,         Creator.class,      "<wasBornIn>",      "birthCity",    false, false));
-        callbacks.add(new GenericObjectLinkCallback<>(creators,     cities,         Creator.class,      "<diedIn>",         "deathCity",    false, false));
-        callbacks.add(new GenericObjectLinkCallback<>(creators,     universities,   Creator.class,      "<graduatedFrom>",  "universities"));
-        callbacks.add(new GenericCallback(creators,     ValueType.DATE,     "<diedOnDate>",         "deathDate"));
-        callbacks.add(new GenericCallback(creators,     ValueType.DATE,     "<wasBornOnDate>",      "birthDate"));
+        callbacks.add(new GenericObjectLinkCallback<>(persons,  cities,         Person.class,   "<wasBornIn>",      "birthCity",    false, false));
+        callbacks.add(new GenericObjectLinkCallback<>(persons,  cities,         Person.class,   "<diedIn>",         "deathCity",    false, false));
+        callbacks.add(new GenericObjectLinkCallback<>(persons,  universities,   Person.class,   "<graduatedFrom>",  "universities"));
+        callbacks.add(new GenericCallback(persons,  ValueType.DATE,     "<diedOnDate>",         "deathDate"));
+        callbacks.add(new GenericCallback(persons,  ValueType.DATE,     "<wasBornOnDate>",      "birthDate"));
         //Business callbacks
         callbacks.add(new GenericObjectLinkCallback<>(businesses,   countries,      Business.class,     "<isLocatedIn>",    "countries"));
         callbacks.add(new GenericObjectLinkCallback<>(businesses,   cities,         Business.class,     "<isLocatedIn>",    "cities"));
         callbacks.add(new GenericCallback(businesses,   ValueType.DATE,     "<wasCreatedOnDate>",   "creationDate"));
         callbacks.add(new GenericCallback(businesses,   ValueType.LONG,     "<hasNumberOfPeople>",  "numberOfEmployees"));
         //Politician callbacks
-        callbacks.add(new GenericObjectLinkCallback<>(politicians,  countries,      Politician.class,   "<isPoliticianOf>", "countries"));
+        callbacks.add(new GenericObjectLinkCallback<>(persons,  countries,      Person.class,   "<isPoliticianOf>", "politicianOf"));
         //Creator callbacks
-        callbacks.add(new GenericObjectLinkCallback<>(creators,     businesses,     Creator.class,      "<created>",        "businesses"));
+        callbacks.add(new GenericObjectLinkCallback<>(persons,     businesses,     Person.class,      "<created>",        "businesses"));
         //Artifact callbacks
         callbacks.add(new GenericObjectLinkCallback<>(artifacts,    businesses,     Artifact.class,     "<created>",        "businesses",   true, true));
-        callbacks.add(new GenericObjectLinkCallback<>(artifacts,    creators,       Artifact.class,     "<created>",        "creators",     true, true));
+        callbacks.add(new GenericObjectLinkCallback<>(artifacts,    persons,       Artifact.class,     "<created>",        "creators",     true, true));
         callbacks.add(new GenericCallback(artifacts,    ValueType.DATE,     "<wasCreatedOnDate>",   "creationDate"));
 
         for (String factFile : factFiles) {
@@ -151,9 +139,8 @@ public class DataCollector {
     private void postProcessData() {
         postCitiesProcessor();
         postUniversitiesProcessor();
-        postPoliticiansProcessor();
         postBusinessesProcessor();
-        postCreatorsProcessor();
+        postPersonProcessor();
         postArtifactProcessor();
     }
 
@@ -182,7 +169,9 @@ public class DataCollector {
         System.out.println(String.format("Deleted %d universities", universitiesToRemove.size()));
     }
 
-    private void postPersonProcessor(Map<String, ? extends Person> persons) {
+    private void postPersonProcessor() {
+        List<String> personsToRemove = new ArrayList<>();
+
         for (Map.Entry<String, ? extends Person> personEntry : persons.entrySet()) {
             if (personEntry.getValue().birthCity != null &&
                     !cities.containsKey(personEntry.getValue().birthCity.entity)) {
@@ -192,37 +181,26 @@ public class DataCollector {
                     !cities.containsKey(personEntry.getValue().deathCity.entity)) {
                 personEntry.getValue().deathCity = null;
             }
+
             List<University> universitiesToBeRemoved = personEntry.getValue().universities.stream().
                     filter(university -> !universities.containsKey(university.entity)).
                     collect(Collectors.toCollection(LinkedList::new));
             universitiesToBeRemoved.forEach(personEntry.getValue().universities::remove);
-        }
-    }
 
-    private void postPoliticiansProcessor() {
-        List<String> politiciansToRemove = politicians.entrySet().stream().
-                filter(politicianEntry -> politicianEntry.getValue().countries.isEmpty()).
-                map(Map.Entry::getKey).collect(Collectors.toList());
-        politiciansToRemove.forEach(politicians::remove);
-        postPersonProcessor(politicians);
-        System.out.println(String.format("Deleted %d politicians", politiciansToRemove.size()));
-    }
-
-    private void postCreatorsProcessor() {
-        postPersonProcessor(creators);
-        List<String> creatorsToRemove = new ArrayList<>();
-        for (Map.Entry<String, Creator> creatorEntry : creators.entrySet()) {
-            if (creatorEntry.getValue().birthCity == null && creatorEntry.getValue().deathCity == null) {
-                creatorsToRemove.add(creatorEntry.getKey());
-            }
-
-            List<Business> businessesToBeRemoved = creatorEntry.getValue().businesses.stream().
+            List<Business> businessesToBeRemoved = personEntry.getValue().businesses.stream().
                     filter(business -> !businesses.containsKey(business.entity)).
                     collect(Collectors.toCollection(LinkedList::new));
-            businessesToBeRemoved.forEach(creatorEntry.getValue().businesses::remove);
+            businessesToBeRemoved.forEach(personEntry.getValue().businesses::remove);
+
+            if (personEntry.getValue().birthCity == null && personEntry.getValue().deathCity == null &&
+                    personEntry.getValue().politicianOf.isEmpty() && personEntry.getValue().businesses.isEmpty() &&
+                    personEntry.getValue().universities.isEmpty()) {
+                personsToRemove.add(personEntry.getKey());
+            }
         }
-        creatorsToRemove.forEach(creators::remove);
-        System.out.println(String.format("Deleted %d creators", creatorsToRemove.size()));
+
+        personsToRemove.forEach(persons::remove);
+        System.out.println(String.format("Deleted %d persons", personsToRemove.size()));
     }
 
     private void postBusinessesProcessor() {
@@ -243,15 +221,18 @@ public class DataCollector {
 
     private void postArtifactProcessor() {
         List<String> artifactsToRemove = new ArrayList<>();
+
         for (Map.Entry<String, Artifact> artifactEntry : artifacts.entrySet()) {
             List<Business> businessesToBeRemoves = artifactEntry.getValue().businesses.stream().
                     filter(business -> !businesses.containsKey(business.entity)).
                     collect(Collectors.toCollection(LinkedList::new));
             businessesToBeRemoves.forEach(artifactEntry.getValue().businesses::remove);
-            List<Creator> creatorsToBeRemoved = artifactEntry.getValue().creators.stream().
-                    filter(creator -> !creators.containsKey(creator.entity)).
+
+            List<Person> creatorsToBeRemoved = artifactEntry.getValue().creators.stream().
+                    filter(creator -> !persons.containsKey(creator.entity)).
                     collect(Collectors.toList());
             creatorsToBeRemoved.forEach(artifactEntry.getValue().creators::remove);
+
             if (artifactEntry.getValue().creators.isEmpty() && artifactEntry.getValue().businesses.isEmpty()) {
                 artifactsToRemove.add(artifactEntry.getKey());
             }

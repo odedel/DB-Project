@@ -16,7 +16,7 @@ public class Artifact extends Entity{
 
     public Set<Business> businesses = new HashSet<>();
 
-    public Set<Creator> creators = new HashSet<>();
+    public Set<Person> creators = new HashSet<>();
 
 
 }

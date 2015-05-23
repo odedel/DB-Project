@@ -6,6 +6,10 @@ import java.util.Set;
 
 public class Person extends Entity {
 
+    public Person(String entity) {
+        this.entity = entity;
+    }
+
     public int id;
 
     public City birthCity;
@@ -17,4 +21,8 @@ public class Person extends Entity {
     public LocalDate deathDate;
 
     public Set<University> universities = new HashSet<>();
+
+    public Set<Country> politicianOf = new HashSet<>();
+
+    public Set<Business> businesses = new HashSet<>();
 }

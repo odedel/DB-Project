@@ -35,28 +35,25 @@ class Sample {
         Collection<Country> countries = dataCollector.getCountries();
         Collection<City> cities = dataCollector.getCities();
         Collection<University> universities = dataCollector.getUniversities();
-        Collection<Politician> politicians = dataCollector.getPoliticians();
         Collection<Artifact> artifacts = dataCollector.getArtifacts();
         Collection<Business> businesses = dataCollector.getBusinesses();
-        Collection<Creator> creators = dataCollector.getCreators();
+        Collection<Person> persons = dataCollector.getPersons();
 
         System.out.println();
         System.out.println(String.format("Collected %d countries", countries.size()));
         System.out.println(String.format("Collected %d cities", cities.size()));
         System.out.println(String.format("Collected %d universities", universities.size()));
-        System.out.println(String.format("Collected %d politicians", politicians.size()));
+        System.out.println(String.format("Collected %d persons", persons.size()));
         System.out.println(String.format("Collected %d artifacts", artifacts.size()));
         System.out.println(String.format("Collected %d businesses", businesses.size()));
-        System.out.println(String.format("Collected %d creators", creators.size()));
 
         System.out.println("Uploading ...");
 
         connection.uploadCountries(new LinkedList<>(countries));
         connection.uploadCities(new LinkedList<>(cities));
         connection.uploadUniversities(new LinkedList<>(universities));
-        connection.uploadPoliticians(new LinkedList<>(politicians));
         connection.uploadBusinesses(new LinkedList<>(businesses));
-        connection.uploadCreators(new LinkedList<>(creators));
+        connection.uploadPersons(new LinkedList<>(persons));
         connection.uploadArtifacts(new LinkedList<>(artifacts));
     }
 
