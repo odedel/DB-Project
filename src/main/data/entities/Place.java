@@ -1,4 +1,4 @@
-package main.data;
+package main.data.entities;
 
 import java.util.LinkedList;
 import java.util.List;

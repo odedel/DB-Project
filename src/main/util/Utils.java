@@ -1,6 +1,6 @@
 package main.util;
 
-import main.data.ValueType;
+import main.data.logic.ValueType;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;

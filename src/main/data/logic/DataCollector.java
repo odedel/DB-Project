@@ -1,5 +1,6 @@
-package main.data;
+package main.data.logic;
 
+import main.data.entities.*;
 import main.util.*;
 
 import java.io.IOException;

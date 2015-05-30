@@ -1,6 +1,6 @@
 package db;
 
-import main.data.*;
+import main.data.entities.*;
 
 import java.sql.*;
 import java.sql.Date;

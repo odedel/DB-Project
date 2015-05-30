@@ -1,4 +1,4 @@
-package main.data;
+package main.data.entities;
 
 public class Country extends PopulatedRegion {
 

@@ -3,7 +3,8 @@ package main;
 import db.DBConnection;
 import db.DBException;
 import db.DBUser;
-import main.data.*;
+import main.data.entities.*;
+import main.data.logic.DataCollector;
 
 import java.io.IOException;
 import java.util.Collection;
