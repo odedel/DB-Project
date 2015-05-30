@@ -3,6 +3,11 @@ package main.data.entities;
 import java.time.LocalDate;
 
 public class PopulatedRegion extends Entity {
+
+    public PopulatedRegion(String entity) {
+        super(entity);
+    }
+
     public int          id;
     public LocalDate    creationDate;
     public float        export;                         // Dollar

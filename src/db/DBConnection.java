@@ -67,7 +67,7 @@ public class DBConnection {
 //                                                        //  think if you want that, if so - add the generated keys
 //                    pstmt.executeBatch();
 //                }
-                pstmt.setString(1, country.name);
+                pstmt.setString(1, country.getName());
                 if (country.creationDate != null) {
                     pstmt.setDate(2, Date.valueOf(country.creationDate));
                 } else {
@@ -126,7 +126,7 @@ public class DBConnection {
 //                                                        //  think if you want that, if so - add the generated keys
 //                    pstmt.executeBatch();
 //                }
-                pstmt.setString(1, city.name);
+                pstmt.setString(1, city.getName());
                 pstmt.setInt(2, city.country.id);
                 if (city.creationDate != null) {
                     pstmt.setDate(3, Date.valueOf(city.creationDate));
@@ -306,7 +306,7 @@ public class DBConnection {
 //                                                        //  think if you want that, if so - add the generated keys
 //                    pstmt.executeBatch();
 //                }
-                pstmt.setString(1, person.name);
+                pstmt.setString(1, person.getName());
 
                 if (person.birthCity != null) {
                     pstmt.setInt(2, person.birthCity.id);
@@ -497,7 +497,7 @@ public class DBConnection {
 //                                                        //  think if you want that, if so - add the generated keys
 //                    pstmt.executeBatch();
 //                }
-                pstmt.setString(1, business.name);
+                pstmt.setString(1, business.getName());
 
                 if (business.creationDate != null) {
                     pstmt.setDate(2, Date.valueOf(business.creationDate));
@@ -644,7 +644,7 @@ public class DBConnection {
 //                                                        //  think if you want that, if so - add the generated keys
 //                    pstmt.executeBatch();
 //                }
-                pstmt.setString(1, artifact.name);
+                pstmt.setString(1, artifact.getName());
 
                 if (artifact.creationDate != null) {
                     pstmt.setDate(2, Date.valueOf(artifact.creationDate));
@@ -699,71 +699,71 @@ public class DBConnection {
         }
     }
 
-    public Map<Integer, Country> getAllCountriesData() throws DBException {
-        Map<Integer, Country> countries = new HashMap<>();
+//    public Map<Integer, Country> getAllCountriesData() throws DBException {
+//        Map<Integer, Country> countries = new HashMap<>();
+//
+//        try (Statement stmt = conn.createStatement()) {
+//            ResultSet rs = stmt.executeQuery("SELECT * FROM COUNTRY");
+//
+//            while (rs.next()) {
+//                Country country = new Country();
+//
+//                country.id = rs.getInt("id");
+//                country.name = rs.getString("name");
+//
+//                Date creationDate = rs.getDate("creation_date");
+//                if (creationDate != null) {
+//                    country.creationDate = creationDate.toLocalDate();
+//                }
+//                country.economicGrowth = rs.getFloat("economic_growth");
+//                country.poverty = rs.getFloat("poverty");
+//                country.population = rs.getLong("population");
+//                country.unemployment = rs.getFloat("unemployment");
+//                country.gini = rs.getFloat("gini");
+//                country.inflation = rs.getFloat("inflation");
+//                country.populationDensity = rs.getFloat("population_density");
+//
+//                countries.put(country.id, country);
+//            }
+//
+//        } catch (SQLException e) {
+//            throw new DBException("Error while fetching countries data : " + e.getMessage());
+//        }
+//        return countries;
+//    }
 
-        try (Statement stmt = conn.createStatement()) {
-            ResultSet rs = stmt.executeQuery("SELECT * FROM COUNTRY");
-
-            while (rs.next()) {
-                Country country = new Country();
-
-                country.id = rs.getInt("id");
-                country.name = rs.getString("name");
-
-                Date creationDate = rs.getDate("creation_date");
-                if (creationDate != null) {
-                    country.creationDate = creationDate.toLocalDate();
-                }
-                country.economicGrowth = rs.getFloat("economic_growth");
-                country.poverty = rs.getFloat("poverty");
-                country.population = rs.getLong("population");
-                country.unemployment = rs.getFloat("unemployment");
-                country.gini = rs.getFloat("gini");
-                country.inflation = rs.getFloat("inflation");
-                country.populationDensity = rs.getFloat("population_density");
-
-                countries.put(country.id, country);
-            }
-
-        } catch (SQLException e) {
-            throw new DBException("Error while fetching countries data : " + e.getMessage());
-        }
-        return countries;
-    }
-
-    public Map<Integer, City> getAllCitiesData(Map<Integer, Country> countries) throws DBException {
-        Map<Integer, City> cities = new HashMap<>();
-
-        try (Statement stmt = conn.createStatement()) {
-            ResultSet rs = stmt.executeQuery("SELECT * FROM CITY");
-
-            while (rs.next()) {
-                City city = new City();
-
-                city.id = rs.getInt("id");
-                city.name = rs.getString("name");
-                city.country = countries.get(rs.getInt("country_id"));
-                Date creationDate = rs.getDate("creation_date");
-                if (creationDate != null) {
-                    city.creationDate = creationDate.toLocalDate();
-                }
-                city.economicGrowth = rs.getFloat("economic_growth");
-                city.poverty = rs.getFloat("poverty");
-                city.population = rs.getLong("population");
-                city.unemployment = rs.getFloat("unemployment");
-                city.gini = rs.getFloat("gini");
-                city.inflation = rs.getFloat("inflation");
-                city.populationDensity = rs.getFloat("population_density");
-
-                cities.put(city.id, city);
-            }
-
-        } catch (SQLException e) {
-            throw new DBException("Error while fetching cities data : " + e.getMessage());
-        }
-        return cities;
-    }
+//    public Map<Integer, City> getAllCitiesData(Map<Integer, Country> countries) throws DBException {
+//        Map<Integer, City> cities = new HashMap<>();
+//
+//        try (Statement stmt = conn.createStatement()) {
+//            ResultSet rs = stmt.executeQuery("SELECT * FROM CITY");
+//
+//            while (rs.next()) {
+//                City city = new City();
+//
+//                city.id = rs.getInt("id");
+//                city.name = rs.getString("name");
+//                city.country = countries.get(rs.getInt("country_id"));
+//                Date creationDate = rs.getDate("creation_date");
+//                if (creationDate != null) {
+//                    city.creationDate = creationDate.toLocalDate();
+//                }
+//                city.economicGrowth = rs.getFloat("economic_growth");
+//                city.poverty = rs.getFloat("poverty");
+//                city.population = rs.getLong("population");
+//                city.unemployment = rs.getFloat("unemployment");
+//                city.gini = rs.getFloat("gini");
+//                city.inflation = rs.getFloat("inflation");
+//                city.populationDensity = rs.getFloat("population_density");
+//
+//                cities.put(city.id, city);
+//            }
+//
+//        } catch (SQLException e) {
+//            throw new DBException("Error while fetching cities data : " + e.getMessage());
+//        }
+//        return cities;
+//    }
 
     /**
      * Clears data from DB.

@@ -7,7 +7,7 @@ import java.util.Set;
 public class University extends Entity {
 
     public University(String entity) {
-        this.entity = entity;
+        super(entity);
     }
 
     public int id;

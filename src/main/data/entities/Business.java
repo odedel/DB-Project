@@ -9,7 +9,7 @@ public class Business extends Entity {
     public int id;
     
     public Business(String entity) {
-        this.entity = entity;
+        super(entity);
     }
 
     public LocalDate creationDate;

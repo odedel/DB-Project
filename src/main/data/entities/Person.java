@@ -7,7 +7,7 @@ import java.util.Set;
 public class Person extends Entity {
 
     public Person(String entity) {
-        this.entity = entity;
+        super(entity);
     }
 
     public int id;

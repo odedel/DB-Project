@@ -9,7 +9,7 @@ public class Artifact extends Entity{
     public int id;
 
     public Artifact(String entity) {
-        this.entity = entity;
+        super(entity);
     }
 
     public LocalDate creationDate;
