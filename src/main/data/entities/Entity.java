@@ -2,39 +2,37 @@ package main.data.entities;
 
 public class Entity {
 
+    /* --- Ctors --- */
+
     public Entity(String entity) {
         this.entity = entity;
     }
 
+
+    /** --- Getters and Setters --- */
+
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getEntity() {
         return entity;
     }
 
-    public void setEntity(String entity) {
-        this.entity = entity;
-    }
-
     public int getId() {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
+    public void setId(int id) { this.id = id; }
+
+
+    /** --- Date Members --- */
 
     /** YAGO's entity */
-    private String       entity;
+    protected String       entity;
 
     /** Entity's name */
-    private String       name;
+    protected String       name;
 
     /** Entity's ID in the DB */
     private int         id;

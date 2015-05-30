@@ -189,10 +189,10 @@ public class DBConnection {
 //                                                        //  think if you want that, if so - add the generated keys
 //                    pstmt.executeBatch();
 //                }
-                pstmt.setString(1, university.name);
+                pstmt.setString(1, university.getName());
 
-                if (university.creationDate != null) {
-                    pstmt.setDate(2, Date.valueOf(university.creationDate));
+                if (university.getCreationDate() != null) {
+                    pstmt.setDate(2, Date.valueOf(university.getCreationDate()));
                 } else {
                     pstmt.setDate(2, null);
                 }
@@ -236,7 +236,7 @@ public class DBConnection {
 //                                                        //  think if you want that, if so - add the generated keys
 //                    pstmt.executeBatch();
 //                }
-                for (Country country : university.countries) {
+                for (Country country : university.getCountries()) {
                     pstmt.setInt(1, university.getId());
                     pstmt.setInt(2, country.getId());
                     pstmt.addBatch();
@@ -266,7 +266,7 @@ public class DBConnection {
 //                                                        //  think if you want that, if so - add the generated keys
 //                    pstmt.executeBatch();
 //                }
-                for (City city : university.cities) {
+                for (City city : university.getCities()) {
                     pstmt.setInt(1, university.getId());
                     pstmt.setInt(2, city.getId());
                     pstmt.addBatch();
@@ -308,24 +308,24 @@ public class DBConnection {
 //                }
                 pstmt.setString(1, person.getName());
 
-                if (person.birthCity != null) {
-                    pstmt.setInt(2, person.birthCity.getId());
+                if (person.getBirthCity() != null) {
+                    pstmt.setInt(2, person.getBirthCity().getId());
                 } else {
                     pstmt.setNull(2, java.sql.Types.INTEGER);
                 }
-                if (person.birthDate != null) {
-                    pstmt.setDate(3, Date.valueOf(person.birthDate));
+                if (person.getBirthDate() != null) {
+                    pstmt.setDate(3, Date.valueOf(person.getBirthDate()));
                 } else {
                     pstmt.setDate(3, null);
                 }
 
-                if (person.deathCity != null) {
-                    pstmt.setInt(4, person.deathCity.getId());
+                if (person.getDeathCity() != null) {
+                    pstmt.setInt(4, person.getDeathCity().getId());
                 } else {
                     pstmt.setNull(4, java.sql.Types.INTEGER);
                 }
-                if (person.deathDate != null) {
-                    pstmt.setDate(5, Date.valueOf(person.deathDate));
+                if (person.getDeathDate() != null) {
+                    pstmt.setDate(5, Date.valueOf(person.getDeathDate()));
                 } else {
                     pstmt.setDate(5, null);
                 }
@@ -369,7 +369,7 @@ public class DBConnection {
 //                                                        //  think if you want that, if so - add the generated keys
 //                    pstmt.executeBatch();
 //                }
-                for (Country country : person.politicianOf) {
+                for (Country country : person.getPoliticianOf()) {
                     pstmt.setInt(1, country.getId());
                     pstmt.setInt(2, person.getId());
                     pstmt.addBatch();
@@ -399,7 +399,7 @@ public class DBConnection {
 //                                                        //  think if you want that, if so - add the generated keys
 //                    pstmt.executeBatch();
 //                }
-                for (University university : person.universities) {
+                for (University university : person.getUniversities()) {
                     pstmt.setInt(1, person.getId());
                     pstmt.setInt(2, university.getId());
                     pstmt.addBatch();
@@ -429,7 +429,7 @@ public class DBConnection {
 //                                                        //  think if you want that, if so - add the generated keys
 //                    pstmt.executeBatch();
 //                }
-                for (Business business : person.businesses) {
+                for (Business business : person.getBusinesses()) {
                     pstmt.setInt(1, person.getId());
                     pstmt.setInt(2, business.getId());
                     pstmt.addBatch();
@@ -499,13 +499,13 @@ public class DBConnection {
 //                }
                 pstmt.setString(1, business.getName());
 
-                if (business.creationDate != null) {
-                    pstmt.setDate(2, Date.valueOf(business.creationDate));
+                if (business.getCreationDate() != null) {
+                    pstmt.setDate(2, Date.valueOf(business.getCreationDate()));
                 } else {
                     pstmt.setDate(2, null);
                 }
 
-                pstmt.setLong(3, business.numberOfEmployees);
+                pstmt.setLong(3, business.getNumberOfEmployees());
 
                 pstmt.addBatch();
                 counter++;
@@ -546,7 +546,7 @@ public class DBConnection {
 //                                                        //  think if you want that, if so - add the generated keys
 //                    pstmt.executeBatch();
 //                }
-                for (City city : business.cities) {
+                for (City city : business.getCities()) {
                     pstmt.setInt(1, business.getId());
                     pstmt.setInt(2, city.getId());
                     pstmt.addBatch();
@@ -576,7 +576,7 @@ public class DBConnection {
 //                                                        //  think if you want that, if so - add the generated keys
 //                    pstmt.executeBatch();
 //                }
-                for (Country country : business.countries) {
+                for (Country country : business.getCountries()) {
                     pstmt.setInt(1, country.getId());
                     pstmt.setInt(2, business.getId());
                     pstmt.addBatch();

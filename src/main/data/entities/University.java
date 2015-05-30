@@ -6,16 +6,34 @@ import java.util.Set;
 
 public class University extends Entity {
 
+    /** --- Ctors --- */
+
     public University(String entity) {
         super(entity);
     }
 
-    public String name;
 
-    public Set<Country> countries = new HashSet<>();
+    /** --- Getters and Setters --- */
 
-    public Set<City> cities = new HashSet<>();
+    public Set<Country> getCountries() {
+        return countries;
+    }
 
-    public LocalDate creationDate;
+    public Set<City> getCities() {
+        return cities;
+    }
+
+    public LocalDate getCreationDate() {
+        return creationDate;
+    }
+
+
+    /** --- Data Members --- */
+
+    protected Set<Country> countries = new HashSet<>();
+
+    protected Set<City> cities = new HashSet<>();
+
+    protected LocalDate creationDate;
 
 }

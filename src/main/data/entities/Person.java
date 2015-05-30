@@ -6,21 +6,65 @@ import java.util.Set;
 
 public class Person extends Entity {
 
+    /** --- Ctors --- */
+
     public Person(String entity) {
+
         super(entity);
+        this.universities = new HashSet<>();
+        this.politicianOf = new HashSet<>();
+        this.businesses = new HashSet<>();
     }
 
-    public City birthCity;
 
-    public LocalDate birthDate;
+    /** --- Getters and Setters --- */
 
-    public City deathCity;
+    public City getBirthCity() {
+        return birthCity;
+    }
 
-    public LocalDate deathDate;
+    public void setBirthCity(City city) { this.birthCity = city; }
 
-    public Set<University> universities = new HashSet<>();
+    public LocalDate getBirthDate() {
+        return birthDate;
+    }
 
-    public Set<Country> politicianOf = new HashSet<>();
+    public City getDeathCity() {
+        return deathCity;
+    }
 
-    public Set<Business> businesses = new HashSet<>();
+    public LocalDate getDeathDate() {
+        return deathDate;
+    }
+
+    public void setDeathCity(City city) { this.deathCity = city; }
+
+    public Set<University> getUniversities() {
+        return universities;
+    }
+
+    public Set<Country> getPoliticianOf() {
+        return politicianOf;
+    }
+
+    public Set<Business> getBusinesses() {
+        return businesses;
+    }
+
+
+    /** --- Data Members --- */
+
+    protected City birthCity;
+
+    protected LocalDate birthDate;
+
+    protected City deathCity;
+
+    protected LocalDate deathDate;
+
+    protected Set<University> universities;
+
+    protected Set<Country> politicianOf;
+
+    protected Set<Business> businesses;
 }

@@ -63,7 +63,6 @@ public class DataCollector {
                 new GenericEntityCallback<>(universities,   University.class,   "<wordnet_university"),
         };
         Collections.addAll(callbacks, c);
-        //FIXME: do we need to use the other attributes file?
         Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(YAGOFilesLocation.YAGO_TYPES_FILE, callbacks);
     }
 
@@ -158,11 +157,11 @@ public class DataCollector {
         List<String> universitiesToRemove = new ArrayList<>();
 
         for (Map.Entry<String, University> universitiesEntry : universities.entrySet()) {
-            List<City> citiesToBeRemoved = universitiesEntry.getValue().cities.stream().
+            List<City> citiesToBeRemoved = universitiesEntry.getValue().getCities().stream().
                     filter(city -> !cities.containsKey(city.getEntity())).
                     collect(Collectors.toCollection(LinkedList::new));
-            citiesToBeRemoved.forEach(universitiesEntry.getValue().cities::remove);
-            if (universitiesEntry.getValue().cities.isEmpty() && universitiesEntry.getValue().countries.isEmpty()) {
+            citiesToBeRemoved.forEach(universitiesEntry.getValue().getCities()::remove);
+            if (universitiesEntry.getValue().getCities().isEmpty() && universitiesEntry.getValue().getCountries().isEmpty()) {
                 universitiesToRemove.add(universitiesEntry.getKey());
             }
         }
@@ -174,28 +173,28 @@ public class DataCollector {
         List<String> personsToRemove = new ArrayList<>();
 
         for (Map.Entry<String, ? extends Person> personEntry : persons.entrySet()) {
-            if (personEntry.getValue().birthCity != null &&
-                    !cities.containsKey(personEntry.getValue().birthCity.getEntity())) {
-                personEntry.getValue().birthCity = null;
+            if (personEntry.getValue().getBirthCity() != null &&
+                    !cities.containsKey(personEntry.getValue().getBirthCity().getEntity())) {
+                personEntry.getValue().setBirthCity(null);
             }
-            if (personEntry.getValue().deathCity != null &&
-                    !cities.containsKey(personEntry.getValue().deathCity.getEntity())) {
-                personEntry.getValue().deathCity = null;
+            if (personEntry.getValue().getDeathCity() != null &&
+                    !cities.containsKey(personEntry.getValue().getDeathCity().getEntity())) {
+                personEntry.getValue().setDeathCity(null);
             }
 
-            List<University> universitiesToBeRemoved = personEntry.getValue().universities.stream().
+            List<University> universitiesToBeRemoved = personEntry.getValue().getUniversities().stream().
                     filter(university -> !universities.containsKey(university.getEntity())).
                     collect(Collectors.toCollection(LinkedList::new));
-            universitiesToBeRemoved.forEach(personEntry.getValue().universities::remove);
+            universitiesToBeRemoved.forEach(personEntry.getValue().getUniversities()::remove);
 
-            List<Business> businessesToBeRemoved = personEntry.getValue().businesses.stream().
+            List<Business> businessesToBeRemoved = personEntry.getValue().getBusinesses().stream().
                     filter(business -> !businesses.containsKey(business.getEntity())).
                     collect(Collectors.toCollection(LinkedList::new));
-            businessesToBeRemoved.forEach(personEntry.getValue().businesses::remove);
+            businessesToBeRemoved.forEach(personEntry.getValue().getBusinesses()::remove);
 
-            if (personEntry.getValue().birthCity == null && personEntry.getValue().deathCity == null &&
-                    personEntry.getValue().politicianOf.isEmpty() && personEntry.getValue().businesses.isEmpty() &&
-                    personEntry.getValue().universities.isEmpty()) {
+            if (personEntry.getValue().getBirthCity() == null && personEntry.getValue().getDeathCity() == null &&
+                    personEntry.getValue().getPoliticianOf().isEmpty() && personEntry.getValue().getBusinesses().isEmpty() &&
+                    personEntry.getValue().getUniversities().isEmpty()) {
                 personsToRemove.add(personEntry.getKey());
             }
         }
@@ -208,11 +207,11 @@ public class DataCollector {
         List<String> businessesToRemove = new ArrayList<>();
 
         for (Map.Entry<String, Business> businessEntry : businesses.entrySet()) {
-            List<City> citiesToBeRemoved = businessEntry.getValue().cities.stream().
+            List<City> citiesToBeRemoved = businessEntry.getValue().getCities().stream().
                     filter(city -> !cities.containsKey(city.getEntity())).
                     collect(Collectors.toCollection(LinkedList::new));
-            citiesToBeRemoved.forEach(businessEntry.getValue().cities::remove);
-            if (businessEntry.getValue().countries.isEmpty() && businessEntry.getValue().cities.isEmpty()) {
+            citiesToBeRemoved.forEach(businessEntry.getValue().getCities()::remove);
+            if (businessEntry.getValue().getCountries().isEmpty() && businessEntry.getValue().getCities().isEmpty()) {
                 businessesToRemove.add(businessEntry.getKey());
             }
         }

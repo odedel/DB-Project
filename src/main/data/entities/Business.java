@@ -14,22 +14,15 @@ public class Business extends Entity {
         this.countries = new HashSet<>();
     }
 
+
     /** --- Getters and Setters --- */
 
     public LocalDate getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(LocalDate creationDate) {
-        this.creationDate = creationDate;
-    }
-
     public long getNumberOfEmployees() {
         return numberOfEmployees;
-    }
-
-    public void setNumberOfEmployees(long numberOfEmployees) {
-        this.numberOfEmployees = numberOfEmployees;
     }
 
     public Set<City> getCities() {
@@ -40,14 +33,15 @@ public class Business extends Entity {
         return countries;
     }
 
+
     /** --- Data Members --- */
 
-    public LocalDate creationDate;
+    protected LocalDate creationDate;
 
-    public long numberOfEmployees;
+    protected long numberOfEmployees;
 
-    public Set<City> cities;
+    protected Set<City> cities;
 
-    public Set<Country> countries;
+    protected Set<Country> countries;
 
 }

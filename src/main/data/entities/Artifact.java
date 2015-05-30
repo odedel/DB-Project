@@ -7,20 +7,18 @@ import java.util.Set;
 public class Artifact extends Entity {
 
     /** --- Ctors --- */
+
     public Artifact(String entity) {
         super(entity);
         this.businesses = new HashSet<>();
         this.creators = new HashSet<>();
     }
 
+
     /** --- Getter and Setter --- */
 
     public LocalDate getCreationDate() {
         return creationDate;
-    }
-
-    public void setCreationDate(LocalDate creationDate) {
-        this.creationDate = creationDate;
     }
 
     public Set<Business> getBusinesses() {
@@ -31,12 +29,13 @@ public class Artifact extends Entity {
         return creators;
     }
 
+
     /** --- Data Members --- */
 
-    private LocalDate creationDate;
+    protected LocalDate creationDate;
 
-    private Set<Business> businesses;
+    protected Set<Business> businesses;
 
-    private Set<Person> creators;
+    protected Set<Person> creators;
 
 }
