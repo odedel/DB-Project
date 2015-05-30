@@ -89,7 +89,7 @@ public class DBConnection {
             rs = pstmt.getGeneratedKeys();
             Iterator<Country> countryIterator = countries.iterator();
             while (rs.next()) {
-                countryIterator.next().id = rs.getInt(1);
+                countryIterator.next().setId(rs.getInt(1));
             }
 
             conn.commit();
@@ -127,7 +127,7 @@ public class DBConnection {
 //                    pstmt.executeBatch();
 //                }
                 pstmt.setString(1, city.getName());
-                pstmt.setInt(2, city.country.id);
+                pstmt.setInt(2, city.country.getId());
                 if (city.creationDate != null) {
                     pstmt.setDate(3, Date.valueOf(city.creationDate));
                 } else {
@@ -149,7 +149,7 @@ public class DBConnection {
             rs = pstmt.getGeneratedKeys();
             Iterator<City> cityIterator = cities.iterator();
             while (rs.next()) {
-                cityIterator.next().id = rs.getInt(1);
+                cityIterator.next().setId(rs.getInt(1));
             }
 
             conn.commit();
@@ -205,7 +205,7 @@ public class DBConnection {
             rs = pstmt.getGeneratedKeys();
             Iterator<University> universityIterator = universities.iterator();
             while (rs.next()) {
-                universityIterator.next().id = rs.getInt(1);
+                universityIterator.next().setId(rs.getInt(1));
             }
 
             conn.commit();
@@ -237,8 +237,8 @@ public class DBConnection {
 //                    pstmt.executeBatch();
 //                }
                 for (Country country : university.countries) {
-                    pstmt.setInt(1, university.id);
-                    pstmt.setInt(2, country.id);
+                    pstmt.setInt(1, university.getId());
+                    pstmt.setInt(2, country.getId());
                     pstmt.addBatch();
                 }
                 counter++;
@@ -267,8 +267,8 @@ public class DBConnection {
 //                    pstmt.executeBatch();
 //                }
                 for (City city : university.cities) {
-                    pstmt.setInt(1, university.id);
-                    pstmt.setInt(2, city.id);
+                    pstmt.setInt(1, university.getId());
+                    pstmt.setInt(2, city.getId());
                     pstmt.addBatch();
                 }
                 counter++;
@@ -309,7 +309,7 @@ public class DBConnection {
                 pstmt.setString(1, person.getName());
 
                 if (person.birthCity != null) {
-                    pstmt.setInt(2, person.birthCity.id);
+                    pstmt.setInt(2, person.birthCity.getId());
                 } else {
                     pstmt.setNull(2, java.sql.Types.INTEGER);
                 }
@@ -320,7 +320,7 @@ public class DBConnection {
                 }
 
                 if (person.deathCity != null) {
-                    pstmt.setInt(4, person.deathCity.id);
+                    pstmt.setInt(4, person.deathCity.getId());
                 } else {
                     pstmt.setNull(4, java.sql.Types.INTEGER);
                 }
@@ -338,7 +338,7 @@ public class DBConnection {
             rs = pstmt.getGeneratedKeys();
             Iterator<Person> politicianIterator = persons.iterator();
             while (rs.next()) {
-                politicianIterator.next().id = rs.getInt(1);
+                politicianIterator.next().setId(rs.getInt(1));
             }
 
             conn.commit();
@@ -370,8 +370,8 @@ public class DBConnection {
 //                    pstmt.executeBatch();
 //                }
                 for (Country country : person.politicianOf) {
-                    pstmt.setInt(1, country.id);
-                    pstmt.setInt(2, person.id);
+                    pstmt.setInt(1, country.getId());
+                    pstmt.setInt(2, person.getId());
                     pstmt.addBatch();
                 }
                 counter++;
@@ -400,8 +400,8 @@ public class DBConnection {
 //                    pstmt.executeBatch();
 //                }
                 for (University university : person.universities) {
-                    pstmt.setInt(1, person.id);
-                    pstmt.setInt(2, university.id);
+                    pstmt.setInt(1, person.getId());
+                    pstmt.setInt(2, university.getId());
                     pstmt.addBatch();
                 }
                 counter++;
@@ -430,8 +430,8 @@ public class DBConnection {
 //                    pstmt.executeBatch();
 //                }
                 for (Business business : person.businesses) {
-                    pstmt.setInt(1, person.id);
-                    pstmt.setInt(2, business.id);
+                    pstmt.setInt(1, person.getId());
+                    pstmt.setInt(2, business.getId());
                     pstmt.addBatch();
                 }
                 counter++;
@@ -459,9 +459,9 @@ public class DBConnection {
 //                                                        //  think if you want that, if so - add the generated keys
 //                    pstmt.executeBatch();
 //                }
-                for (Person creator : artifact.creators) {
-                    pstmt.setInt(1, creator.id);
-                    pstmt.setInt(2, artifact.id);
+                for (Person creator : artifact.getCreators()) {
+                    pstmt.setInt(1, creator.getId());
+                    pstmt.setInt(2, artifact.getId());
                     pstmt.addBatch();
                 }
                 counter++;
@@ -515,7 +515,7 @@ public class DBConnection {
             rs = pstmt.getGeneratedKeys();
             Iterator<Business> businessIterator = businesses.iterator();
             while (rs.next()) {
-                businessIterator.next().id = rs.getInt(1);
+                businessIterator.next().setId(rs.getInt(1));
             }
 
             conn.commit();
@@ -547,8 +547,8 @@ public class DBConnection {
 //                    pstmt.executeBatch();
 //                }
                 for (City city : business.cities) {
-                    pstmt.setInt(1, business.id);
-                    pstmt.setInt(2, city.id);
+                    pstmt.setInt(1, business.getId());
+                    pstmt.setInt(2, city.getId());
                     pstmt.addBatch();
                 }
                 counter++;
@@ -577,8 +577,8 @@ public class DBConnection {
 //                    pstmt.executeBatch();
 //                }
                 for (Country country : business.countries) {
-                    pstmt.setInt(1, country.id);
-                    pstmt.setInt(2, business.id);
+                    pstmt.setInt(1, country.getId());
+                    pstmt.setInt(2, business.getId());
                     pstmt.addBatch();
                 }
                 counter++;
@@ -606,9 +606,9 @@ public class DBConnection {
 //                                                        //  think if you want that, if so - add the generated keys
 //                    pstmt.executeBatch();
 //                }
-                for (Business business : artifact.businesses) {
-                    pstmt.setInt(1, business.id);
-                    pstmt.setInt(2, artifact.id);
+                for (Business business : artifact.getBusinesses()) {
+                    pstmt.setInt(1, business.getId());
+                    pstmt.setInt(2, artifact.getId());
                     pstmt.addBatch();
                 }
                 counter++;
@@ -646,8 +646,8 @@ public class DBConnection {
 //                }
                 pstmt.setString(1, artifact.getName());
 
-                if (artifact.creationDate != null) {
-                    pstmt.setDate(2, Date.valueOf(artifact.creationDate));
+                if (artifact.getCreationDate() != null) {
+                    pstmt.setDate(2, Date.valueOf(artifact.getCreationDate()));
                 } else {
                     pstmt.setDate(2, null);
                 }
@@ -660,7 +660,7 @@ public class DBConnection {
             rs = pstmt.getGeneratedKeys();
             Iterator<Artifact> artifactIterator = artifacts.iterator();
             while (rs.next()) {
-                artifactIterator.next().id = rs.getInt(1);
+                artifactIterator.next().setId(rs.getInt(1));
             }
 
             conn.commit();

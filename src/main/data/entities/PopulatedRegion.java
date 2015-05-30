@@ -8,7 +8,6 @@ public class PopulatedRegion extends Entity {
         super(entity);
     }
 
-    public int          id;
     public LocalDate    creationDate;
     public float        export;                         // Dollar
     public float        expenses;                       // Dollar

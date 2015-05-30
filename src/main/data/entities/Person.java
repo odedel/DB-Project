@@ -10,8 +10,6 @@ public class Person extends Entity {
         super(entity);
     }
 
-    public int id;
-
     public City birthCity;
 
     public LocalDate birthDate;

@@ -159,7 +159,7 @@ public class DataCollector {
 
         for (Map.Entry<String, University> universitiesEntry : universities.entrySet()) {
             List<City> citiesToBeRemoved = universitiesEntry.getValue().cities.stream().
-                    filter(city -> !cities.containsKey(city.entity)).
+                    filter(city -> !cities.containsKey(city.getEntity())).
                     collect(Collectors.toCollection(LinkedList::new));
             citiesToBeRemoved.forEach(universitiesEntry.getValue().cities::remove);
             if (universitiesEntry.getValue().cities.isEmpty() && universitiesEntry.getValue().countries.isEmpty()) {
@@ -175,21 +175,21 @@ public class DataCollector {
 
         for (Map.Entry<String, ? extends Person> personEntry : persons.entrySet()) {
             if (personEntry.getValue().birthCity != null &&
-                    !cities.containsKey(personEntry.getValue().birthCity.entity)) {
+                    !cities.containsKey(personEntry.getValue().birthCity.getEntity())) {
                 personEntry.getValue().birthCity = null;
             }
             if (personEntry.getValue().deathCity != null &&
-                    !cities.containsKey(personEntry.getValue().deathCity.entity)) {
+                    !cities.containsKey(personEntry.getValue().deathCity.getEntity())) {
                 personEntry.getValue().deathCity = null;
             }
 
             List<University> universitiesToBeRemoved = personEntry.getValue().universities.stream().
-                    filter(university -> !universities.containsKey(university.entity)).
+                    filter(university -> !universities.containsKey(university.getEntity())).
                     collect(Collectors.toCollection(LinkedList::new));
             universitiesToBeRemoved.forEach(personEntry.getValue().universities::remove);
 
             List<Business> businessesToBeRemoved = personEntry.getValue().businesses.stream().
-                    filter(business -> !businesses.containsKey(business.entity)).
+                    filter(business -> !businesses.containsKey(business.getEntity())).
                     collect(Collectors.toCollection(LinkedList::new));
             businessesToBeRemoved.forEach(personEntry.getValue().businesses::remove);
 
@@ -209,7 +209,7 @@ public class DataCollector {
 
         for (Map.Entry<String, Business> businessEntry : businesses.entrySet()) {
             List<City> citiesToBeRemoved = businessEntry.getValue().cities.stream().
-                    filter(city -> !cities.containsKey(city.entity)).
+                    filter(city -> !cities.containsKey(city.getEntity())).
                     collect(Collectors.toCollection(LinkedList::new));
             citiesToBeRemoved.forEach(businessEntry.getValue().cities::remove);
             if (businessEntry.getValue().countries.isEmpty() && businessEntry.getValue().cities.isEmpty()) {
@@ -224,17 +224,17 @@ public class DataCollector {
         List<String> artifactsToRemove = new ArrayList<>();
 
         for (Map.Entry<String, Artifact> artifactEntry : artifacts.entrySet()) {
-            List<Business> businessesToBeRemoves = artifactEntry.getValue().businesses.stream().
-                    filter(business -> !businesses.containsKey(business.entity)).
+            List<Business> businessesToBeRemoves = artifactEntry.getValue().getBusinesses().stream().
+                    filter(business -> !businesses.containsKey(business.getEntity())).
                     collect(Collectors.toCollection(LinkedList::new));
-            businessesToBeRemoves.forEach(artifactEntry.getValue().businesses::remove);
+            businessesToBeRemoves.forEach(artifactEntry.getValue().getBusinesses()::remove);
 
-            List<Person> creatorsToBeRemoved = artifactEntry.getValue().creators.stream().
-                    filter(creator -> !persons.containsKey(creator.entity)).
+            List<Person> creatorsToBeRemoved = artifactEntry.getValue().getCreators().stream().
+                    filter(creator -> !persons.containsKey(creator.getEntity())).
                     collect(Collectors.toList());
-            creatorsToBeRemoved.forEach(artifactEntry.getValue().creators::remove);
+            creatorsToBeRemoved.forEach(artifactEntry.getValue().getCreators()::remove);
 
-            if (artifactEntry.getValue().creators.isEmpty() && artifactEntry.getValue().businesses.isEmpty()) {
+            if (artifactEntry.getValue().getCreators().isEmpty() && artifactEntry.getValue().getBusinesses().isEmpty()) {
                 artifactsToRemove.add(artifactEntry.getKey());
             }
         }

@@ -10,8 +10,6 @@ public class University extends Entity {
         super(entity);
     }
 
-    public int id;
-
     public String name;
 
     public Set<Country> countries = new HashSet<>();

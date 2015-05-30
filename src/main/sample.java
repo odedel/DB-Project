@@ -58,12 +58,12 @@ class Sample {
         connection.uploadArtifacts(new LinkedList<>(artifacts));
     }
 
-    public static void queryData(DBConnection connection) throws DBException {
-        connection.connect(DBUser.PLAYER);
-
-        Map<Integer, Country> countries = connection.getAllCountriesData();
-        Map<Integer, City> cities = connection.getAllCitiesData(countries);
-        assert countries.size() == connection.getCountOfCountries();
-        assert cities.size() == connection.getCountOfCities();
-    }
+//    public static void queryData(DBConnection connection) throws DBException {
+//        connection.connect(DBUser.PLAYER);
+//
+//        Map<Integer, Country> countries = connection.getAllCountriesData();
+//        Map<Integer, City> cities = connection.getAllCitiesData(countries);
+//        assert countries.size() == connection.getCountOfCountries();
+//        assert cities.size() == connection.getCountOfCities();
+//    }
 }
