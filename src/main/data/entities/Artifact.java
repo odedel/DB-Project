@@ -47,5 +47,4 @@ public class Artifact extends Entity {
 
     private Set<Person> creators;
 
-
 }
