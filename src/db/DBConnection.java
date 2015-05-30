@@ -58,10 +58,6 @@ public class DBConnection {
 
             int counter = 0;
             for (Country country : countries) {
-//                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
-//                                                        //  think if you want that, if so - add the generated keys
-//                    pstmt.executeBatch();
-//                }
                 pstmt.setString(1, country.getName());
                 pstmt.setDate(2, Utils.localDateToDate(country.getCreationDate()));
                 pstmt.setFloat(3, country.getEconomicGrowth());
@@ -71,13 +67,10 @@ public class DBConnection {
                 pstmt.setFloat(7, country.getGini());
                 pstmt.setFloat(8, country.getInflation());
                 pstmt.setFloat(9, country.getPopulationDensity());
-                pstmt.addBatch();
 
-                counter++;
+                counter = addBatchAndExecuteIfNeeded(counter, pstmt, countries, false);
             }
-            pstmt.executeBatch();
-
-            setIDsToEntities(pstmt, countries);
+            addBatchAndExecuteIfNeeded(counter, pstmt, countries, true);
 
             conn.commit();
         } catch (SQLException e) {
@@ -97,10 +90,6 @@ public class DBConnection {
 
             int counter = 0;
             for (City city : cities) {
-//                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
-//                                                        //  think if you want that, if so - add the generated keys
-//                    pstmt.executeBatch();
-//                }
                 pstmt.setString(1, city.getName());
                 pstmt.setInt(2, city.getCountry().getId());
                 pstmt.setDate(3, Utils.localDateToDate(city.getCreationDate()));
@@ -111,13 +100,10 @@ public class DBConnection {
                 pstmt.setFloat(8, city.getGini());
                 pstmt.setFloat(9, city.getInflation());
                 pstmt.setFloat(10, city.getPopulationDensity());
-                pstmt.addBatch();
 
-                counter++;
+                counter = addBatchAndExecuteIfNeeded(counter, pstmt, cities, false);
             }
-            pstmt.executeBatch();
-
-            setIDsToEntities(pstmt, cities);
+            addBatchAndExecuteIfNeeded(counter, pstmt, cities, true);
 
             conn.commit();
         } catch (SQLException e) {
@@ -151,19 +137,12 @@ public class DBConnection {
 
             int counter = 0;
             for (University university : universities) {
-//                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
-//                                                        //  think if you want that, if so - add the generated keys
-//                    pstmt.executeBatch();
-//                }
                 pstmt.setString(1, university.getName());
                 pstmt.setDate(2, Utils.localDateToDate(university.getCreationDate()));
 
-                pstmt.addBatch();
-                counter++;
+                counter = addBatchAndExecuteIfNeeded(counter, pstmt, universities, false);
             }
-            pstmt.executeBatch();
-
-            setIDsToEntities(pstmt, universities);
+            addBatchAndExecuteIfNeeded(counter, pstmt, universities, true);
         } catch (SQLException e) {
             throw new DBException("Error while uploading universities : " + e.getMessage());
         }
@@ -176,18 +155,12 @@ public class DBConnection {
 
             int counter = 0;
             for (University university : universities) {
-//                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
-//                                                        //  think if you want that, if so - add the generated keys
-//                    pstmt.executeBatch();
-//                }
                 for (Country country : university.getCountries()) {
                     createRelation(pstmt, university, country);
-                    pstmt.addBatch();
+                    counter = addBatchAndExecuteIfNeeded(counter, pstmt, null, false);
                 }
-                counter++;
             }
-
-            pstmt.executeBatch();
+            addBatchAndExecuteIfNeeded(counter, pstmt, null, true);
         } catch (SQLException e) {
             throw new DBException("Error while uploading politicians : " + e.getMessage());
         }
@@ -200,18 +173,12 @@ public class DBConnection {
 
             int counter = 0;
             for (University university : universities) {
-//                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
-//                                                        //  think if you want that, if so - add the generated keys
-//                    pstmt.executeBatch();
-//                }
                 for (City city : university.getCities()) {
                     createRelation(pstmt, university, city);
-                    pstmt.addBatch();
+                    counter = addBatchAndExecuteIfNeeded(counter, pstmt, null, false);
                 }
-                counter++;
             }
-
-            pstmt.executeBatch();
+            addBatchAndExecuteIfNeeded(counter, pstmt, null, true);
         } catch (SQLException e) {
             throw new DBException("Error while uploading politicians : " + e.getMessage());
         }
@@ -241,10 +208,6 @@ public class DBConnection {
                         Statement.RETURN_GENERATED_KEYS)) {
             int counter = 0;
             for (Person person : persons) {
-//                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
-//                                                        //  think if you want that, if so - add the generated keys
-//                    pstmt.executeBatch();
-//                }
                 pstmt.setString(1, person.getName());
 
                 if (person.getBirthCity() != null) {
@@ -261,12 +224,9 @@ public class DBConnection {
                 }
                 pstmt.setDate(5, Utils.localDateToDate(person.getDeathDate()));
 
-                pstmt.addBatch();
-                counter++;
+                counter = addBatchAndExecuteIfNeeded(counter, pstmt, persons, false);
             }
-            pstmt.executeBatch();
-
-            setIDsToEntities(pstmt, persons);
+            addBatchAndExecuteIfNeeded(counter, pstmt, persons, true);
         } catch (SQLException e) {
             throw new DBException("Error while uploading persons : " + e.getMessage());
         }
@@ -278,18 +238,12 @@ public class DBConnection {
                                 "VALUES(?, ?)")) {
             int counter = 0;
             for (Person person : persons) {
-//                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
-//                                                        //  think if you want that, if so - add the generated keys
-//                    pstmt.executeBatch();
-//                }
                 for (Country country : person.getPoliticianOf()) {
                     createRelation(pstmt, country, person);
-                    pstmt.addBatch();
+                    counter = addBatchAndExecuteIfNeeded(counter, pstmt, null, false);
                 }
-                counter++;
             }
-
-            pstmt.executeBatch();
+            addBatchAndExecuteIfNeeded(counter, pstmt, null, true);
         } catch (SQLException e) {
             throw new DBException("Error while uploading Persons-Politician-Of-Relation : " + e.getMessage());
         }
@@ -301,18 +255,12 @@ public class DBConnection {
                         "VALUES(?, ?)")) {
             int counter = 0;
             for (Person person : persons) {
-//                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
-//                                                        //  think if you want that, if so - add the generated keys
-//                    pstmt.executeBatch();
-//                }
                 for (University university : person.getUniversities()) {
                     createRelation(pstmt, person, university);
-                    pstmt.addBatch();
+                    counter = addBatchAndExecuteIfNeeded(counter, pstmt, null, false);
                 }
-                counter++;
             }
-
-            pstmt.executeBatch();
+            addBatchAndExecuteIfNeeded(counter, pstmt, null, true);
         } catch (SQLException e) {
             throw new DBException("Error while uploading Person-University-Relation : " + e.getMessage());
         }
@@ -324,18 +272,12 @@ public class DBConnection {
                         "VALUES(?, ?)")) {
             int counter = 0;
             for (Person person : persons) {
-//                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
-//                                                        //  think if you want that, if so - add the generated keys
-//                    pstmt.executeBatch();
-//                }
                 for (Business business : person.getBusinesses()) {
                     createRelation(pstmt, person, business);
-                    pstmt.addBatch();
+                    counter = addBatchAndExecuteIfNeeded(counter, pstmt, null, false);
                 }
-                counter++;
             }
-
-            pstmt.executeBatch();
+            addBatchAndExecuteIfNeeded(counter, pstmt, null, true);
         } catch (SQLException e) {
             throw new DBException("Error while uploading business-creator-relation : " + e.getMessage());
         }
@@ -347,18 +289,12 @@ public class DBConnection {
                         "VALUES(?, ?)")) {
             int counter = 0;
             for (Artifact artifact : artifacts) {
-//                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
-//                                                        //  think if you want that, if so - add the generated keys
-//                    pstmt.executeBatch();
-//                }
                 for (Person creator : artifact.getCreators()) {
                     createRelation(pstmt, creator, artifact);
-                    pstmt.addBatch();
+                    addBatchAndExecuteIfNeeded(counter, pstmt, null, false);
                 }
-                counter++;
             }
-
-            pstmt.executeBatch();
+            addBatchAndExecuteIfNeeded(counter, pstmt, null, true);
         } catch (SQLException e) {
             throw new DBException("Error while uploading creators : " + e.getMessage());
         }
@@ -387,20 +323,12 @@ public class DBConnection {
                         Statement.RETURN_GENERATED_KEYS)) {
             int counter = 0;
             for (Business business : businesses) {
-//                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
-//                                                        //  think if you want that, if so - add the generated keys
-//                    pstmt.executeBatch();
-//                }
                 pstmt.setString(1, business.getName());
                 pstmt.setDate(2, Utils.localDateToDate(business.getCreationDate()));
                 pstmt.setLong(3, business.getNumberOfEmployees());
-
-                pstmt.addBatch();
-                counter++;
+                counter = addBatchAndExecuteIfNeeded(counter, pstmt, businesses, false);
             }
-            pstmt.executeBatch();
-
-            setIDsToEntities(pstmt, businesses);
+            addBatchAndExecuteIfNeeded(counter, pstmt, businesses, true);
         } catch (SQLException e) {
             throw new DBException("Error while uploading creators : " + e.getMessage());
         }
@@ -412,18 +340,12 @@ public class DBConnection {
                         "VALUES(?, ?)")) {
             int counter = 0;
             for (Business business : businesses) {
-//                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
-//                                                        //  think if you want that, if so - add the generated keys
-//                    pstmt.executeBatch();
-//                }
                 for (City city : business.getCities()) {
                     createRelation(pstmt, business, city);
-                    pstmt.addBatch();
+                    counter = addBatchAndExecuteIfNeeded(counter, pstmt, null, false);
                 }
-                counter++;
             }
-
-            pstmt.executeBatch();
+            addBatchAndExecuteIfNeeded(counter, pstmt, null, true);
         } catch (SQLException e) {
             throw new DBException("Error while uploading businesses : " + e.getMessage());
         }
@@ -435,18 +357,12 @@ public class DBConnection {
                         "VALUES(?, ?)")) {
             int counter = 0;
             for (Business business : businesses) {
-//                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
-//                                                        //  think if you want that, if so - add the generated keys
-//                    pstmt.executeBatch();
-//                }
                 for (Country country : business.getCountries()) {
                     createRelation(pstmt, country, business);
-                    pstmt.addBatch();
+                    counter = addBatchAndExecuteIfNeeded(counter, pstmt, null, false);
                 }
-                counter++;
             }
-
-            pstmt.executeBatch();
+            addBatchAndExecuteIfNeeded(counter, pstmt, null, true);
         } catch (SQLException e) {
             throw new DBException("Error while uploading creators : " + e.getMessage());
         }
@@ -474,18 +390,12 @@ public class DBConnection {
                         "VALUES(?, ?)")) {
             int counter = 0;
             for (Artifact artifact : artifacts) {
-//                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
-//                                                        //  think if you want that, if so - add the generated keys
-//                    pstmt.executeBatch();
-//                }
                 for (Business business : artifact.getBusinesses()) {
                     createRelation(pstmt, business, artifact);
-                    pstmt.addBatch();
+                    counter = addBatchAndExecuteIfNeeded(counter, pstmt, null, false);
                 }
-                counter++;
             }
-
-            pstmt.executeBatch();
+            addBatchAndExecuteIfNeeded(counter, pstmt, null, true);
         } catch (SQLException e) {
             throw new DBException("Error while uploading businesses : " + e.getMessage());
         }
@@ -498,18 +408,11 @@ public class DBConnection {
                         Statement.RETURN_GENERATED_KEYS)) {
             int counter = 0;
             for (Artifact artifact : artifacts) {
-//                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
-//                                                        //  think if you want that, if so - add the generated keys
-//                    pstmt.executeBatch();
-//                }
                 pstmt.setString(1, artifact.getName());
                 pstmt.setDate(2, Utils.localDateToDate(artifact.getCreationDate()));
-                pstmt.addBatch();
-                counter++;
+                counter = addBatchAndExecuteIfNeeded(counter, pstmt, artifacts, false);
             }
-            pstmt.executeBatch();
-
-            setIDsToEntities(pstmt, artifacts);
+            addBatchAndExecuteIfNeeded(counter, pstmt, artifacts, true);
         } catch (SQLException e) {
             throw new DBException("Error while uploading artifacts : " + e.getMessage());
         }
@@ -636,6 +539,26 @@ public class DBConnection {
             throw new DBException("Error while getting generated keys : " + e.getMessage());
         }
     }
+
+    private int addBatchAndExecuteIfNeeded(int counter, PreparedStatement pstmt, List<? extends Entity> entities, boolean force) throws DBException {
+        try {
+            counter++;
+            pstmt.addBatch();
+            if (counter % 10000000 == 0 || force) { // Execute once in 100000 adds
+                System.out.println("Executing batch");
+                pstmt.executeQuery();
+
+                if (entities != null) {
+                    setIDsToEntities(pstmt, entities);
+                }
+            }
+
+            return counter;
+        } catch (SQLException e) {
+            throw new DBException("Error while doing batching : " + e.getMessage());
+        }
+    }
+
 
     /**
      * Attempts to set the connection back to auto-commit, ignoring errors.
