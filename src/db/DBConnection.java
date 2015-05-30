@@ -1,11 +1,9 @@
 package db;
 
-import main.collect_data.entities.*;
-import main.collect_data.util.Utils;
+import collect_data.entities.*;
+import collect_data.util.Utils;
 
 import java.sql.*;
-import java.sql.Date;
-import java.time.LocalDate;
 import java.util.*;
 
 public class DBConnection {
@@ -183,7 +181,7 @@ public class DBConnection {
 //                    pstmt.executeBatch();
 //                }
                 for (Country country : university.getCountries()) {
-                    setRelation(pstmt, university, country);
+                    createRelation(pstmt, university, country);
                     pstmt.addBatch();
                 }
                 counter++;
@@ -207,7 +205,7 @@ public class DBConnection {
 //                    pstmt.executeBatch();
 //                }
                 for (City city : university.getCities()) {
-                    setRelation(pstmt, university, city);
+                    createRelation(pstmt, university, city);
                     pstmt.addBatch();
                 }
                 counter++;
@@ -285,7 +283,7 @@ public class DBConnection {
 //                    pstmt.executeBatch();
 //                }
                 for (Country country : person.getPoliticianOf()) {
-                    setRelation(pstmt, country, person);
+                    createRelation(pstmt, country, person);
                     pstmt.addBatch();
                 }
                 counter++;
@@ -308,7 +306,7 @@ public class DBConnection {
 //                    pstmt.executeBatch();
 //                }
                 for (University university : person.getUniversities()) {
-                    setRelation(pstmt, person, university);
+                    createRelation(pstmt, person, university);
                     pstmt.addBatch();
                 }
                 counter++;
@@ -331,7 +329,7 @@ public class DBConnection {
 //                    pstmt.executeBatch();
 //                }
                 for (Business business : person.getBusinesses()) {
-                    setRelation(pstmt, person, business);
+                    createRelation(pstmt, person, business);
                     pstmt.addBatch();
                 }
                 counter++;
@@ -354,7 +352,7 @@ public class DBConnection {
 //                    pstmt.executeBatch();
 //                }
                 for (Person creator : artifact.getCreators()) {
-                    setRelation(pstmt, creator, artifact);
+                    createRelation(pstmt, creator, artifact);
                     pstmt.addBatch();
                 }
                 counter++;
@@ -419,7 +417,7 @@ public class DBConnection {
 //                    pstmt.executeBatch();
 //                }
                 for (City city : business.getCities()) {
-                    setRelation(pstmt, business, city);
+                    createRelation(pstmt, business, city);
                     pstmt.addBatch();
                 }
                 counter++;
@@ -442,7 +440,7 @@ public class DBConnection {
 //                    pstmt.executeBatch();
 //                }
                 for (Country country : business.getCountries()) {
-                    setRelation(pstmt, country, business);
+                    createRelation(pstmt, country, business);
                     pstmt.addBatch();
                 }
                 counter++;
@@ -481,7 +479,7 @@ public class DBConnection {
 //                    pstmt.executeBatch();
 //                }
                 for (Business business : artifact.getBusinesses()) {
-                    setRelation(pstmt, business, artifact);
+                    createRelation(pstmt, business, artifact);
                     pstmt.addBatch();
                 }
                 counter++;
@@ -620,7 +618,7 @@ public class DBConnection {
         }
     }
 
-    private void setRelation(PreparedStatement pstmt, Entity entity1, Entity entity2) throws SQLException {
+    private void createRelation(PreparedStatement pstmt, Entity entity1, Entity entity2) throws SQLException {
         pstmt.setInt(1, entity1.getId());
         pstmt.setInt(2, entity2.getId());
     }

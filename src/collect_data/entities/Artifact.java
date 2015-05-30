@@ -1,4 +1,4 @@
-package main.collect_data.entities;
+package collect_data.entities;
 
 import java.time.LocalDate;
 import java.util.HashSet;

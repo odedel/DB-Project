@@ -1,4 +1,4 @@
-package main.collect_data.entities;
+package collect_data.entities;
 
 public class City extends PopulatedRegion {
 

@@ -1,11 +1,11 @@
-package main.collect_data;
+package collect_data;
 
-import main.collect_data.entities.*;
-import main.collect_data.generic.Callback;
-import main.collect_data.generic.GenericCallback;
-import main.collect_data.generic.GenericEntityCallback;
-import main.collect_data.generic.GenericObjectLinkCallback;
-import main.collect_data.util.*;
+import collect_data.entities.*;
+import collect_data.generic.Callback;
+import collect_data.generic.GenericCallback;
+import collect_data.generic.GenericEntityCallback;
+import collect_data.generic.GenericObjectLinkCallback;
+import collect_data.util.*;
 
 import java.io.IOException;
 import java.util.*;

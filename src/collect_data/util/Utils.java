@@ -1,7 +1,7 @@
-package main.collect_data.util;
+package collect_data.util;
 
-import main.collect_data.generic.Callback;
-import main.collect_data.ValueType;
+import collect_data.generic.Callback;
+import collect_data.ValueType;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;

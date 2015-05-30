@@ -1,4 +1,4 @@
-package main.collect_data.util;
+package collect_data.util;
 
 
 public class YAGOFilesLocation {
