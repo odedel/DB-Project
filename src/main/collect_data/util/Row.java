@@ -1,4 +1,4 @@
-package main.util;
+package main.collect_data.util;
 
 public class Row {
     public String id;

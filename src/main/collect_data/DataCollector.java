@@ -1,7 +1,11 @@
-package main.data.logic;
+package main.collect_data;
 
-import main.data.entities.*;
-import main.util.*;
+import main.collect_data.entities.*;
+import main.collect_data.generic.Callback;
+import main.collect_data.generic.GenericCallback;
+import main.collect_data.generic.GenericEntityCallback;
+import main.collect_data.generic.GenericObjectLinkCallback;
+import main.collect_data.util.*;
 
 import java.io.IOException;
 import java.util.*;
@@ -84,25 +88,15 @@ public class DataCollector {
 
         //Populated place callbacks
         for (Map<String, ? extends PopulatedRegion> places : place_maps) {
-            callbacks.add(new GenericCallback(places, ValueType.STRING, "<isLocatedIn>",            "places", true, true));
             callbacks.add(new GenericCallback(places, ValueType.DATE,   "<wasCreatedOnDate>",       "creationDate"));
-            callbacks.add(new GenericCallback(places, ValueType.FLOAT,  "<hasExport>",              "export"));
-            callbacks.add(new GenericCallback(places, ValueType.FLOAT,  "<hasExpenses>",            "expenses"));
-            callbacks.add(new GenericCallback(places, ValueType.FLOAT,  "<hasLatitude>",            "latitude"));
-            callbacks.add(new GenericCallback(places, ValueType.FLOAT,  "<hasLongitude>",           "longitude"));
             callbacks.add(new GenericCallback(places, ValueType.FLOAT,  "<hasEconomicGrowth>",      "economicGrowth"));
             callbacks.add(new GenericCallback(places, ValueType.FLOAT,  "<hasPoverty>",             "poverty"));
             callbacks.add(new GenericCallback(places, ValueType.LONG,   "<hasNumberOfPeople>",      "population"));
             callbacks.add(new GenericCallback(places, ValueType.FLOAT,  "<hasUnemployment>",        "unemployment"));
-            callbacks.add(new GenericCallback(places, ValueType.FLOAT,  "<hasRevenue>",             "revenue"));
             callbacks.add(new GenericCallback(places, ValueType.FLOAT,  "<hasGini>",                "gini"));
-            callbacks.add(new GenericCallback(places, ValueType.FLOAT,  "<hasImport>",              "_import"));
-            callbacks.add(new GenericCallback(places, ValueType.FLOAT,  "<hasGDP>",                 "gdp"));
             callbacks.add(new GenericCallback(places, ValueType.FLOAT,  "<hasInflation>",           "inflation"));
             callbacks.add(new GenericCallback(places, ValueType.FLOAT,  "<hasPopulationDensity>",   "populationDensity"));
         }
-        //Country callbacks
-        callbacks.add(new GenericCallback(countries,    ValueType.STRING,   "<hasTLD>",             "tld"));
         //City callbacks
         callbacks.add(new GenericObjectLinkCallback<>(cities,       countries,      City.class,         "<isLocatedIn>",    "country",      false, false));
         //University callbacks

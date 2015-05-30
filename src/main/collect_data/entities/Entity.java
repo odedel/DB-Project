@@ -1,4 +1,4 @@
-package main.data.entities;
+package main.collect_data.entities;
 
 public class Entity {
 
@@ -28,12 +28,14 @@ public class Entity {
 
     /** --- Date Members --- */
 
+    /** NOTE: The members are PUBLIC because we use reflection to set them */
+
     /** YAGO's entity */
-    protected String       entity;
+    public String       entity;
 
     /** Entity's name */
-    protected String       name;
+    public String       name;
 
     /** Entity's ID in the DB */
-    private int         id;
+    public int         id;
 }

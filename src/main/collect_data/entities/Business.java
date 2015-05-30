@@ -1,4 +1,4 @@
-package main.data.entities;
+package main.collect_data.entities;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -36,12 +36,14 @@ public class Business extends Entity {
 
     /** --- Data Members --- */
 
-    protected LocalDate creationDate;
+    /** NOTE: The members are PUBLIC because we use reflection to set them */
 
-    protected long numberOfEmployees;
+    public LocalDate creationDate;
 
-    protected Set<City> cities;
+    public long numberOfEmployees;
 
-    protected Set<Country> countries;
+    public Set<City> cities;
+
+    public Set<Country> countries;
 
 }

@@ -1,4 +1,6 @@
-package main.util;
+package main.collect_data.generic;
+
+import main.collect_data.util.Row;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

@@ -1,6 +1,6 @@
 package db;
 
-import main.data.entities.*;
+import main.collect_data.entities.*;
 
 import java.sql.*;
 import java.sql.Date;
@@ -51,7 +51,7 @@ public class DBConnection {
 
     /**
      * Upload countries to DB.
-     * @throws DBException - Error while uploading data.
+     * @throws DBException - Error while uploading collect_data.
      */
     public void uploadCountries(List<Country> countries) throws DBException {
         ResultSet rs = null;
@@ -109,7 +109,7 @@ public class DBConnection {
 
     /**
      * Upload cities to DB.
-     * @throws DBException - Error while uploading data.
+     * @throws DBException - Error while uploading collect_data.
      */
     public void uploadCities(List<City> cities) throws DBException {
         ResultSet rs = null;
@@ -727,7 +727,7 @@ public class DBConnection {
 //            }
 //
 //        } catch (SQLException e) {
-//            throw new DBException("Error while fetching countries data : " + e.getMessage());
+//            throw new DBException("Error while fetching countries collect_data : " + e.getMessage());
 //        }
 //        return countries;
 //    }
@@ -760,13 +760,13 @@ public class DBConnection {
 //            }
 //
 //        } catch (SQLException e) {
-//            throw new DBException("Error while fetching cities data : " + e.getMessage());
+//            throw new DBException("Error while fetching cities collect_data : " + e.getMessage());
 //        }
 //        return cities;
 //    }
 
     /**
-     * Clears data from DB.
+     * Clears collect_data from DB.
      */
     public void deleteData() throws DBException {
         try (Statement stmt = conn.createStatement()) {
@@ -777,7 +777,7 @@ public class DBConnection {
             stmt.executeUpdate("DELETE FROM PERSON");
             stmt.executeUpdate("DELETE FROM country");
         } catch (SQLException e) {
-            throw new DBException("Error while deleting data from country : " + e.getMessage());
+            throw new DBException("Error while deleting collect_data from country : " + e.getMessage());
         }
     }
 

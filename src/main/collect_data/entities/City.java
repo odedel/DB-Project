@@ -1,4 +1,4 @@
-package main.data.entities;
+package main.collect_data.entities;
 
 public class City extends PopulatedRegion {
 
@@ -18,5 +18,7 @@ public class City extends PopulatedRegion {
 
     /** --- Data Members --- */
 
-    protected Country country;
+    /** NOTE: The members are PUBLIC because we use reflection to set them */
+
+    public Country country;
 }

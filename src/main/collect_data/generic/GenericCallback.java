@@ -1,7 +1,8 @@
-package main.util;
+package main.collect_data.generic;
 
-import main.data.entities.Entity;
-import main.data.logic.ValueType;
+import main.collect_data.entities.Entity;
+import main.collect_data.ValueType;
+import main.collect_data.util.Row;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -9,7 +10,7 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Map;
 
-import static main.util.Utils.parseValue;
+import static main.collect_data.util.Utils.parseValue;
 
 public class GenericCallback extends Callback {
 

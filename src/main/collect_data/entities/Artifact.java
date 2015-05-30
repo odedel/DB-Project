@@ -1,4 +1,4 @@
-package main.data.entities;
+package main.collect_data.entities;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -32,10 +32,12 @@ public class Artifact extends Entity {
 
     /** --- Data Members --- */
 
-    protected LocalDate creationDate;
+    /** NOTE: The members are PUBLIC because we use reflection to set them */
 
-    protected Set<Business> businesses;
+    public LocalDate creationDate;
 
-    protected Set<Person> creators;
+    public Set<Business> businesses;
+
+    public Set<Person> creators;
 
 }

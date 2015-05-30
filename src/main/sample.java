@@ -3,13 +3,12 @@ package main;
 import db.DBConnection;
 import db.DBException;
 import db.DBUser;
-import main.data.entities.*;
-import main.data.logic.DataCollector;
+import main.collect_data.DataCollector;
+import main.collect_data.entities.*;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.Map;
 
 class Sample {
 

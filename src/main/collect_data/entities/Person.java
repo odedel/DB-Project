@@ -1,4 +1,4 @@
-package main.data.entities;
+package main.collect_data.entities;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -54,17 +54,19 @@ public class Person extends Entity {
 
     /** --- Data Members --- */
 
-    protected City birthCity;
+    /** NOTE: The members are PUBLIC because we use reflection to set them */
 
-    protected LocalDate birthDate;
+    public City birthCity;
 
-    protected City deathCity;
+    public LocalDate birthDate;
 
-    protected LocalDate deathDate;
+    public City deathCity;
 
-    protected Set<University> universities;
+    public LocalDate deathDate;
 
-    protected Set<Country> politicianOf;
+    public Set<University> universities;
 
-    protected Set<Business> businesses;
+    public Set<Country> politicianOf;
+
+    public Set<Business> businesses;
 }

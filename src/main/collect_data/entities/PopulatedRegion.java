@@ -1,4 +1,4 @@
-package main.data.entities;
+package main.collect_data.entities;
 
 import java.time.LocalDate;
 
@@ -48,12 +48,14 @@ public class PopulatedRegion extends Entity {
 
     /** --- Data Members --- */
 
-    protected LocalDate    creationDate;
-    protected float        economicGrowth;                 // %
-    protected float        poverty;                        // %
-    protected long         population;
-    protected float        unemployment;                   // %
-    protected float        gini;
-    protected float        inflation;                      // %
-    protected float        populationDensity;              // 1/km^2
+    /** NOTE: The members are PUBLIC because we use reflection to set them */
+
+    public LocalDate    creationDate;
+    public float        economicGrowth;                 // %
+    public float        poverty;                        // %
+    public long         population;
+    public float        unemployment;                   // %
+    public float        gini;
+    public float        inflation;                      // %
+    public float        populationDensity;              // 1/km^2
 }

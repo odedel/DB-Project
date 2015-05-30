@@ -1,4 +1,4 @@
-package main.data.entities;
+package main.collect_data.entities;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -30,10 +30,12 @@ public class University extends Entity {
 
     /** --- Data Members --- */
 
-    protected Set<Country> countries = new HashSet<>();
+    /** NOTE: The members are PUBLIC because we use reflection to set them */
 
-    protected Set<City> cities = new HashSet<>();
+    public Set<Country> countries = new HashSet<>();
 
-    protected LocalDate creationDate;
+    public Set<City> cities = new HashSet<>();
+
+    public LocalDate creationDate;
 
 }
