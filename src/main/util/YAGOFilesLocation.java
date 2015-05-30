@@ -1,7 +1,7 @@
-package main.data;
+package main.util;
 
 
-public class Consts {
+public class YAGOFilesLocation {
 
     public static final String YAGO_LABELS_FILE = "yago\\yagoLabels.tsv";
 

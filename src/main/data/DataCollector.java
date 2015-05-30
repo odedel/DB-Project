@@ -63,7 +63,7 @@ public class DataCollector {
         };
         Collections.addAll(callbacks, c);
         //FIXME: do we need to use the other attributes file?
-        Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(Consts.YAGO_TYPES_FILE, callbacks);
+        Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(YAGOFilesLocation.YAGO_TYPES_FILE, callbacks);
     }
 
 
@@ -73,12 +73,12 @@ public class DataCollector {
         for (final Map<String, ? extends Entity> entities : entities_maps) {
             callbacks.add(new GenericCallback(entities, ValueType.NAME, "skos:prefLabel", "name"));
         }
-        Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(Consts.YAGO_LABELS_FILE, callbacks);
+        Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(YAGOFilesLocation.YAGO_LABELS_FILE, callbacks);
     }
 
     @SafeVarargs
     private final void getFacts(final Map<String, ? extends PopulatedRegion>... place_maps) throws IOException {
-        String factFiles[] = new String[]{Consts.YAGO_DATE_FACTS_FILE, Consts.YAGO_FACTS_FILE, Consts.YAGO_LITERAL_FACTS_FILE,};
+        String factFiles[] = new String[]{YAGOFilesLocation.YAGO_DATE_FACTS_FILE, YAGOFilesLocation.YAGO_FACTS_FILE, YAGOFilesLocation.YAGO_LITERAL_FACTS_FILE,};
 
         List<Callback> callbacks = new LinkedList<>();
 
