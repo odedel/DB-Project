@@ -2,7 +2,7 @@ package main;
 
 import db.DBConnection;
 import db.DBException;
-import db.User;
+import db.DBUser;
 import main.data.*;
 
 import java.io.IOException;
@@ -25,7 +25,7 @@ class Sample {
     }
 
     public static void insertData(DBConnection connection) throws DBException, IOException {
-        connection.connect(User.MODIFIER);
+        connection.connect(DBUser.MODIFIER);
 
         connection.deleteData();
         assert connection.getCountOfCountries() == 0;
@@ -58,7 +58,7 @@ class Sample {
     }
 
     public static void queryData(DBConnection connection) throws DBException {
-        connection.connect(User.PLAYER);
+        connection.connect(DBUser.PLAYER);
 
         Map<Integer, Country> countries = connection.getAllCountriesData();
         Map<Integer, City> cities = connection.getAllCitiesData(countries);

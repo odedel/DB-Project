@@ -1,5 +1,5 @@
 package db;
 
-public enum User {
+public enum DBUser {
     PLAYER, MODIFIER
 }

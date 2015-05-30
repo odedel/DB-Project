@@ -14,7 +14,7 @@ public class DBConnection {
      * Opens new connection to the db and initialize conn with it.
      * Throws DBException if something bad happened.
      * */
-    public void connect(User user) throws DBException {
+    public void connect(DBUser user) throws DBException {
 
         // loading the driver
         try {
