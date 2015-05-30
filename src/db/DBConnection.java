@@ -56,7 +56,7 @@ public class DBConnection {
 
             conn.setAutoCommit(false);
 
-            int counter = 0;
+            List<Entity> batchingList = new LinkedList<>();
             for (Country country : countries) {
                 pstmt.setString(1, country.getName());
                 pstmt.setDate(2, Utils.localDateToDate(country.getCreationDate()));
@@ -68,9 +68,9 @@ public class DBConnection {
                 pstmt.setFloat(8, country.getInflation());
                 pstmt.setFloat(9, country.getPopulationDensity());
 
-                counter = addBatchAndExecuteIfNeeded(counter, pstmt, countries, false);
+                addBatchAndExecuteIfNeeded(pstmt, batchingList, country, true);
             }
-            addBatchAndExecuteIfNeeded(counter, pstmt, countries, true);
+            executeBatch(pstmt, batchingList);
 
             conn.commit();
         } catch (SQLException e) {
@@ -88,7 +88,7 @@ public class DBConnection {
 
             conn.setAutoCommit(false);
 
-            int counter = 0;
+            List<Entity> batchingList = new LinkedList<>();
             for (City city : cities) {
                 pstmt.setString(1, city.getName());
                 pstmt.setInt(2, city.getCountry().getId());
@@ -101,9 +101,9 @@ public class DBConnection {
                 pstmt.setFloat(9, city.getInflation());
                 pstmt.setFloat(10, city.getPopulationDensity());
 
-                counter = addBatchAndExecuteIfNeeded(counter, pstmt, cities, false);
+                addBatchAndExecuteIfNeeded(pstmt, batchingList, city, true);
             }
-            addBatchAndExecuteIfNeeded(counter, pstmt, cities, true);
+            executeBatch(pstmt, batchingList);
 
             conn.commit();
         } catch (SQLException e) {
@@ -135,14 +135,14 @@ public class DBConnection {
                                 "VALUES(?, ?)",
                         Statement.RETURN_GENERATED_KEYS)) {
 
-            int counter = 0;
+            List<Entity> batchingList = new LinkedList<>();
             for (University university : universities) {
                 pstmt.setString(1, university.getName());
                 pstmt.setDate(2, Utils.localDateToDate(university.getCreationDate()));
 
-                counter = addBatchAndExecuteIfNeeded(counter, pstmt, universities, false);
+                addBatchAndExecuteIfNeeded(pstmt, batchingList, university, true);
             }
-            addBatchAndExecuteIfNeeded(counter, pstmt, universities, true);
+            executeBatch(pstmt, batchingList);
         } catch (SQLException e) {
             throw new DBException("Error while uploading universities : " + e.getMessage());
         }
@@ -153,14 +153,14 @@ public class DBConnection {
                 .prepareStatement("INSERT INTO University_Country_Relation(university_id, country_id) " +
                         "VALUES(?, ?)")) {
 
-            int counter = 0;
+            List<Entity> batchingList = new LinkedList<>();
             for (University university : universities) {
                 for (Country country : university.getCountries()) {
                     createRelation(pstmt, university, country);
-                    counter = addBatchAndExecuteIfNeeded(counter, pstmt, null, false);
+                    addBatchAndExecuteIfNeeded(pstmt, batchingList, country, false);
                 }
             }
-            addBatchAndExecuteIfNeeded(counter, pstmt, null, true);
+            executeBatch(pstmt, null);
         } catch (SQLException e) {
             throw new DBException("Error while uploading politicians : " + e.getMessage());
         }
@@ -171,14 +171,14 @@ public class DBConnection {
                 .prepareStatement("INSERT INTO University_City_Relation(university_id, city_id) " +
                         "VALUES(?, ?)")) {
 
-            int counter = 0;
+            List<Entity> batchingList = new LinkedList<>();
             for (University university : universities) {
                 for (City city : university.getCities()) {
                     createRelation(pstmt, university, city);
-                    counter = addBatchAndExecuteIfNeeded(counter, pstmt, null, false);
+                    addBatchAndExecuteIfNeeded(pstmt, batchingList, university, false);
                 }
             }
-            addBatchAndExecuteIfNeeded(counter, pstmt, null, true);
+            executeBatch(pstmt, null);
         } catch (SQLException e) {
             throw new DBException("Error while uploading politicians : " + e.getMessage());
         }
@@ -206,7 +206,8 @@ public class DBConnection {
                 .prepareStatement("INSERT INTO person(name, birth_city_id, birth_date, death_city_id, death_date) " +
                                 "VALUES(?, ?, ?, ?, ?)",
                         Statement.RETURN_GENERATED_KEYS)) {
-            int counter = 0;
+
+            List<Entity> batchingList = new LinkedList<>();
             for (Person person : persons) {
                 pstmt.setString(1, person.getName());
 
@@ -224,9 +225,9 @@ public class DBConnection {
                 }
                 pstmt.setDate(5, Utils.localDateToDate(person.getDeathDate()));
 
-                counter = addBatchAndExecuteIfNeeded(counter, pstmt, persons, false);
+                addBatchAndExecuteIfNeeded(pstmt, batchingList, person, true);
             }
-            addBatchAndExecuteIfNeeded(counter, pstmt, persons, true);
+            executeBatch(pstmt, batchingList);
         } catch (SQLException e) {
             throw new DBException("Error while uploading persons : " + e.getMessage());
         }
@@ -236,14 +237,15 @@ public class DBConnection {
         try (PreparedStatement pstmt = conn
                 .prepareStatement("INSERT INTO Person_Politician_Of_Country_Relation(country_id, politician_id) " +
                                 "VALUES(?, ?)")) {
-            int counter = 0;
+
+            List<Entity> batchingList = new LinkedList<>();
             for (Person person : persons) {
                 for (Country country : person.getPoliticianOf()) {
                     createRelation(pstmt, country, person);
-                    counter = addBatchAndExecuteIfNeeded(counter, pstmt, null, false);
+                    addBatchAndExecuteIfNeeded(pstmt, batchingList, country, false);
                 }
             }
-            addBatchAndExecuteIfNeeded(counter, pstmt, null, true);
+            executeBatch(pstmt, null);
         } catch (SQLException e) {
             throw new DBException("Error while uploading Persons-Politician-Of-Relation : " + e.getMessage());
         }
@@ -253,14 +255,15 @@ public class DBConnection {
         try (PreparedStatement pstmt = conn
                 .prepareStatement("INSERT INTO University_Person_Relation(person_id, university_id) " +
                         "VALUES(?, ?)")) {
-            int counter = 0;
+
+            List<Entity> batchingList = new LinkedList<>();
             for (Person person : persons) {
                 for (University university : person.getUniversities()) {
                     createRelation(pstmt, person, university);
-                    counter = addBatchAndExecuteIfNeeded(counter, pstmt, null, false);
+                     addBatchAndExecuteIfNeeded(pstmt, batchingList, university, false);
                 }
             }
-            addBatchAndExecuteIfNeeded(counter, pstmt, null, true);
+            executeBatch(pstmt, null);
         } catch (SQLException e) {
             throw new DBException("Error while uploading Person-University-Relation : " + e.getMessage());
         }
@@ -270,14 +273,15 @@ public class DBConnection {
         try (PreparedStatement pstmt = conn
                 .prepareStatement("INSERT INTO Business_Creator_Relation(creator_id, business_id) " +
                         "VALUES(?, ?)")) {
-            int counter = 0;
+
+            List<Entity> batchingList = new LinkedList<>();
             for (Person person : persons) {
                 for (Business business : person.getBusinesses()) {
                     createRelation(pstmt, person, business);
-                    counter = addBatchAndExecuteIfNeeded(counter, pstmt, null, false);
+                    addBatchAndExecuteIfNeeded(pstmt, batchingList, business, false);
                 }
             }
-            addBatchAndExecuteIfNeeded(counter, pstmt, null, true);
+            executeBatch(pstmt, null);
         } catch (SQLException e) {
             throw new DBException("Error while uploading business-creator-relation : " + e.getMessage());
         }
@@ -287,14 +291,15 @@ public class DBConnection {
         try (PreparedStatement pstmt = conn
                 .prepareStatement("INSERT INTO Artifact_Creator_Relation(creator_id, artifact_id) " +
                         "VALUES(?, ?)")) {
-            int counter = 0;
+
+            List<Entity> batchingList = new LinkedList<>();
             for (Artifact artifact : artifacts) {
                 for (Person creator : artifact.getCreators()) {
                     createRelation(pstmt, creator, artifact);
-                    addBatchAndExecuteIfNeeded(counter, pstmt, null, false);
+                    addBatchAndExecuteIfNeeded(pstmt, batchingList, creator, false);
                 }
             }
-            addBatchAndExecuteIfNeeded(counter, pstmt, null, true);
+            executeBatch(pstmt, null);
         } catch (SQLException e) {
             throw new DBException("Error while uploading creators : " + e.getMessage());
         }
@@ -321,14 +326,16 @@ public class DBConnection {
                 .prepareStatement("INSERT INTO business(name, creation_date, number_of_employees) " +
                                 "VALUES(?, ?, ?)",
                         Statement.RETURN_GENERATED_KEYS)) {
-            int counter = 0;
+
+            List<Entity> batchingList = new LinkedList<>();
             for (Business business : businesses) {
                 pstmt.setString(1, business.getName());
                 pstmt.setDate(2, Utils.localDateToDate(business.getCreationDate()));
                 pstmt.setLong(3, business.getNumberOfEmployees());
-                counter = addBatchAndExecuteIfNeeded(counter, pstmt, businesses, false);
+
+                addBatchAndExecuteIfNeeded(pstmt, batchingList, business, true);
             }
-            addBatchAndExecuteIfNeeded(counter, pstmt, businesses, true);
+            executeBatch(pstmt, batchingList);
         } catch (SQLException e) {
             throw new DBException("Error while uploading creators : " + e.getMessage());
         }
@@ -338,14 +345,15 @@ public class DBConnection {
         try (PreparedStatement pstmt = conn
                 .prepareStatement("INSERT INTO Business_City_Relation(business_id, city_id) " +
                         "VALUES(?, ?)")) {
-            int counter = 0;
+
+            List<Entity> batchingList = new LinkedList<>();
             for (Business business : businesses) {
                 for (City city : business.getCities()) {
                     createRelation(pstmt, business, city);
-                    counter = addBatchAndExecuteIfNeeded(counter, pstmt, null, false);
+                    addBatchAndExecuteIfNeeded(pstmt, batchingList, city, false);
                 }
             }
-            addBatchAndExecuteIfNeeded(counter, pstmt, null, true);
+            executeBatch(pstmt, null);
         } catch (SQLException e) {
             throw new DBException("Error while uploading businesses : " + e.getMessage());
         }
@@ -355,14 +363,15 @@ public class DBConnection {
         try (PreparedStatement pstmt = conn
                 .prepareStatement("INSERT INTO Business_Country_Relation(country_id, business_id) " +
                         "VALUES(?, ?)")) {
-            int counter = 0;
+
+            List<Entity> batchingList = new LinkedList<>();
             for (Business business : businesses) {
                 for (Country country : business.getCountries()) {
                     createRelation(pstmt, country, business);
-                    counter = addBatchAndExecuteIfNeeded(counter, pstmt, null, false);
+                    addBatchAndExecuteIfNeeded(pstmt, batchingList, country, false);
                 }
             }
-            addBatchAndExecuteIfNeeded(counter, pstmt, null, true);
+            executeBatch(pstmt, null);
         } catch (SQLException e) {
             throw new DBException("Error while uploading creators : " + e.getMessage());
         }
@@ -388,14 +397,15 @@ public class DBConnection {
         try (PreparedStatement pstmt = conn
                 .prepareStatement("INSERT INTO Business_Artifact_Relation(business_id, artifact_id) " +
                         "VALUES(?, ?)")) {
-            int counter = 0;
+
+            List<Entity> batchingList = new LinkedList<>();
             for (Artifact artifact : artifacts) {
                 for (Business business : artifact.getBusinesses()) {
                     createRelation(pstmt, business, artifact);
-                    counter = addBatchAndExecuteIfNeeded(counter, pstmt, null, false);
+                    addBatchAndExecuteIfNeeded(pstmt, batchingList, artifact, false);
                 }
             }
-            addBatchAndExecuteIfNeeded(counter, pstmt, null, true);
+            executeBatch(pstmt, null);
         } catch (SQLException e) {
             throw new DBException("Error while uploading businesses : " + e.getMessage());
         }
@@ -406,13 +416,14 @@ public class DBConnection {
                 .prepareStatement("INSERT INTO artifact(name, creation_date) " +
                                 "VALUES(?, ?)",
                         Statement.RETURN_GENERATED_KEYS)) {
-            int counter = 0;
+
+            List<Entity> batchingList = new LinkedList<>();
             for (Artifact artifact : artifacts) {
                 pstmt.setString(1, artifact.getName());
                 pstmt.setDate(2, Utils.localDateToDate(artifact.getCreationDate()));
-                counter = addBatchAndExecuteIfNeeded(counter, pstmt, artifacts, false);
+                addBatchAndExecuteIfNeeded(pstmt, batchingList, artifact, true);
             }
-            addBatchAndExecuteIfNeeded(counter, pstmt, artifacts, true);
+            executeBatch(pstmt, batchingList);
         } catch (SQLException e) {
             throw new DBException("Error while uploading artifacts : " + e.getMessage());
         }
@@ -540,25 +551,38 @@ public class DBConnection {
         }
     }
 
-    private int addBatchAndExecuteIfNeeded(int counter, PreparedStatement pstmt, List<? extends Entity> entities, boolean force) throws DBException {
+    private void addBatchAndExecuteIfNeeded(PreparedStatement pstmt, List<Entity> batchingList, Entity entity, boolean setIDs) throws DBException {
         try {
-            counter++;
             pstmt.addBatch();
-            if (counter % 10000000 == 0 || force) { // Execute once in 100000 adds
-                System.out.println("Executing batch");
-                pstmt.executeQuery();
 
-                if (entities != null) {
-                    setIDsToEntities(pstmt, entities);
+            batchingList.add(entity);
+
+            if (batchingList.size() % 10000 == 0) { // Execute once in 100000 adds
+                if (setIDs) {
+                    executeBatch(pstmt, batchingList);
+                } else {
+                    executeBatch(pstmt, null);
                 }
-            }
 
-            return counter;
+                batchingList.clear();
+            }
         } catch (SQLException e) {
-            throw new DBException("Error while doing batching : " + e.getMessage());
+            throw new DBException("Error while adding to batch : " + e.getMessage());
         }
     }
 
+    private void executeBatch(PreparedStatement pstmt, List<? extends  Entity> entities) throws DBException {
+        System.out.println("Executing batch");
+        try {
+            pstmt.executeBatch();
+
+            if (entities != null) {
+                setIDsToEntities(pstmt, entities);
+            }
+        } catch (SQLException e) {
+            throw new DBException("Error while executing batch : " + e.getMessage());
+        }
+    }
 
     /**
      * Attempts to set the connection back to auto-commit, ignoring errors.
