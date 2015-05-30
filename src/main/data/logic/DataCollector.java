@@ -148,7 +148,7 @@ public class DataCollector {
     private void postCitiesProcessor() {
         List<String> citiesToRemove = new ArrayList<>();
 
-        citiesToRemove.addAll(cities.entrySet().stream().filter(entry -> entry.getValue().country == null).map(Map.Entry::getKey).collect(Collectors.toList()));
+        citiesToRemove.addAll(cities.entrySet().stream().filter(entry -> entry.getValue().getCountry() == null).map(Map.Entry::getKey).collect(Collectors.toList()));
         citiesToRemove.forEach(cities::remove);
 
         System.out.println(String.format("Deleted %d cities", citiesToRemove.size()));

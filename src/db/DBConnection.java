@@ -68,18 +68,18 @@ public class DBConnection {
 //                    pstmt.executeBatch();
 //                }
                 pstmt.setString(1, country.getName());
-                if (country.creationDate != null) {
-                    pstmt.setDate(2, Date.valueOf(country.creationDate));
+                if (country.getCreationDate() != null) {
+                    pstmt.setDate(2, Date.valueOf(country.getCreationDate()));
                 } else {
                     pstmt.setDate(2, null);
                 }
-                pstmt.setFloat(3, country.economicGrowth);
-                pstmt.setFloat(4, country.poverty);
-                pstmt.setLong(5, country.population);
-                pstmt.setFloat(6, country.unemployment);
-                pstmt.setFloat(7, country.gini);
-                pstmt.setFloat(8, country.inflation);
-                pstmt.setFloat(9, country.populationDensity);
+                pstmt.setFloat(3, country.getEconomicGrowth());
+                pstmt.setFloat(4, country.getPoverty());
+                pstmt.setLong(5, country.getPopulation());
+                pstmt.setFloat(6, country.getUnemployment());
+                pstmt.setFloat(7, country.getGini());
+                pstmt.setFloat(8, country.getInflation());
+                pstmt.setFloat(9, country.getPopulationDensity());
                 pstmt.addBatch();
 
                 counter++;
@@ -127,19 +127,19 @@ public class DBConnection {
 //                    pstmt.executeBatch();
 //                }
                 pstmt.setString(1, city.getName());
-                pstmt.setInt(2, city.country.getId());
-                if (city.creationDate != null) {
-                    pstmt.setDate(3, Date.valueOf(city.creationDate));
+                pstmt.setInt(2, city.getCountry().getId());
+                if (city.getCreationDate() != null) {
+                    pstmt.setDate(3, Date.valueOf(city.getCreationDate()));
                 } else {
                     pstmt.setDate(3, null);
                 }
-                pstmt.setFloat(4, city.economicGrowth);
-                pstmt.setFloat(5, city.poverty);
-                pstmt.setLong(6, city.population);
-                pstmt.setFloat(7, city.unemployment);
-                pstmt.setFloat(8, city.gini);
-                pstmt.setFloat(9, city.inflation);
-                pstmt.setFloat(10, city.populationDensity);
+                pstmt.setFloat(4, city.getEconomicGrowth());
+                pstmt.setFloat(5, city.getPoverty());
+                pstmt.setLong(6, city.getPopulation());
+                pstmt.setFloat(7, city.getUnemployment());
+                pstmt.setFloat(8, city.getGini());
+                pstmt.setFloat(9, city.getInflation());
+                pstmt.setFloat(10, city.getPopulationDensity());
                 pstmt.addBatch();
 
                 counter++;
