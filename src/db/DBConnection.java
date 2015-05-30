@@ -183,8 +183,7 @@ public class DBConnection {
 //                    pstmt.executeBatch();
 //                }
                 for (Country country : university.getCountries()) {
-                    pstmt.setInt(1, university.getId());
-                    pstmt.setInt(2, country.getId());
+                    setRelation(pstmt, university, country);
                     pstmt.addBatch();
                 }
                 counter++;
@@ -208,8 +207,7 @@ public class DBConnection {
 //                    pstmt.executeBatch();
 //                }
                 for (City city : university.getCities()) {
-                    pstmt.setInt(1, university.getId());
-                    pstmt.setInt(2, city.getId());
+                    setRelation(pstmt, university, city);
                     pstmt.addBatch();
                 }
                 counter++;
@@ -287,8 +285,7 @@ public class DBConnection {
 //                    pstmt.executeBatch();
 //                }
                 for (Country country : person.getPoliticianOf()) {
-                    pstmt.setInt(1, country.getId());
-                    pstmt.setInt(2, person.getId());
+                    setRelation(pstmt, country, person);
                     pstmt.addBatch();
                 }
                 counter++;
@@ -311,8 +308,7 @@ public class DBConnection {
 //                    pstmt.executeBatch();
 //                }
                 for (University university : person.getUniversities()) {
-                    pstmt.setInt(1, person.getId());
-                    pstmt.setInt(2, university.getId());
+                    setRelation(pstmt, person, university);
                     pstmt.addBatch();
                 }
                 counter++;
@@ -335,8 +331,7 @@ public class DBConnection {
 //                    pstmt.executeBatch();
 //                }
                 for (Business business : person.getBusinesses()) {
-                    pstmt.setInt(1, person.getId());
-                    pstmt.setInt(2, business.getId());
+                    setRelation(pstmt, person, business);
                     pstmt.addBatch();
                 }
                 counter++;
@@ -359,8 +354,7 @@ public class DBConnection {
 //                    pstmt.executeBatch();
 //                }
                 for (Person creator : artifact.getCreators()) {
-                    pstmt.setInt(1, creator.getId());
-                    pstmt.setInt(2, artifact.getId());
+                    setRelation(pstmt, creator, artifact);
                     pstmt.addBatch();
                 }
                 counter++;
@@ -425,8 +419,7 @@ public class DBConnection {
 //                    pstmt.executeBatch();
 //                }
                 for (City city : business.getCities()) {
-                    pstmt.setInt(1, business.getId());
-                    pstmt.setInt(2, city.getId());
+                    setRelation(pstmt, business, city);
                     pstmt.addBatch();
                 }
                 counter++;
@@ -449,8 +442,7 @@ public class DBConnection {
 //                    pstmt.executeBatch();
 //                }
                 for (Country country : business.getCountries()) {
-                    pstmt.setInt(1, country.getId());
-                    pstmt.setInt(2, business.getId());
+                    setRelation(pstmt, country, business);
                     pstmt.addBatch();
                 }
                 counter++;
@@ -489,8 +481,7 @@ public class DBConnection {
 //                    pstmt.executeBatch();
 //                }
                 for (Business business : artifact.getBusinesses()) {
-                    pstmt.setInt(1, business.getId());
-                    pstmt.setInt(2, artifact.getId());
+                    setRelation(pstmt, business, artifact);
                     pstmt.addBatch();
                 }
                 counter++;
@@ -627,6 +618,11 @@ public class DBConnection {
         } catch (SQLException e) {
             throw new DBException("Error while deleting collect_data from country : " + e.getMessage());
         }
+    }
+
+    private void setRelation(PreparedStatement pstmt, Entity entity1, Entity entity2) throws SQLException {
+        pstmt.setInt(1, entity1.getId());
+        pstmt.setInt(2, entity2.getId());
     }
 
     /**
