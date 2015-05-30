@@ -54,7 +54,6 @@ public class DBConnection {
      * @throws DBException - Error while uploading collect_data.
      */
     public void uploadCountries(List<Country> countries) throws DBException {
-        ResultSet rs = null;
         try (PreparedStatement pstmt = conn
                 .prepareStatement("INSERT INTO country(name, creation_date, economic_growth, poverty, population, unemployment, gini, inflation, population_density) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)",
                         Statement.RETURN_GENERATED_KEYS)) {
@@ -86,24 +85,13 @@ public class DBConnection {
             }
             pstmt.executeBatch();
 
-            rs = pstmt.getGeneratedKeys();
-            Iterator<Country> countryIterator = countries.iterator();
-            while (rs.next()) {
-                countryIterator.next().setId(rs.getInt(1));
-            }
+            setIDsToEntities(pstmt, countries);
 
             conn.commit();
-
         } catch (SQLException e) {
             throw new DBException("Error while uploading countries to DB : " + e.getMessage());
         } finally {
             safelySetAutoCommit();
-            if (rs != null)
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    throw new DBException("Error while uploading countries to DB : " + e.getMessage());
-                }
         }
     }
 
@@ -112,7 +100,6 @@ public class DBConnection {
      * @throws DBException - Error while uploading collect_data.
      */
     public void uploadCities(List<City> cities) throws DBException {
-        ResultSet rs = null;
         try (PreparedStatement pstmt = conn
                 .prepareStatement("INSERT INTO city(name, country_id, creation_date, economic_growth, poverty, population, unemployment, gini, inflation, population_density) " +
                                 "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
@@ -146,24 +133,13 @@ public class DBConnection {
             }
             pstmt.executeBatch();
 
-            rs = pstmt.getGeneratedKeys();
-            Iterator<City> cityIterator = cities.iterator();
-            while (rs.next()) {
-                cityIterator.next().setId(rs.getInt(1));
-            }
+            setIDsToEntities(pstmt, cities);
 
             conn.commit();
-
         } catch (SQLException e) {
             throw new DBException("Error while uploading countries to DB : " + e.getMessage());
         } finally {
             safelySetAutoCommit();
-            if (rs != null)
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    throw new DBException("Error while uploading countries to DB : " + e.getMessage());
-                }
         }
     }
 
@@ -175,7 +151,6 @@ public class DBConnection {
     }
 
     private void uploadUniversitiesEntities(List<University> universities) throws DBException {
-        ResultSet rs = null;
         try (PreparedStatement pstmt = conn
                 .prepareStatement("INSERT INTO university(name, creation_date) " +
                                 "VALUES(?, ?)",
@@ -202,24 +177,13 @@ public class DBConnection {
             }
             pstmt.executeBatch();
 
-            rs = pstmt.getGeneratedKeys();
-            Iterator<University> universityIterator = universities.iterator();
-            while (rs.next()) {
-                universityIterator.next().setId(rs.getInt(1));
-            }
+            setIDsToEntities(pstmt, universities);
 
             conn.commit();
-
         } catch (SQLException e) {
             throw new DBException("Error while uploading universities to DB : " + e.getMessage());
         } finally {
             safelySetAutoCommit();
-            if (rs != null)
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    throw new DBException("Error while uploading universities to DB : " + e.getMessage());
-                }
         }
     }
 
@@ -292,7 +256,6 @@ public class DBConnection {
     }
 
     private void uploadPersonsEntities(List<Person> persons) throws DBException {
-        ResultSet rs = null;
         try (PreparedStatement pstmt = conn
                 .prepareStatement("INSERT INTO person(name, birth_city_id, birth_date, death_city_id, death_date) " +
                                 "VALUES(?, ?, ?, ?, ?)",
@@ -335,24 +298,13 @@ public class DBConnection {
             }
             pstmt.executeBatch();
 
-            rs = pstmt.getGeneratedKeys();
-            Iterator<Person> politicianIterator = persons.iterator();
-            while (rs.next()) {
-                politicianIterator.next().setId(rs.getInt(1));
-            }
+            setIDsToEntities(pstmt, persons);
 
             conn.commit();
-
         } catch (SQLException e) {
             throw new DBException("Error while uploading persons to DB : " + e.getMessage());
         } finally {
             safelySetAutoCommit();
-            if (rs != null)
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    throw new DBException("Error while uploading persons to DB : " + e.getMessage());
-                }
         }
     }
 
@@ -483,7 +435,6 @@ public class DBConnection {
     }
 
     private void uploadBusinessesEntity(List<Business> businesses) throws DBException {
-        ResultSet rs = null;
         try (PreparedStatement pstmt = conn
                 .prepareStatement("INSERT INTO business(name, creation_date, number_of_employees) " +
                                 "VALUES(?, ?, ?)",
@@ -512,24 +463,13 @@ public class DBConnection {
             }
             pstmt.executeBatch();
 
-            rs = pstmt.getGeneratedKeys();
-            Iterator<Business> businessIterator = businesses.iterator();
-            while (rs.next()) {
-                businessIterator.next().setId(rs.getInt(1));
-            }
+            setIDsToEntities(pstmt, businesses);
 
             conn.commit();
-
         } catch (SQLException e) {
             throw new DBException("Error while uploading creators to DB : " + e.getMessage());
         } finally {
             safelySetAutoCommit();
-            if (rs != null)
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    throw new DBException("Error while uploading creators to DB : " + e.getMessage());
-                }
         }
     }
 
@@ -630,7 +570,6 @@ public class DBConnection {
     }
 
     private void uploadArtifactsEntity(List<Artifact> artifacts) throws DBException {
-        ResultSet rs = null;
         try (PreparedStatement pstmt = conn
                 .prepareStatement("INSERT INTO artifact(name, creation_date) " +
                                 "VALUES(?, ?)",
@@ -657,24 +596,13 @@ public class DBConnection {
             }
             pstmt.executeBatch();
 
-            rs = pstmt.getGeneratedKeys();
-            Iterator<Artifact> artifactIterator = artifacts.iterator();
-            while (rs.next()) {
-                artifactIterator.next().setId(rs.getInt(1));
-            }
+            setIDsToEntities(pstmt, artifacts);
 
             conn.commit();
-
         } catch (SQLException e) {
             throw new DBException("Error while uploading artifacts to DB : " + e.getMessage());
         } finally {
             safelySetAutoCommit();
-            if (rs != null)
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    throw new DBException("Error while uploading artifacts to DB : " + e.getMessage());
-                }
         }
     }
 
@@ -778,6 +706,20 @@ public class DBConnection {
             stmt.executeUpdate("DELETE FROM country");
         } catch (SQLException e) {
             throw new DBException("Error while deleting collect_data from country : " + e.getMessage());
+        }
+    }
+
+    /**
+     * Reads the generated keys and set the entity accordingly.
+     */
+    private void setIDsToEntities(PreparedStatement pstmt, List<? extends Entity> entities) throws DBException {
+        try(ResultSet rs = pstmt.getGeneratedKeys()) {
+            Iterator<? extends Entity> entityIterator = entities.iterator();
+            while (rs.next()) {
+                entityIterator.next().setId(rs.getInt(1));
+            }
+        } catch(SQLException e) {
+            throw new DBException("Error while getting generated keys : " + e.getMessage());
         }
     }
 
