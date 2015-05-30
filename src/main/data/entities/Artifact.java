@@ -27,16 +27,8 @@ public class Artifact extends Entity {
         return businesses;
     }
 
-    public void addBusiness(Business business) {
-        this.businesses.add(business);
-    }
-
     public Set<Person> getCreators() {
         return creators;
-    }
-
-    public void addCreator(Person creator) {
-        this.creators.add(creator);
     }
 
     /** --- Data Members --- */

@@ -36,16 +36,8 @@ public class Business extends Entity {
         return cities;
     }
 
-    public void addCity(City city) {
-        this.cities.add(city);
-    }
-
     public Set<Country> getCountries() {
         return countries;
-    }
-
-    public void addCountry(Country country) {
-        this.countries.add(country);
     }
 
     /** --- Data Members --- */
