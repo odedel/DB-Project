@@ -1,9 +1,11 @@
 package db;
 
 import main.collect_data.entities.*;
+import main.collect_data.util.Utils;
 
 import java.sql.*;
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.*;
 
 public class DBConnection {
@@ -63,11 +65,7 @@ public class DBConnection {
 //                    pstmt.executeBatch();
 //                }
                 pstmt.setString(1, country.getName());
-                if (country.getCreationDate() != null) {
-                    pstmt.setDate(2, Date.valueOf(country.getCreationDate()));
-                } else {
-                    pstmt.setDate(2, null);
-                }
+                pstmt.setDate(2, Utils.localDateToDate(country.getCreationDate()));
                 pstmt.setFloat(3, country.getEconomicGrowth());
                 pstmt.setFloat(4, country.getPoverty());
                 pstmt.setLong(5, country.getPopulation());
@@ -107,11 +105,7 @@ public class DBConnection {
 //                }
                 pstmt.setString(1, city.getName());
                 pstmt.setInt(2, city.getCountry().getId());
-                if (city.getCreationDate() != null) {
-                    pstmt.setDate(3, Date.valueOf(city.getCreationDate()));
-                } else {
-                    pstmt.setDate(3, null);
-                }
+                pstmt.setDate(3, Utils.localDateToDate(city.getCreationDate()));
                 pstmt.setFloat(4, city.getEconomicGrowth());
                 pstmt.setFloat(5, city.getPoverty());
                 pstmt.setLong(6, city.getPopulation());
@@ -164,12 +158,7 @@ public class DBConnection {
 //                    pstmt.executeBatch();
 //                }
                 pstmt.setString(1, university.getName());
-
-                if (university.getCreationDate() != null) {
-                    pstmt.setDate(2, Date.valueOf(university.getCreationDate()));
-                } else {
-                    pstmt.setDate(2, null);
-                }
+                pstmt.setDate(2, Utils.localDateToDate(university.getCreationDate()));
 
                 pstmt.addBatch();
                 counter++;
@@ -267,22 +256,14 @@ public class DBConnection {
                 } else {
                     pstmt.setNull(2, java.sql.Types.INTEGER);
                 }
-                if (person.getBirthDate() != null) {
-                    pstmt.setDate(3, Date.valueOf(person.getBirthDate()));
-                } else {
-                    pstmt.setDate(3, null);
-                }
+                pstmt.setDate(3, Utils.localDateToDate(person.getBirthDate()));
 
                 if (person.getDeathCity() != null) {
                     pstmt.setInt(4, person.getDeathCity().getId());
                 } else {
                     pstmt.setNull(4, java.sql.Types.INTEGER);
                 }
-                if (person.getDeathDate() != null) {
-                    pstmt.setDate(5, Date.valueOf(person.getDeathDate()));
-                } else {
-                    pstmt.setDate(5, null);
-                }
+                pstmt.setDate(5, Utils.localDateToDate(person.getDeathDate()));
 
                 pstmt.addBatch();
                 counter++;
@@ -419,13 +400,7 @@ public class DBConnection {
 //                    pstmt.executeBatch();
 //                }
                 pstmt.setString(1, business.getName());
-
-                if (business.getCreationDate() != null) {
-                    pstmt.setDate(2, Date.valueOf(business.getCreationDate()));
-                } else {
-                    pstmt.setDate(2, null);
-                }
-
+                pstmt.setDate(2, Utils.localDateToDate(business.getCreationDate()));
                 pstmt.setLong(3, business.getNumberOfEmployees());
 
                 pstmt.addBatch();
@@ -539,13 +514,7 @@ public class DBConnection {
 //                    pstmt.executeBatch();
 //                }
                 pstmt.setString(1, artifact.getName());
-
-                if (artifact.getCreationDate() != null) {
-                    pstmt.setDate(2, Date.valueOf(artifact.getCreationDate()));
-                } else {
-                    pstmt.setDate(2, null);
-                }
-
+                pstmt.setDate(2, Utils.localDateToDate(artifact.getCreationDate()));
                 pstmt.addBatch();
                 counter++;
             }

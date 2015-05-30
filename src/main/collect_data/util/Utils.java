@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.sql.Date;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -99,5 +100,13 @@ public class Utils {
                 return parseDate(string);
         }
         throw new AssertionError();
+    }
+
+    public static Date localDateToDate(LocalDate localDate) {
+        if (localDate == null) {
+            return null;
+        } else {
+            return Date.valueOf(localDate);
+        }
     }
 }
