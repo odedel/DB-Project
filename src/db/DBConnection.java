@@ -49,10 +49,6 @@ public class DBConnection {
         }
     }
 
-    /**
-     * Upload countries to DB.
-     * @throws DBException - Error while uploading collect_data.
-     */
     public void uploadCountries(List<Country> countries) throws DBException {
         try (PreparedStatement pstmt = conn
                 .prepareStatement("INSERT INTO country(name, creation_date, economic_growth, poverty, population, unemployment, gini, inflation, population_density) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)",
@@ -89,16 +85,12 @@ public class DBConnection {
 
             conn.commit();
         } catch (SQLException e) {
-            throw new DBException("Error while uploading countries to DB : " + e.getMessage());
+            throw new DBException("Error while uploading countries : " + e.getMessage());
         } finally {
             safelySetAutoCommit();
         }
     }
 
-    /**
-     * Upload cities to DB.
-     * @throws DBException - Error while uploading collect_data.
-     */
     public void uploadCities(List<City> cities) throws DBException {
         try (PreparedStatement pstmt = conn
                 .prepareStatement("INSERT INTO city(name, country_id, creation_date, economic_growth, poverty, population, unemployment, gini, inflation, population_density) " +
@@ -137,17 +129,26 @@ public class DBConnection {
 
             conn.commit();
         } catch (SQLException e) {
-            throw new DBException("Error while uploading countries to DB : " + e.getMessage());
+            throw new DBException("Error while uploading countries : " + e.getMessage());
         } finally {
             safelySetAutoCommit();
         }
     }
 
-    // TODO: One transaction?
     public void uploadUniversities(List<University> universities) throws DBException {
-        uploadUniversitiesEntities(universities);
-        uploadUniversityCountryRelation(universities);
-        uploadUniversityCityRelation(universities);
+        try {
+            conn.setAutoCommit(false);
+
+            uploadUniversitiesEntities(universities);
+            uploadUniversityCountryRelation(universities);
+            uploadUniversityCityRelation(universities);
+
+            conn.commit();
+        } catch (SQLException e) {
+            throw new DBException("Error while uploading universities : " + e.getMessage());
+        } finally {
+            safelySetAutoCommit();
+        }
     }
 
     private void uploadUniversitiesEntities(List<University> universities) throws DBException {
@@ -155,8 +156,6 @@ public class DBConnection {
                 .prepareStatement("INSERT INTO university(name, creation_date) " +
                                 "VALUES(?, ?)",
                         Statement.RETURN_GENERATED_KEYS)) {
-
-            conn.setAutoCommit(false);
 
             int counter = 0;
             for (University university : universities) {
@@ -178,12 +177,8 @@ public class DBConnection {
             pstmt.executeBatch();
 
             setIDsToEntities(pstmt, universities);
-
-            conn.commit();
         } catch (SQLException e) {
-            throw new DBException("Error while uploading universities to DB : " + e.getMessage());
-        } finally {
-            safelySetAutoCommit();
+            throw new DBException("Error while uploading universities : " + e.getMessage());
         }
     }
 
@@ -191,8 +186,6 @@ public class DBConnection {
         try (PreparedStatement pstmt = conn
                 .prepareStatement("INSERT INTO University_Country_Relation(university_id, country_id) " +
                         "VALUES(?, ?)")) {
-
-            conn.setAutoCommit(false);
 
             int counter = 0;
             for (University university : universities) {
@@ -209,11 +202,8 @@ public class DBConnection {
             }
 
             pstmt.executeBatch();
-            conn.commit();
         } catch (SQLException e) {
-            throw new DBException("Error while uploading politicians to DB : " + e.getMessage());
-        } finally {
-            safelySetAutoCommit();
+            throw new DBException("Error while uploading politicians : " + e.getMessage());
         }
     }
 
@@ -221,8 +211,6 @@ public class DBConnection {
         try (PreparedStatement pstmt = conn
                 .prepareStatement("INSERT INTO University_City_Relation(university_id, city_id) " +
                         "VALUES(?, ?)")) {
-
-            conn.setAutoCommit(false);
 
             int counter = 0;
             for (University university : universities) {
@@ -239,20 +227,26 @@ public class DBConnection {
             }
 
             pstmt.executeBatch();
-            conn.commit();
         } catch (SQLException e) {
-            throw new DBException("Error while uploading politicians to DB : " + e.getMessage());
-        } finally {
-            safelySetAutoCommit();
+            throw new DBException("Error while uploading politicians : " + e.getMessage());
         }
     }
 
-    // TODO: is it OK that we are not insert the relation in the same transaction?
     public void uploadPersons(List<Person> persons) throws DBException {
-        uploadPersonsEntities(persons);
-        uploadPoliticianUniversityRelation(persons);
-        uploadPersonsPoliticianOfCountryRelation(persons);
-        uploadBusinessCreatorRelation(persons);
+        try {
+            conn.setAutoCommit(false);
+
+            uploadPersonsEntities(persons);
+            uploadPoliticianUniversityRelation(persons);
+            uploadPersonsPoliticianOfCountryRelation(persons);
+            uploadBusinessCreatorRelation(persons);
+
+            conn.commit();
+        } catch (SQLException e) {
+            throw new DBException("Error while uploading persons : " + e.getMessage());
+        } finally {
+            safelySetAutoCommit();
+        }
     }
 
     private void uploadPersonsEntities(List<Person> persons) throws DBException {
@@ -260,9 +254,6 @@ public class DBConnection {
                 .prepareStatement("INSERT INTO person(name, birth_city_id, birth_date, death_city_id, death_date) " +
                                 "VALUES(?, ?, ?, ?, ?)",
                         Statement.RETURN_GENERATED_KEYS)) {
-
-            conn.setAutoCommit(false);
-
             int counter = 0;
             for (Person person : persons) {
 //                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
@@ -299,12 +290,8 @@ public class DBConnection {
             pstmt.executeBatch();
 
             setIDsToEntities(pstmt, persons);
-
-            conn.commit();
         } catch (SQLException e) {
-            throw new DBException("Error while uploading persons to DB : " + e.getMessage());
-        } finally {
-            safelySetAutoCommit();
+            throw new DBException("Error while uploading persons : " + e.getMessage());
         }
     }
 
@@ -312,9 +299,6 @@ public class DBConnection {
         try (PreparedStatement pstmt = conn
                 .prepareStatement("INSERT INTO Person_Politician_Of_Country_Relation(country_id, politician_id) " +
                                 "VALUES(?, ?)")) {
-
-            conn.setAutoCommit(false);
-
             int counter = 0;
             for (Person person : persons) {
 //                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
@@ -330,11 +314,8 @@ public class DBConnection {
             }
 
             pstmt.executeBatch();
-            conn.commit();
         } catch (SQLException e) {
-            throw new DBException("Error while uploading Persons-Politician-Of-Relation to DB : " + e.getMessage());
-        } finally {
-            safelySetAutoCommit();
+            throw new DBException("Error while uploading Persons-Politician-Of-Relation : " + e.getMessage());
         }
     }
 
@@ -342,9 +323,6 @@ public class DBConnection {
         try (PreparedStatement pstmt = conn
                 .prepareStatement("INSERT INTO University_Person_Relation(person_id, university_id) " +
                         "VALUES(?, ?)")) {
-
-            conn.setAutoCommit(false);
-
             int counter = 0;
             for (Person person : persons) {
 //                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
@@ -360,11 +338,8 @@ public class DBConnection {
             }
 
             pstmt.executeBatch();
-            conn.commit();
         } catch (SQLException e) {
-            throw new DBException("Error while uploading Person-University-Relation to DB : " + e.getMessage());
-        } finally {
-            safelySetAutoCommit();
+            throw new DBException("Error while uploading Person-University-Relation : " + e.getMessage());
         }
     }
 
@@ -372,9 +347,6 @@ public class DBConnection {
         try (PreparedStatement pstmt = conn
                 .prepareStatement("INSERT INTO Business_Creator_Relation(creator_id, business_id) " +
                         "VALUES(?, ?)")) {
-
-            conn.setAutoCommit(false);
-
             int counter = 0;
             for (Person person : persons) {
 //                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
@@ -390,11 +362,8 @@ public class DBConnection {
             }
 
             pstmt.executeBatch();
-            conn.commit();
         } catch (SQLException e) {
-            throw new DBException("Error while uploading business-creator-relation to DB : " + e.getMessage());
-        } finally {
-            safelySetAutoCommit();
+            throw new DBException("Error while uploading business-creator-relation : " + e.getMessage());
         }
     }
 
@@ -402,9 +371,6 @@ public class DBConnection {
         try (PreparedStatement pstmt = conn
                 .prepareStatement("INSERT INTO Artifact_Creator_Relation(creator_id, artifact_id) " +
                         "VALUES(?, ?)")) {
-
-            conn.setAutoCommit(false);
-
             int counter = 0;
             for (Artifact artifact : artifacts) {
 //                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
@@ -420,18 +386,25 @@ public class DBConnection {
             }
 
             pstmt.executeBatch();
-            conn.commit();
         } catch (SQLException e) {
-            throw new DBException("Error while uploading creators to DB : " + e.getMessage());
-        } finally {
-            safelySetAutoCommit();
+            throw new DBException("Error while uploading creators : " + e.getMessage());
         }
     }
 
     public void uploadBusinesses(List<Business> businesses) throws DBException {
-        uploadBusinessesEntity(businesses);
-        uploadBusinessCityRelation(businesses);
-        uploadBusinessCountryRelation(businesses);
+        try {
+            conn.setAutoCommit(false);
+
+            uploadBusinessesEntity(businesses);
+            uploadBusinessCityRelation(businesses);
+            uploadBusinessCountryRelation(businesses);
+
+            conn.commit();
+        } catch(SQLException e) {
+            throw new DBException("Error while uploading businesses : " + e.getMessage());
+        } finally {
+            safelySetAutoCommit();
+        }
     }
 
     private void uploadBusinessesEntity(List<Business> businesses) throws DBException {
@@ -439,9 +412,6 @@ public class DBConnection {
                 .prepareStatement("INSERT INTO business(name, creation_date, number_of_employees) " +
                                 "VALUES(?, ?, ?)",
                         Statement.RETURN_GENERATED_KEYS)) {
-
-            conn.setAutoCommit(false);
-
             int counter = 0;
             for (Business business : businesses) {
 //                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
@@ -464,12 +434,8 @@ public class DBConnection {
             pstmt.executeBatch();
 
             setIDsToEntities(pstmt, businesses);
-
-            conn.commit();
         } catch (SQLException e) {
-            throw new DBException("Error while uploading creators to DB : " + e.getMessage());
-        } finally {
-            safelySetAutoCommit();
+            throw new DBException("Error while uploading creators : " + e.getMessage());
         }
     }
 
@@ -477,9 +443,6 @@ public class DBConnection {
         try (PreparedStatement pstmt = conn
                 .prepareStatement("INSERT INTO Business_City_Relation(business_id, city_id) " +
                         "VALUES(?, ?)")) {
-
-            conn.setAutoCommit(false);
-
             int counter = 0;
             for (Business business : businesses) {
 //                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
@@ -495,11 +458,8 @@ public class DBConnection {
             }
 
             pstmt.executeBatch();
-            conn.commit();
         } catch (SQLException e) {
-            throw new DBException("Error while uploading businesses to DB : " + e.getMessage());
-        } finally {
-            safelySetAutoCommit();
+            throw new DBException("Error while uploading businesses : " + e.getMessage());
         }
     }
 
@@ -507,9 +467,6 @@ public class DBConnection {
         try (PreparedStatement pstmt = conn
                 .prepareStatement("INSERT INTO Business_Country_Relation(country_id, business_id) " +
                         "VALUES(?, ?)")) {
-
-            conn.setAutoCommit(false);
-
             int counter = 0;
             for (Business business : businesses) {
 //                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
@@ -525,9 +482,22 @@ public class DBConnection {
             }
 
             pstmt.executeBatch();
-            conn.commit();
         } catch (SQLException e) {
-            throw new DBException("Error while uploading creators to DB : " + e.getMessage());
+            throw new DBException("Error while uploading creators : " + e.getMessage());
+        }
+    }
+
+    public void uploadArtifacts(List<Artifact> artifacts) throws DBException {
+        try {
+            conn.setAutoCommit(false);
+
+            uploadArtifactsEntity(artifacts);
+            uploadArtifactPersonRelation(artifacts);
+            uploadBusinessArtifactRelation(artifacts);
+
+            conn.commit();
+        } catch(SQLException e) {
+            throw new DBException("Error while uploading artifacts : " + e.getMessage());
         } finally {
             safelySetAutoCommit();
         }
@@ -537,9 +507,6 @@ public class DBConnection {
         try (PreparedStatement pstmt = conn
                 .prepareStatement("INSERT INTO Business_Artifact_Relation(business_id, artifact_id) " +
                         "VALUES(?, ?)")) {
-
-            conn.setAutoCommit(false);
-
             int counter = 0;
             for (Artifact artifact : artifacts) {
 //                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
@@ -555,18 +522,9 @@ public class DBConnection {
             }
 
             pstmt.executeBatch();
-            conn.commit();
         } catch (SQLException e) {
-            throw new DBException("Error while uploading businesses to DB : " + e.getMessage());
-        } finally {
-            safelySetAutoCommit();
+            throw new DBException("Error while uploading businesses : " + e.getMessage());
         }
-    }
-
-    public void uploadArtifacts(List<Artifact> artifacts) throws DBException {
-        uploadArtifactsEntity(artifacts);
-        uploadArtifactPersonRelation(artifacts);
-        uploadBusinessArtifactRelation(artifacts);
     }
 
     private void uploadArtifactsEntity(List<Artifact> artifacts) throws DBException {
@@ -574,9 +532,6 @@ public class DBConnection {
                 .prepareStatement("INSERT INTO artifact(name, creation_date) " +
                                 "VALUES(?, ?)",
                         Statement.RETURN_GENERATED_KEYS)) {
-
-            conn.setAutoCommit(false);
-
             int counter = 0;
             for (Artifact artifact : artifacts) {
 //                if (counter % 100000000 == 0) {     // Execute batch once in 10000 iterations,
@@ -597,12 +552,8 @@ public class DBConnection {
             pstmt.executeBatch();
 
             setIDsToEntities(pstmt, artifacts);
-
-            conn.commit();
         } catch (SQLException e) {
-            throw new DBException("Error while uploading artifacts to DB : " + e.getMessage());
-        } finally {
-            safelySetAutoCommit();
+            throw new DBException("Error while uploading artifacts : " + e.getMessage());
         }
     }
 
