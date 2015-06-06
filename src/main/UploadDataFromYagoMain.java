@@ -1,16 +1,16 @@
 package main;
 
+import collect_data.DataCollector;
+import collect_data.entities.*;
 import db.DBConnection;
 import db.DBException;
 import db.DBUser;
-import collect_data.DataCollector;
-import collect_data.entities.*;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 
-class Sample {
+public class UploadDataFromYagoMain {
 
     public static void main(String args[]) throws IOException {
 
