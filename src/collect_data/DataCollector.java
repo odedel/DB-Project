@@ -131,11 +131,23 @@ public class DataCollector {
     /* -------------------- Data Post Processing -------------------- */
 
     private void postProcessData() {
+        postProcessCountries();
         postCitiesProcessor();
         postUniversitiesProcessor();
         postBusinessesProcessor();
         postPersonProcessor();
         postArtifactProcessor();
+    }
+
+    private void postProcessCountries() {
+        List<String> toRemove = new LinkedList<>();
+        for(String name : countries.keySet()) {
+            Country country = countries.get(name);
+            if(country.population == 0 && country.creationDate == null && country.poverty == 0) {
+                toRemove.add(name);
+            }
+        }
+        toRemove.forEach(countries::remove);
     }
 
     private void postCitiesProcessor() {
