@@ -58,13 +58,13 @@ public class DataCollector {
     private void getIDs() throws IOException {
         List<Callback> callbacks = new LinkedList<>();
         Callback[] c = new Callback[]{
-                new GenericEntityCallback<>(artifacts,      Artifact.class,     "<wordnet_artifact"),
-                new GenericEntityCallback<>(persons,       Person.class,      "<wordnet_creator"),
-                new GenericEntityCallback<>(businesses,     Business.class,     "<wordnet_business"),
-                new GenericEntityCallback<>(countries,      Country.class,      "<wikicat_Countries"),
-                new GenericEntityCallback<>(cities,         City.class,         "<wikicat_Cities"),
-                new GenericEntityCallback<>(persons,    Person.class,   "<wordnet_politician"),
-                new GenericEntityCallback<>(universities,   University.class,   "<wordnet_university"),
+                new GenericEntityCallback<>(artifacts,      Artifact.class,     "<wordnet_artifact_100021939>"),
+                new GenericEntityCallback<>(persons,        Person.class,       "<wordnet_creator_109614315>"),
+                new GenericEntityCallback<>(businesses,     Business.class,     "<wordnet_business_108061042>"),
+                new GenericEntityCallback<>(countries,      Country.class,      "<wikicat_Countries>"),
+                new GenericEntityCallback<>(cities,         City.class,         "<wordnet_city_108524735>"),
+                new GenericEntityCallback<>(persons,        Person.class,       "<wordnet_politician_110450303>"),
+                new GenericEntityCallback<>(universities,   University.class,   "<wordnet_university_108286569>"),
         };
         Collections.addAll(callbacks, c);
         Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(YAGOFilesLocation.YAGO_TYPES_FILE, callbacks);
