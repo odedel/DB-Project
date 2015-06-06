@@ -49,6 +49,4 @@ public class DAO {
         connection.uploadPersons(new LinkedList<>(dataCollector.getPersons()));
         connection.uploadArtifacts(new LinkedList<>(dataCollector.getArtifacts()));
     }
-
-
 }

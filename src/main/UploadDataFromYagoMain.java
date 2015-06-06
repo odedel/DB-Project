@@ -25,7 +25,7 @@ public class UploadDataFromYagoMain {
             printStats(dataCollector);
 
             System.out.println("Uploading ...");
-            dao.uploadDataCollector(collectData());
+            dao.uploadDataCollector(dataCollector);
         } catch (DAOException e) {
             throw new Exception("Could not upload data to DB: " + e.getMessage());
         } catch (IOException e) {
