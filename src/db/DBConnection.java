@@ -49,6 +49,14 @@ public class DBConnection {
         }
     }
 
+    public boolean isConnected() throws DBException {
+        try {
+            return !conn.isClosed();
+        } catch (SQLException e) {
+            throw new DBException("Unable to check connection status : " + e.getMessage());
+        }
+    }
+
     public void uploadCountries(List<Country> countries) throws DBException {
         try (PreparedStatement pstmt = conn
                 .prepareStatement("INSERT INTO country(name, creation_date, economic_growth, poverty, population, unemployment, gini, inflation, population_density) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)",
