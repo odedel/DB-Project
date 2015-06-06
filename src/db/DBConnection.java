@@ -2,6 +2,7 @@ package db;
 
 import collect_data.entities.*;
 import collect_data.util.Utils;
+import utils.DBUser;
 
 import java.sql.*;
 import java.util.*;
