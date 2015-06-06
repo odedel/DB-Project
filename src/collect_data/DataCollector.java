@@ -143,8 +143,6 @@ public class DataCollector {
 
         citiesToRemove.addAll(cities.entrySet().stream().filter(entry -> entry.getValue().getCountry() == null).map(Map.Entry::getKey).collect(Collectors.toList()));
         citiesToRemove.forEach(cities::remove);
-
-        System.out.println(String.format("Deleted %d cities", citiesToRemove.size()));
     }
 
     private void postUniversitiesProcessor() {
@@ -160,7 +158,6 @@ public class DataCollector {
             }
         }
         universitiesToRemove.forEach(universities::remove);
-        System.out.println(String.format("Deleted %d universities", universitiesToRemove.size()));
     }
 
     private void postPersonProcessor() {
@@ -194,7 +191,6 @@ public class DataCollector {
         }
 
         personsToRemove.forEach(persons::remove);
-        System.out.println(String.format("Deleted %d persons", personsToRemove.size()));
     }
 
     private void postBusinessesProcessor() {
@@ -210,7 +206,6 @@ public class DataCollector {
             }
         }
         businessesToRemove.forEach(businesses::remove);
-        System.out.println(String.format("Deleted %d businesses", businessesToRemove.size()));
     }
 
     private void postArtifactProcessor() {
@@ -232,6 +227,5 @@ public class DataCollector {
             }
         }
         artifactsToRemove.forEach(artifacts::remove);
-        System.out.println(String.format("Deleted %d artifacts", artifactsToRemove.size()));
     }
 }
