@@ -572,7 +572,6 @@ public class DBConnection {
     }
 
     private void executeBatch(PreparedStatement pstmt, List<? extends  Entity> entities) throws DBException {
-        System.out.println("Executing batch");
         try {
             pstmt.executeBatch();
 
