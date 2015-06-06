@@ -32,6 +32,6 @@ public class GenericEntityCallback<T> extends Callback {
 
     @Override
     public boolean map(Row row) {
-        return row.superEntity.startsWith(prefix);
+        return row.superEntity.equals(prefix);
     }
 }
