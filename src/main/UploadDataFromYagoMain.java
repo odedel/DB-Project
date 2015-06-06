@@ -2,36 +2,43 @@ package main;
 
 import collect_data.DataCollector;
 import collect_data.entities.*;
-import db.DBConnection;
-import db.DBException;
-import db.DBUser;
+import dao.DAO;
+import dao.DAOException;
+import utils.DBUser;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.LinkedList;
 
 public class UploadDataFromYagoMain {
 
-    public static void main(String args[]) throws IOException {
+    public static void main(String args[]) throws Exception {
 
-        DBConnection connection = new DBConnection();
+        DAO dao = new DAO();
         try {
-            insertData(connection);
-        } catch (Exception e) {
-            e.printStackTrace();
+            dao.connect(DBUser.MODIFIER);
+
+            DataCollector dataCollector = collectData();
+            printStats(dataCollector);
+
+            System.out.println("Uploading ...");
+            dao.uploadDataCollector(collectData());
+        } catch (DAOException e) {
+            throw new Exception("Could not upload data to DB: " + e.getMessage());
+        } catch (IOException e) {
+            throw new Exception("Could not find YAGO data: " + e.getMessage());
         } finally {
-            connection.disconnect();
+            dao.disconnect();
         }
     }
 
-    public static void insertData(DBConnection connection) throws DBException, IOException {
-        connection.connect(DBUser.MODIFIER);
-
-        connection.deleteData();
-        assert connection.getCountOfCountries() == 0;
-
+    private static DataCollector collectData() throws IOException {
         DataCollector dataCollector = new DataCollector();
         dataCollector.collectData();
+
+        return dataCollector;
+    }
+
+    private static void printStats(DataCollector dataCollector) {
         Collection<Country> countries = dataCollector.getCountries();
         Collection<City> cities = dataCollector.getCities();
 
@@ -76,23 +83,5 @@ public class UploadDataFromYagoMain {
         System.out.println(String.format("Collected %d persons: %d countries, %d universities, %d businesses", persons.size(), personCountry, personUniversity, personBusiness));
         System.out.println(String.format("Collected %d artifacts: %d businesses, %d creators,", artifacts.size(), artifactBusiness, artifcatCreator));
         System.out.println(String.format("Collected %d businesses: %d countries, %d cities", businesses.size(), businessCountry, businessCity));
-
-        System.out.println("Uploading ...");
-
-        connection.uploadCountries(new LinkedList<>(countries));
-        connection.uploadCities(new LinkedList<>(cities));
-        connection.uploadUniversities(new LinkedList<>(universities));
-        connection.uploadBusinesses(new LinkedList<>(businesses));
-        connection.uploadPersons(new LinkedList<>(persons));
-        connection.uploadArtifacts(new LinkedList<>(artifacts));
     }
-
-//    public static void queryData(DBConnection connection) throws DBException {
-//        connection.connect(DBUser.PLAYER);
-//
-//        Map<Integer, Country> countries = connection.getAllCountriesData();
-//        Map<Integer, City> cities = connection.getAllCitiesData(countries);
-//        assert countries.size() == connection.getCountOfCountries();
-//        assert cities.size() == connection.getCountOfCities();
-//    }
 }
