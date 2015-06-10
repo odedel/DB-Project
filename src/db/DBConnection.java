@@ -459,6 +459,29 @@ public class DBConnection {
         }
     }
 
+    public int getUserAnsweredCorrectly(int userID) throws DBException {
+        return genericIntFetcher(
+                String.format("SELECT number_of_correct_answers FROM USER WHERE ID=%s", userID));
+    }
+
+    public void setUserAnsweredCorrectly(int userID, int number) throws DBException {
+        genericUpdater(
+                String.format("UPDATE USER SET number_of_correct_answers=%s WHERE ID=%s", number, userID)
+        );
+    }
+
+    public int getUserAnsweredWrong(int userID) throws DBException {
+        return genericIntFetcher(
+                String.format("SELECT number_of_wrong_answers FROM USER WHERE ID=%s", userID)
+        );
+    }
+
+    public void setUserAnsweredWrong(int userID, int number) throws DBException {
+        genericUpdater(
+                String.format("UPDATE USER SET number_of_wrong_answers=%s WHERE ID=%s", number, userID)
+        );
+    }
+
     /**
      * @return How many countries there are in the DB
      */
@@ -510,6 +533,24 @@ public class DBConnection {
             return stringCollection;
         } catch (SQLException e) {
             throw new DBException("Error while fetching countries: " + e.getMessage());
+        }
+    }
+
+    private int genericIntFetcher(String select) throws DBException {
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(select)) {
+            rs.next();
+            return rs.getInt(1);
+        } catch (SQLException e) {
+            throw new DBException("Could not fetch data: " + e.getMessage());
+        }
+    }
+
+    private void genericUpdater(String update) throws DBException {
+        try (Statement stmt = conn.createStatement()) {
+            stmt.executeUpdate(update);
+        } catch (SQLException e) {
+            throw new DBException("Could not set data: " + e.getMessage());
         }
     }
 

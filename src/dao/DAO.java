@@ -65,17 +65,31 @@ public class DAO {
         }
     }
 
-    public void setUserAnsweredCorrectly(int userID) {
-
+    public void setUserAnsweredCorrectly(int userID) throws DAOException {
+        try {
+            connection.setUserAnsweredCorrectly(userID,
+                    connection.getUserAnsweredCorrectly(userID) + 1);
+        } catch (DBException e) {
+            throw new DAOException("Could not add answer to user");
+        }
     }
 
-    public void setUserAnsweredWrong(int userID) {
-
+    public void setUserAnsweredWrong(int userID) throws DAOException {
+        try {
+            connection.setUserAnsweredWrong(userID,
+                    connection.getUserAnsweredWrong(userID) + 1);
+        } catch (DBException e) {
+            throw new DAOException("Could not add answer to user");
+        }
     }
 
-    public void setUserStartedNewGame(int userID) {
-
-    }
+//    public void setUserStartedNewGame(int userID) throws DAOException {
+//        try {
+//
+//        } catch (DBException e) {
+//            throw new DAOException("Could not add answer to user");
+//        }
+//    }
 
     public Collection<String> getCountries() throws DAOException {
         try {

@@ -14,7 +14,10 @@ public class Check {
             System.out.println(c);
         }
 
-        System.out.println(dao.createUser("Oded2231231232"));
+//        System.out.println(dao.createUser("Oded2231231232"));
+
+        dao.setUserAnsweredCorrectly(1);
+        dao.setUserAnsweredWrong(1);
 
         dao.disconnect();
     }
