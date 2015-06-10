@@ -63,7 +63,7 @@ public class DAO {
     }
 
     /**
-     * Return a set of size count with random countriess
+     * Return a set of size count with random countries
      */
     public Collection<String> getRandomCountries(int count) throws DAOException {
         try {
@@ -74,7 +74,11 @@ public class DAO {
     }
 
 
-//    public Collection<String> getCities() {
-//
-//    }
+    public Collection<String> getRandomCitiesByCountry(String country, int count) throws DAOException {
+        try {
+            return connection.getCities(country, count);
+        } catch (DBException e) {
+            throw new DAOException("Could not get random cities: " + e.getMessage());
+        }
+    }
 }

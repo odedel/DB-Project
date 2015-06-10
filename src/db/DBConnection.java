@@ -460,28 +460,33 @@ public class DBConnection {
     }
 
     public Collection<String> getAllCountries() throws DBException {
-        try (Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT NAME FROM COUNTRY")) {
-
-            Collection<String> countries = new HashSet<>();
-            while (rs.next()) {
-                countries.add(rs.getString(1));
-            }
-            return countries;
-        } catch (SQLException e) {
-            throw new DBException("Error while fetching countries: " + e.getMessage());
-        }
+        return genericStringCollectionFetcher("SELECT NAME FROM COUNTRY");
     }
 
     public Collection<String> getRandomCountries(int count) throws DBException {
-        try (Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(String.format("SELECT NAME FROM COUNTRY ORDER BY RAND() LIMIT %s", count))) {
+        return genericStringCollectionFetcherRandomLimit("SELECT NAME FROM COUNTRY", count);
+    }
 
-            Collection<String> countries = new HashSet<>();
+    public Collection<String> getCities(String country, int count) throws DBException {
+        return genericStringCollectionFetcherRandomLimit(
+                String.format("SELECT CITY.NAME FROM COUNTRY, CITY WHERE CITY.COUNTRY_ID=COUNTRY.ID " +
+                        "AND COUNTRY.NAME='%s' ", country), count);
+    }
+
+    private Collection<String> genericStringCollectionFetcherRandomLimit(String select, int count) throws DBException {
+        return genericStringCollectionFetcher(
+                select + String.format(" ORDER BY RAND() LIMIT %s", count));
+    }
+
+    private Collection<String> genericStringCollectionFetcher(String select) throws DBException {
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(select)) {
+
+            Collection<String> stringCollection = new HashSet<>();
             while (rs.next()) {
-                countries.add(rs.getString(1));
+                stringCollection.add(rs.getString(1));
             }
-            return countries;
+            return stringCollection;
         } catch (SQLException e) {
             throw new DBException("Error while fetching countries: " + e.getMessage());
         }

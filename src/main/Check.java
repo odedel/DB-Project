@@ -10,7 +10,7 @@ public class Check {
         DAO dao = new DAO();
 
         dao.connect(DBUser.PLAYER);
-        for (String c : dao.getRandomCountries(10)) {
+        for (String c : dao.getRandomCitiesByCountry("Israel", 10)) {
             System.out.println(c);
         }
     }
