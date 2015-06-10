@@ -54,6 +54,29 @@ public class DAO {
         }
     }
 
+    /**
+     * @return user id
+     */
+    public int createUser(String name) throws DAOException {
+        try {
+            return connection.createUser(name);
+        } catch (DBException e) {
+            throw new DAOException("Could not create user: " + e.getMessage());
+        }
+    }
+
+    public void setUserAnsweredCorrectly(int userID) {
+
+    }
+
+    public void setUserAnsweredWrong(int userID) {
+
+    }
+
+    public void setUserStartedNewGame(int userID) {
+
+    }
+
     public Collection<String> getCountries() throws DAOException {
         try {
             return connection.getAllCountries();
@@ -72,7 +95,6 @@ public class DAO {
             throw new DAOException("Could not get random countries: " + e.getMessage());
         }
     }
-
 
     public Collection<String> getRandomCitiesByCountry(String country, int count) throws DAOException {
         try {

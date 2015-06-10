@@ -438,6 +438,27 @@ public class DBConnection {
         }
     }
 
+    public int createUser(String user) throws DBException {
+        ResultSet rs = null;
+        try (Statement stmt = conn.createStatement()) {
+            stmt.executeUpdate(String.format("INSERT INTO USER(name) VALUES ('%s')", user), new String[] { "ID" });
+
+            rs = stmt.getGeneratedKeys();
+            rs.next();
+            return rs.getInt(1);
+        } catch (SQLException e) {
+            throw new DBException("Could not create user: " + e.getMessage());
+        } finally {
+            try {
+                if (rs != null && !rs.isClosed()) {
+                    rs.close();
+                }
+            } catch (SQLException e) {
+                throw new DBException("Something really bad happend while creating user: " + e.getMessage());
+            }
+        }
+    }
+
     /**
      * @return How many countries there are in the DB
      */
