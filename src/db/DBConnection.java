@@ -32,7 +32,7 @@ public class DBConnection {
                     user.toString().toLowerCase(), user.toString().toLowerCase());
         } catch (SQLException e) {
             conn = null;
-            throw new DBException("Unable to connect : " + e.getMessage());
+            throw new DBException("Unable to connect: " + e.getMessage());
         }
         System.out.println("Connected!");
     }
@@ -54,7 +54,7 @@ public class DBConnection {
         try {
             return !conn.isClosed();
         } catch (SQLException e) {
-            throw new DBException("Unable to check connection status : " + e.getMessage());
+            throw new DBException("Unable to check connection status: " + e.getMessage());
         }
     }
 
@@ -83,7 +83,7 @@ public class DBConnection {
 
             conn.commit();
         } catch (SQLException e) {
-            throw new DBException("Error while uploading countries : " + e.getMessage());
+            throw new DBException("Error while uploading countries: " + e.getMessage());
         } finally {
             safelySetAutoCommit();
         }
@@ -116,7 +116,7 @@ public class DBConnection {
 
             conn.commit();
         } catch (SQLException e) {
-            throw new DBException("Error while uploading countries : " + e.getMessage());
+            throw new DBException("Error while uploading countries: " + e.getMessage());
         } finally {
             safelySetAutoCommit();
         }
@@ -132,7 +132,7 @@ public class DBConnection {
 
             conn.commit();
         } catch (SQLException e) {
-            throw new DBException("Error while uploading universities : " + e.getMessage());
+            throw new DBException("Error while uploading universities: " + e.getMessage());
         } finally {
             safelySetAutoCommit();
         }
@@ -153,7 +153,7 @@ public class DBConnection {
             }
             executeBatch(pstmt, batchingList);
         } catch (SQLException e) {
-            throw new DBException("Error while uploading universities : " + e.getMessage());
+            throw new DBException("Error while uploading universities: " + e.getMessage());
         }
     }
 
@@ -171,7 +171,7 @@ public class DBConnection {
             }
             executeBatch(pstmt, null);
         } catch (SQLException e) {
-            throw new DBException("Error while uploading politicians : " + e.getMessage());
+            throw new DBException("Error while uploading politicians: " + e.getMessage());
         }
     }
 
@@ -189,7 +189,7 @@ public class DBConnection {
             }
             executeBatch(pstmt, null);
         } catch (SQLException e) {
-            throw new DBException("Error while uploading politicians : " + e.getMessage());
+            throw new DBException("Error while uploading politicians: " + e.getMessage());
         }
     }
 
@@ -204,7 +204,7 @@ public class DBConnection {
 
             conn.commit();
         } catch (SQLException e) {
-            throw new DBException("Error while uploading persons : " + e.getMessage());
+            throw new DBException("Error while uploading persons: " + e.getMessage());
         } finally {
             safelySetAutoCommit();
         }
@@ -238,7 +238,7 @@ public class DBConnection {
             }
             executeBatch(pstmt, batchingList);
         } catch (SQLException e) {
-            throw new DBException("Error while uploading persons : " + e.getMessage());
+            throw new DBException("Error while uploading persons: " + e.getMessage());
         }
     }
 
@@ -256,7 +256,7 @@ public class DBConnection {
             }
             executeBatch(pstmt, null);
         } catch (SQLException e) {
-            throw new DBException("Error while uploading Persons-Politician-Of-Relation : " + e.getMessage());
+            throw new DBException("Error while uploading Persons-Politician-Of-Relation: " + e.getMessage());
         }
     }
 
@@ -274,7 +274,7 @@ public class DBConnection {
             }
             executeBatch(pstmt, null);
         } catch (SQLException e) {
-            throw new DBException("Error while uploading Person-University-Relation : " + e.getMessage());
+            throw new DBException("Error while uploading Person-University-Relation: " + e.getMessage());
         }
     }
 
@@ -292,7 +292,7 @@ public class DBConnection {
             }
             executeBatch(pstmt, null);
         } catch (SQLException e) {
-            throw new DBException("Error while uploading business-creator-relation : " + e.getMessage());
+            throw new DBException("Error while uploading business-creator-relation: " + e.getMessage());
         }
     }
 
@@ -310,7 +310,7 @@ public class DBConnection {
             }
             executeBatch(pstmt, null);
         } catch (SQLException e) {
-            throw new DBException("Error while uploading creators : " + e.getMessage());
+            throw new DBException("Error while uploading creators: " + e.getMessage());
         }
     }
 
@@ -324,7 +324,7 @@ public class DBConnection {
 
             conn.commit();
         } catch(SQLException e) {
-            throw new DBException("Error while uploading businesses : " + e.getMessage());
+            throw new DBException("Error while uploading businesses: " + e.getMessage());
         } finally {
             safelySetAutoCommit();
         }
@@ -346,7 +346,7 @@ public class DBConnection {
             }
             executeBatch(pstmt, batchingList);
         } catch (SQLException e) {
-            throw new DBException("Error while uploading creators : " + e.getMessage());
+            throw new DBException("Error while uploading creators: " + e.getMessage());
         }
     }
 
@@ -364,7 +364,7 @@ public class DBConnection {
             }
             executeBatch(pstmt, null);
         } catch (SQLException e) {
-            throw new DBException("Error while uploading businesses : " + e.getMessage());
+            throw new DBException("Error while uploading businesses: " + e.getMessage());
         }
     }
 
@@ -382,7 +382,7 @@ public class DBConnection {
             }
             executeBatch(pstmt, null);
         } catch (SQLException e) {
-            throw new DBException("Error while uploading creators : " + e.getMessage());
+            throw new DBException("Error while uploading creators: " + e.getMessage());
         }
     }
 
@@ -396,7 +396,7 @@ public class DBConnection {
 
             conn.commit();
         } catch(SQLException e) {
-            throw new DBException("Error while uploading artifacts : " + e.getMessage());
+            throw new DBException("Error while uploading artifacts: " + e.getMessage());
         } finally {
             safelySetAutoCommit();
         }
@@ -416,7 +416,7 @@ public class DBConnection {
             }
             executeBatch(pstmt, null);
         } catch (SQLException e) {
-            throw new DBException("Error while uploading businesses : " + e.getMessage());
+            throw new DBException("Error while uploading businesses: " + e.getMessage());
         }
     }
 
@@ -434,7 +434,7 @@ public class DBConnection {
             }
             executeBatch(pstmt, batchingList);
         } catch (SQLException e) {
-            throw new DBException("Error while uploading artifacts : " + e.getMessage());
+            throw new DBException("Error while uploading artifacts: " + e.getMessage());
         }
     }
 
@@ -446,7 +446,7 @@ public class DBConnection {
             ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM country")) {
             return rs.getInt(1);
         } catch (SQLException e) {
-            throw new DBException("Error while counting countries : " + e.getMessage());
+            throw new DBException("Error while counting countries: " + e.getMessage());
         }
     }
 
@@ -455,7 +455,35 @@ public class DBConnection {
              ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM city")) {
             return rs.getInt(1);
         } catch (SQLException e) {
-            throw new DBException("Error while counting countries : " + e.getMessage());
+            throw new DBException("Error while counting countries: " + e.getMessage());
+        }
+    }
+
+    public Collection<String> getAllCountries() throws DBException {
+        try (Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT NAME FROM COUNTRY")) {
+
+            Collection<String> countries = new HashSet<>();
+            while (rs.next()) {
+                countries.add(rs.getString(1));
+            }
+            return countries;
+        } catch (SQLException e) {
+            throw new DBException("Error while fetching countries: " + e.getMessage());
+        }
+    }
+
+    public Collection<String> getFourRandomCountries() throws DBException {
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT NAME FROM COUNTRY ORDER BY RAND() LIMIT 4")) {
+
+            Collection<String> countries = new HashSet<>();
+            while (rs.next()) {
+                countries.add(rs.getString(1));
+            }
+            return countries;
+        } catch (SQLException e) {
+            throw new DBException("Error while fetching countries: " + e.getMessage());
         }
     }
 
@@ -537,7 +565,7 @@ public class DBConnection {
             stmt.executeUpdate("DELETE FROM PERSON");
             stmt.executeUpdate("DELETE FROM country");
         } catch (SQLException e) {
-            throw new DBException("Error while deleting collect_data from country : " + e.getMessage());
+            throw new DBException("Error while deleting collect_data from country: " + e.getMessage());
         }
     }
 
@@ -556,7 +584,7 @@ public class DBConnection {
                 entityIterator.next().setId(rs.getInt(1));
             }
         } catch(SQLException e) {
-            throw new DBException("Error while getting generated keys : " + e.getMessage());
+            throw new DBException("Error while getting generated keys: " + e.getMessage());
         }
     }
 
@@ -576,7 +604,7 @@ public class DBConnection {
                 batchingList.clear();
             }
         } catch (SQLException e) {
-            throw new DBException("Error while adding to batch : " + e.getMessage());
+            throw new DBException("Error while adding to batch: " + e.getMessage());
         }
     }
 
@@ -588,7 +616,7 @@ public class DBConnection {
                 setIDsToEntities(pstmt, entities);
             }
         } catch (SQLException e) {
-            throw new DBException("Error while executing batch : " + e.getMessage());
+            throw new DBException("Error while executing batch: " + e.getMessage());
         }
     }
 

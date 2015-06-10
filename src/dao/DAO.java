@@ -5,7 +5,7 @@ import db.DBConnection;
 import db.DBException;
 import utils.DBUser;
 
-import java.io.IOException;
+import java.util.Collection;
 import java.util.LinkedList;
 
 public class DAO {
@@ -41,12 +41,36 @@ public class DAO {
         }
     }
 
-    public void uploadDataCollector(DataCollector dataCollector) throws DBException, IOException {
-        connection.uploadCountries(new LinkedList<>(dataCollector.getCountries()));
-        connection.uploadCities(new LinkedList<>(dataCollector.getCities()));
-        connection.uploadUniversities(new LinkedList<>(dataCollector.getUniversities()));
-        connection.uploadBusinesses(new LinkedList<>(dataCollector.getBusinesses()));
-        connection.uploadPersons(new LinkedList<>(dataCollector.getPersons()));
-        connection.uploadArtifacts(new LinkedList<>(dataCollector.getArtifacts()));
+    public void uploadDataCollector(DataCollector dataCollector) throws DAOException {
+        try {
+            connection.uploadCountries(new LinkedList<>(dataCollector.getCountries()));
+            connection.uploadCities(new LinkedList<>(dataCollector.getCities()));
+            connection.uploadUniversities(new LinkedList<>(dataCollector.getUniversities()));
+            connection.uploadBusinesses(new LinkedList<>(dataCollector.getBusinesses()));
+            connection.uploadPersons(new LinkedList<>(dataCollector.getPersons()));
+            connection.uploadArtifacts(new LinkedList<>(dataCollector.getArtifacts()));
+        } catch (DBException e) {
+            throw new DAOException("Could not upload data to DB: " + e.getMessage());
+        }
     }
+
+    public Collection<String> getCountries() throws DAOException {
+        try {
+            return connection.getAllCountries();
+        } catch (DBException e) {
+            throw new DAOException("Could not get countries: " + e.getMessage());
+        }
+    }
+
+    public Collection<String> getFourRandomCountries() throws DAOException {
+        try {
+            return connection.getFourRandomCountries();
+        } catch (DBException e) {
+            throw new DAOException("Could not get random countries: " + e.getMessage());
+        }
+    }
+
+//    public Collection<String> getCities() {
+//
+//    }
 }
