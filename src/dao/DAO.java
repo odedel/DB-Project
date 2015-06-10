@@ -4,6 +4,7 @@ import collect_data.DataCollector;
 import db.DBConnection;
 import db.DBException;
 import utils.DBUser;
+import utils.IntegrityException;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -65,6 +66,14 @@ public class DAO {
         }
     }
 
+    public int getUserID(String name) throws DAOException, IntegrityException {
+        try {
+            return connection.getUserID(name);
+        } catch (DBException e) {
+            throw new DAOException("Could not fetch user ID: " + e.getMessage());
+        }
+    }
+
     public void setUserAnsweredCorrectly(int userID) throws DAOException {
         try {
             connection.setUserAnsweredCorrectly(userID,
@@ -83,13 +92,14 @@ public class DAO {
         }
     }
 
-//    public void setUserStartedNewGame(int userID) throws DAOException {
-//        try {
-//
-//        } catch (DBException e) {
-//            throw new DAOException("Could not add answer to user");
-//        }
-//    }
+    public void setUserStartedNewGame(int userID) throws DAOException {
+        try {
+            connection.setUserStartedNewGame(userID,
+                    connection.setUserStartedNewGame(userID) + 1);
+        } catch (DBException e) {
+            throw new DAOException("Could not add answer to user");
+        }
+    }
 
     public Collection<String> getCountries() throws DAOException {
         try {

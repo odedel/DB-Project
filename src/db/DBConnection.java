@@ -3,6 +3,7 @@ package db;
 import collect_data.entities.*;
 import collect_data.util.Utils;
 import utils.DBUser;
+import utils.IntegrityException;
 
 import java.sql.*;
 import java.util.*;
@@ -459,6 +460,16 @@ public class DBConnection {
         }
     }
 
+    public int getUserID(String name) throws DBException, IntegrityException {
+        Collection<String> result = genericStringCollectionFetcher(String.format("SELECT ID FROM USER WHERE NAME='%s'", name));
+
+        if (result.isEmpty()) {
+            throw new IntegrityException("Could not find user " + name);
+        }
+
+        return Integer.parseInt(result.iterator().next());
+    }
+
     public int getUserAnsweredCorrectly(int userID) throws DBException {
         return genericIntFetcher(
                 String.format("SELECT number_of_correct_answers FROM USER WHERE ID=%s", userID));
@@ -479,6 +490,18 @@ public class DBConnection {
     public void setUserAnsweredWrong(int userID, int number) throws DBException {
         genericUpdater(
                 String.format("UPDATE USER SET number_of_wrong_answers=%s WHERE ID=%s", number, userID)
+        );
+    }
+
+    public int setUserStartedNewGame(int userID) throws DBException {
+        return genericIntFetcher(
+                String.format("SELECT number_of_games_played FROM USER WHERE ID=%s", userID)
+        );
+    }
+
+    public void setUserStartedNewGame(int userID, int number) throws DBException {
+        genericUpdater(
+                String.format("UPDATE USER SET number_of_games_played=%s WHERE ID=%s", number, userID)
         );
     }
 
