@@ -473,9 +473,9 @@ public class DBConnection {
         }
     }
 
-    public Collection<String> getFourRandomCountries() throws DBException {
+    public Collection<String> getRandomCountries(int count) throws DBException {
         try (Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT NAME FROM COUNTRY ORDER BY RAND() LIMIT 4")) {
+             ResultSet rs = stmt.executeQuery(String.format("SELECT NAME FROM COUNTRY ORDER BY RAND() LIMIT %s", count))) {
 
             Collection<String> countries = new HashSet<>();
             while (rs.next()) {
