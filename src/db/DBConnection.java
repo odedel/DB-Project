@@ -531,18 +531,23 @@ public class DBConnection {
     }
 
     public Collection<String> getRandomCountries(int count) throws DBException {
-        return genericStringCollectionFetcherRandomLimit("SELECT NAME FROM COUNTRY", count);
-    }
-
-    public Collection<String> getCities(String country, int count) throws DBException {
-        return genericStringCollectionFetcherRandomLimit(
-                String.format("SELECT CITY.NAME FROM COUNTRY, CITY WHERE CITY.COUNTRY_ID=COUNTRY.ID " +
-                        "AND COUNTRY.NAME='%s' ", country), count);
-    }
-
-    private Collection<String> genericStringCollectionFetcherRandomLimit(String select, int count) throws DBException {
         return genericStringCollectionFetcher(
-                select + String.format(" ORDER BY RAND() LIMIT %s", count));
+                addRandomLimitToQuery("SELECT NAME FROM COUNTRY", count)
+        );
+    }
+
+    public int getEntityID(String entity_type, String name) throws DBException {
+        return genericIntFetcher(String.format("SELECT ID FROM %s WHERE NAME='%s'", entity_type, name));
+    }
+
+    public Collection<Integer> getCities(int country, int count) throws DBException {
+        return genericIntCollectionFetcher(
+                addRandomLimitToQuery(String.format("SELECT ID FROM CITY WHERE CITY.COUNTRY_ID='%s'", country), count)
+        );
+    }
+
+    private String addRandomLimitToQuery(String select, int count) {
+        return select + String.format(" ORDER BY RAND() LIMIT %s", count);
     }
 
     private Collection<String> genericStringCollectionFetcher(String select) throws DBException {
@@ -554,6 +559,35 @@ public class DBConnection {
                 stringCollection.add(rs.getString(1));
             }
             return stringCollection;
+        } catch (SQLException e) {
+            throw new DBException("Error while fetching countries: " + e.getMessage());
+        }
+    }
+
+    private Collection<Integer> genericIntCollectionFetcher(String select) throws DBException {
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(select)) {
+
+            Collection<Integer> integerCollection = new HashSet<>();
+            while (rs.next()) {
+                integerCollection.add(rs.getInt(1));
+            }
+            return integerCollection;
+        } catch (SQLException e) {
+            throw new DBException("Error while fetching countries: " + e.getMessage());
+        }
+    }
+
+    private Collection<List<String>> genericListCollectionFetcher(String select) throws DBException {
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(select)) {
+
+            Collection<String> stringCollection = new HashSet<>();
+            while (rs.next()) {
+                stringCollection.add(rs.getString(1));
+            }
+
+            return new HashSet<>();
         } catch (SQLException e) {
             throw new DBException("Error while fetching countries: " + e.getMessage());
         }
@@ -724,4 +758,6 @@ public class DBConnection {
     private static String CONNECTION_STRING = "jdbc:mysql://%s/%s";
     private static String DEFAULT_HOST = "localhost:3306";
     private static String DEFAULT_SCHEMA = "toyt";
+
+
 }

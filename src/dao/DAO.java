@@ -120,11 +120,29 @@ public class DAO {
         }
     }
 
-    public Collection<String> getRandomCitiesByCountry(String country, int count) throws DAOException {
+    /**
+     * Returns entity's ID.
+     * Example: getID("country", "Israel")
+     */
+    public int getID(String entity_type, String name) throws DAOException {
         try {
-            return connection.getCities(country, count);
+            return connection.getEntityID(entity_type, name);
+        } catch (DBException e) {
+            throw new DAOException("Could not fetch country ID: " + e.getMessage());
+        }
+    }
+
+
+    /**
+     * Example: getRandomCitiesByCountry(*COUNTRY-ID*, 4, [name, creation_date, economic_growth])
+     * Returns collection of 4 elements, each is a list where the first value represents city's name, second is the creation date...
+     */
+    public Collection<Integer> getRandomCitiesByCountry(int country_id, int count) throws DAOException {
+        try {
+            return connection.getCities(country_id, count);
         } catch (DBException e) {
             throw new DAOException("Could not get random cities: " + e.getMessage());
         }
     }
+
 }
