@@ -576,6 +576,18 @@ public class DBConnection {
         }
     }
 
+    private IDName genericIntStringFetcher(String select) throws DBException {
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(select)) {
+            if (rs.next()) {
+                return new IDName(rs.getInt(1), rs.getString(2));
+            }
+            return null;
+        } catch (SQLException e) {
+            throw new DBException("Error while fetching countries: " + e.getMessage());
+        }
+    }
+
     private Integer genericIntFetcher(String select) throws DBException {
         try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(select)) {
@@ -869,6 +881,12 @@ public class DBConnection {
                 addRandomLimitToQuery(
                     String.format("SELECT ID, NAME FROM CITY WHERE COUNTRY_ID != %s", country_id),
                         count)
+        );
+    }
+
+    public IDName getOldestCity(int country_id) throws DBException {
+        return genericIntStringFetcher(
+                String.format("SELECT ID, NAME FROM CITY WHERE COUNTRY_ID=%s and CREATION_DATE is not null ORDER BY CREATION_DATE ASC LIMIT 1", country_id)
         );
     }
 }

@@ -359,16 +359,20 @@ public class DAO {
             throw new DAOException("Could not fetch data: " + e.getMessage());
         }
     }
-//
-//    /* What is the oldest city in X? */
-//    public IDName getOldestCity(int country_id) throws DAOException {
-//        try {
-//            return connection.getOldestCity(country_id);
-//        } catch (DBException e) {
-//            throw new DAOException("Could not fetch data: " + e.getMessage());
-//        }
-//    }
-//
+
+    /* What is the oldest city in X? */
+    public IDName getOldestCity(int country_id) throws DAOException, DataNotFoundException {
+        try {
+            IDName answer = connection.getOldestCity(country_id);
+            if (answer == null) {
+                throw new DataNotFoundException("Can not find the oldest city in " + country_id);
+            }
+            return answer;
+        } catch (DBException e) {
+            throw new DAOException("Could not fetch data: " + e.getMessage());
+        }
+    }
+
 //    /* Which city is older then X? */
 //    /* Which city is newer then X? */
 //    public Collection<IDName> getOlderCityThan(int city_id, int count) throws DAOException {

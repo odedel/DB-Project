@@ -18,7 +18,7 @@ public class Check {
         l.add(1258);
         l.add(1118);
 
-        System.out.println(dao.getRansomCitiesNotInCountry(1147, 2));
+        System.out.println(dao.getOldestCity(1147));
 
         dao.disconnect();
     }
