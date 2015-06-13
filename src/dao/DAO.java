@@ -61,7 +61,25 @@ public class DAO {
 
     private void validateUserExists(int userID) throws EntityNotFound, DAOException {
         if (!checkIfEntityExists("user", userID))
-            throw new EntityNotFound(String.format("User ID %s is not found", userID));
+            throw new EntityNotFound(String.format("User ID %s does not found", userID));
+    }
+
+    private void validateCountryExists(int countryID) throws EntityNotFound, DAOException {
+        if (!checkIfEntityExists("country", countryID)) {
+            throw new EntityNotFound(String.format("Country ID %s does not found", countryID));
+        }
+    }
+
+    private void validateCityExists(int cityID) throws EntityNotFound, DAOException {
+        if (!checkIfEntityExists("city", cityID)) {
+            throw new EntityNotFound(String.format("City ID %s does not found", cityID));
+        }
+    }
+
+    private void validatePersonExists(int personID) throws EntityNotFound, DAOException {
+        if (!checkIfEntityExists("person", personID)) {
+            throw new EntityNotFound(String.format("Person ID %s does not found", personID));
+        }
     }
 
 
