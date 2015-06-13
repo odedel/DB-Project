@@ -82,17 +82,17 @@ public class DAO {
         }
     }
 
-//    private void validateCityExists(int cityID) throws EntityNotFound, DAOException {
-//        if (!checkIfEntityExists("city", cityID)) {
-//            throw new EntityNotFound(String.format("City ID %s does not exists", cityID));
-//        }
-//    }
-//
-//    private void validatePersonExists(int personID) throws EntityNotFound, DAOException {
-//        if (!checkIfEntityExists("person", personID)) {
-//            throw new EntityNotFound(String.format("Person ID %s does not exists", personID));
-//        }
-//    }
+    private void validateCityExists(int cityID) throws EntityNotFound, DAOException {
+        if (!checkIfEntityExists("city", cityID)) {
+            throw new EntityNotFound(String.format("City ID %s does not exists", cityID));
+        }
+    }
+
+    private void validatePersonExists(int personID) throws EntityNotFound, DAOException {
+        if (!checkIfEntityExists("person", personID)) {
+            throw new EntityNotFound(String.format("Person ID %s does not exists", personID));
+        }
+    }
 
     /* --- Upload data from Yago --- */
 
@@ -332,25 +332,33 @@ public class DAO {
         }
     }
 
-//    /* --- Cities --- */
-//
-//    /* Which country is in X? */
-//    /* Which country is not in X? */
-//    /* Which city is different? */
-//    public Collection<IDName> getRandomCitiesByCountry(int country_id, int count) throws DAOException {
-//        try {
-//            return connection.getCities(country_id, count);
-//        } catch (DBException e) {
-//            throw new DAOException("Could not get random cities: " + e.getMessage());
-//        }
-//    }
-//    public Collection<IDName> getRansomCitiesNotInCountry(int country_id, int count) throws DAOException {
-//        try {
-//            return connection.getCitiesNotIn(country_id, count);
-//        } catch (DBException e) {
-//            throw new DAOException("Could not fetch data: " + e.getMessage());
-//        }
-//    }
+    /* --- Cities --- */
+
+    /* Which city is in X? */
+    /* Which city is not in X? */
+    /* Which city is different? */
+    public Collection<IDName> getRandomCitiesByCountry(int country_id, int count) throws DAOException, DataNotFoundException {
+        try {
+            Collection<IDName> answer = connection.getCities(country_id, count);
+            if(answer.size() != count) {
+                throw new DataNotFoundException(String.format("Can not find %s cities in %s", count, country_id));
+            }
+            return answer;
+        } catch (DBException e) {
+            throw new DAOException("Could not get random cities: " + e.getMessage());
+        }
+    }
+    public Collection<IDName> getRansomCitiesNotInCountry(int country_id, int count) throws DAOException, DataNotFoundException {
+        try {
+            Collection<IDName> answer = connection.getCitiesNotIn(country_id, count);
+            if (answer.size() != count) {
+                throw new DataNotFoundException(String.format("Can not find %s cities that are not in %s", count, country_id));
+            }
+            return answer;
+        } catch (DBException e) {
+            throw new DAOException("Could not fetch data: " + e.getMessage());
+        }
+    }
 //
 //    /* What is the oldest city in X? */
 //    public IDName getOldestCity(int country_id) throws DAOException {

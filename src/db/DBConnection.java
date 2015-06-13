@@ -863,4 +863,12 @@ public class DBConnection {
                 ), 1)
         );
     }
+
+    public Collection<IDName> getCitiesNotIn(int country_id, int count) throws DBException {
+        return genericIntStringCollectionFetcher(
+                addRandomLimitToQuery(
+                    String.format("SELECT ID, NAME FROM CITY WHERE COUNTRY_ID != %s", country_id),
+                        count)
+        );
+    }
 }

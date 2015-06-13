@@ -18,7 +18,7 @@ public class Check {
         l.add(1258);
         l.add(1118);
 
-        System.out.println(dao.getCountryCreatedBetween(1132, 1258));
+        System.out.println(dao.getRansomCitiesNotInCountry(1147, 2));
 
         dao.disconnect();
     }
