@@ -449,24 +449,26 @@ public class DAO {
             throw new DAOException("Could not fetch birth place: " + e.getMessage());
         }
     }
-//
-//    /* Which person was born in the same place as X? */
-//    /* Which person was not born in the same place as X? */
-//    public Collection<IDName> getPersonsBornInSamePlace(int person_id, int count) throws DAOException {
-//        try {
-//            return connection.getPersonsBornInSamePlace(person_id, count);
-//        } catch (DBException e) {
-//            throw new DAOException("Could not fetch data: " + e.getMessage());
-//        }
-//    }
-//    public Collection<IDName> getPersonsNotBornInSamePlace(int person_id, int count) throws DAOException {
-//        try {
-//            return connection.getPersonsNotBornInSamePlace(person_id, count);
-//        } catch (DBException e) {
-//            throw new DAOException("Could not fetch data: " + e.getMessage());
-//        }
-//    }
-//
+
+    /* Which person was born in the same country as X? */
+    /* Which person was not born in the same country as X? */
+    public Collection<IDName> getPersonsBornInSamePlace(int person_id, int count) throws DAOException, EntityNotFound {
+        validatePersonExists(person_id);
+        try {
+            return connection.getPersonsBornInSameCountry(person_id, count);
+        } catch (DBException e) {
+            throw new DAOException("Could not fetch data: " + e.getMessage());
+        }
+    }
+    public Collection<IDName> getPersonsNotBornInSamePlace(int person_id, int count) throws DAOException, EntityNotFound {
+        validatePersonExists(person_id);
+        try {
+            return connection.getPersonsNotBornInSameCountry(person_id, count);
+        } catch (DBException e) {
+            throw new DAOException("Could not fetch data: " + e.getMessage());
+        }
+    }
+
 //    /* When X was born? */
 //    /* Who was born first/last? */
 //    public Date getPersonBirthDate(int person_id) throws DAOException {

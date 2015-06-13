@@ -923,4 +923,24 @@ public class DBConnection {
                 String.format("SELECT ID, NAME FROM CITY WHERE ID in (SELECT BIRTH_CITY_ID FROM PERSON WHERE ID=%s)", person_id)
         );
     }
+
+    public Collection<IDName> getPersonsBornInSameCountry(int person_id, int count) throws DBException {
+        return genericIntStringCollectionFetcher(
+                addRandomLimitToQuery(
+                        String.format("SELECT ID, NAME FROM person WHERE birth_city_id in (SELECT ID from city where " +
+                                        "country_id in (SELECT COUNTRY.ID FROM COUNTRY, PERSON, CITY WHERE " +
+                                        "CITY.country_id=COUNTRY.ID AND PERSON.birth_city_id=CITY.ID AND PERSON.ID=%s))", person_id
+                                        )
+                                , count));
+    }
+
+    public Collection<IDName> getPersonsNotBornInSameCountry(int person_id, int count) throws DBException {
+        return genericIntStringCollectionFetcher(
+                addRandomLimitToQuery(
+                        String.format("SELECT ID, NAME FROM person WHERE birth_city_id not in (SELECT ID from city where " +
+                                        "country_id in (SELECT COUNTRY.ID FROM COUNTRY, PERSON, CITY WHERE " +
+                                        "CITY.country_id=COUNTRY.ID AND PERSON.birth_city_id=CITY.ID AND PERSON.ID=%s))", person_id
+                        )
+                        , count));
+    }
 }

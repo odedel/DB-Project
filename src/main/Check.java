@@ -18,7 +18,7 @@ public class Check {
         l.add(1258);
         l.add(1118);
 
-        System.out.println(dao.getBirthPlace(95419));
+        System.out.println(dao.getPersonsNotBornInSamePlace(163838, 5));
 
         dao.disconnect();
     }
