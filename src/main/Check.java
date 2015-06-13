@@ -18,7 +18,7 @@ public class Check {
         l.add(1258);
         l.add(1118);
 
-        System.out.println(dao.getPersonBirthDate(95427));
+        System.out.println(dao.getPersonsOrderByBirthDate(1147, 5));
 
         dao.disconnect();
     }

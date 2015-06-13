@@ -9,6 +9,7 @@ import utils.EntityNotFound;
 import utils.IDName;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -57,9 +58,9 @@ public class DAO {
         }
     }
 
-    public Boolean checkIfEntityExists(String entityType, List<Integer> id) throws DAOException {
+    public Boolean checkIfEntityExists(String entityType, Collection<Integer> id) throws DAOException {
         try {
-            List<Integer> answer = connection.getCountOf(entityType, id);
+            Collection<Integer> answer = connection.getCountOf(entityType, new ArrayList<Integer>(id));
             return (answer.size() == id.size());
         } catch (DBException e) {
             throw new DAOException("Could not fetch data: " + e.getMessage());
@@ -76,8 +77,8 @@ public class DAO {
             throw new EntityNotFound(String.format("Country ID %s does not exists", countryID));
         }
     }
-    private void validateCountryExists(List<Integer> countryIDList) throws EntityNotFound, DAOException {
-        if (!checkIfEntityExists("country", countryIDList)) {
+    private void validateCountryExists(Collection<Integer> countryIDCollection) throws EntityNotFound, DAOException {
+        if (!checkIfEntityExists("country", countryIDCollection)) {
             throw new EntityNotFound("One of the countries does not exists");
         }
     }
@@ -260,10 +261,10 @@ public class DAO {
     /**
      * NOTE: you should check first that the country has a population data.
      */
-    public List<Integer> getCountryThatIsMorePopulatedThan(int countryID, int count) throws DAOException, EntityNotFound, DataNotFoundException {
+    public Collection<IDName> getCountryThatIsMorePopulatedThan(int countryID, int count) throws DAOException, EntityNotFound, DataNotFoundException {
         validateCountryExists(countryID);
         try {
-            List<Integer> answer = connection.getCountryThatIsMorePopulatedThan(countryID, count);
+            Collection<IDName> answer = connection.getCountryThatIsMorePopulatedThan(countryID, count);
             if(answer.size() == count) {
                 return answer;
             }
@@ -276,10 +277,10 @@ public class DAO {
     /**
      * NOTE: you should check first that the country has a population data.
      */
-    public List<Integer> getCountryThatIsLessPopulatedThan(int countryID, int count) throws DAOException, EntityNotFound, DataNotFoundException {
+    public Collection<IDName> getCountryThatIsLessPopulatedThan(int countryID, int count) throws DAOException, EntityNotFound, DataNotFoundException {
         validateCountryExists(countryID);
         try {
-            List<Integer> answer = connection.getCountryThatIsLessPopulatedThan(countryID, count);
+            Collection<IDName> answer = connection.getCountryThatIsLessPopulatedThan(countryID, count);
             if(answer.size() == count) {
                 return answer;
             }
@@ -306,23 +307,23 @@ public class DAO {
 
     /* Which country is the oldest? */
     /** Note: You should validate that the country has a creation date */
-    public int getOldestCountry(List<Integer> countriesList) throws DAOException, EntityNotFound {
-        validateCountryExists(countriesList);
+    public int getOldestCountry(Collection<Integer> integerCollection) throws DAOException, EntityNotFound {
+        validateCountryExists(integerCollection);
 
         try {
-            return connection.getTheOldestCountry(countriesList);
+            return connection.getTheOldestCountry(new ArrayList<>(integerCollection));
         } catch (DBException e) {
             throw new DAOException("Could not fetch data: " + e.getMessage());
         }
     }
 
     /* Which country Created before X but after Y?      Note: should first get the answers and than ask the question */
-    public int getCountryCreatedBetween(int afterCountry, int beforeCountry) throws DAOException, EntityNotFound, DataNotFoundException {
+    public IDName getCountryCreatedBetween(int afterCountry, int beforeCountry) throws DAOException, EntityNotFound, DataNotFoundException {
         validateCountryExists(afterCountry);
         validateCountryExists(beforeCountry);
 
         try {
-            Integer result = connection.getCountryCreatedBetween(afterCountry, beforeCountry);
+            IDName result = connection.getCountryCreatedBetween(afterCountry, beforeCountry);
             if (result == null) {
                 throw new DataNotFoundException("Can not find entity between countries");
             }
@@ -491,5 +492,19 @@ public class DAO {
     }
 
     /* Who was born first/last? */
-
+    /**
+     * Returns a ordered list with person IDS. The oldest person is the first one.
+     */
+    public List<IDName> getPersonsOrderByBirthDate(int country_id, int count) throws DAOException, EntityNotFound, DataNotFoundException {
+        validateCountryExists(country_id);
+        try {
+            List<IDName> result = connection.getPersonsOrderByBirthDate(country_id, count);
+            if (result.size() != count) {
+                throw new DataNotFoundException(String.format("Could not find %s persons with birth date in %s", count, country_id));
+            }
+            return result;
+        } catch (DBException e) {
+            throw new DAOException("Could not fetch data: " + e.getMessage());
+        }
+    }
 }

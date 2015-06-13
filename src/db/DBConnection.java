@@ -576,6 +576,22 @@ public class DBConnection {
         }
     }
 
+    private List<IDName> genericIntStringListFetcher(String select) throws DBException {
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(select)) {
+
+            List<IDName> idNameCollection = new LinkedList<>();
+            while (rs.next()) {
+                int id = rs.getInt(1);
+                String name = rs.getString(2);
+                idNameCollection.add(new IDName(id, name));
+            }
+            return idNameCollection;
+        } catch (SQLException e) {
+            throw new DBException("Error while fetching countries: " + e.getMessage());
+        }
+    }
+
     private IDName genericIntStringFetcher(String select) throws DBException {
         try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(select)) {
@@ -845,16 +861,16 @@ public class DBConnection {
                 listToStringForQuery(countryIDList)));
     }
 
-    public List<Integer> getCountryThatIsMorePopulatedThan(int countryID, int count) throws DBException {
-        return genericListIntFetcher(
+    public Collection<IDName> getCountryThatIsMorePopulatedThan(int countryID, int count) throws DBException {
+        return genericIntStringCollectionFetcher(
                 addRandomLimitToQuery(String.format(
-                                "SELECT ID FROM COUNTRY WHERE POPULATION > (SELECT POPULATION FROM COUNTRY WHERE ID=%s)",
-                                countryID), count)
+                        "SELECT ID FROM COUNTRY WHERE POPULATION > (SELECT POPULATION FROM COUNTRY WHERE ID=%s)",
+                        countryID), count)
         );
     }
 
-    public List<Integer> getCountryThatIsLessPopulatedThan(int countryID, int count) throws DBException {
-        return genericListIntFetcher(
+    public Collection<IDName> getCountryThatIsLessPopulatedThan(int countryID, int count) throws DBException {
+        return genericIntStringCollectionFetcher(
                 addRandomLimitToQuery(
                         String.format("SELECT ID FROM COUNTRY WHERE POPULATION < (SELECT POPULATION FROM COUNTRY WHERE ID=%s) AND POPULATION > 0", countryID), count
                 )
@@ -867,11 +883,11 @@ public class DBConnection {
         );
     }
 
-    public Integer getCountryCreatedBetween(int afterCountry, int beforeCountry) throws DBException {
-        return genericIntFetcher(
+    public IDName getCountryCreatedBetween(int afterCountry, int beforeCountry) throws DBException {
+        return genericIntStringFetcher(
                 addRandomLimitToQuery(
                 String.format(
-                        "SELECT ID FROM COUNTRY WHERE CREATION_DATE > (SELECT CREATION_DATE FROM COUNTRY WHERE ID=%s) AND CREATION_DATE < (SELECT CREATION_DATE FROM COUNTRY WHERE ID=%s)", afterCountry, beforeCountry
+                        "SELECT ID, NAME FROM COUNTRY WHERE CREATION_DATE > (SELECT CREATION_DATE FROM COUNTRY WHERE ID=%s) AND CREATION_DATE < (SELECT CREATION_DATE FROM COUNTRY WHERE ID=%s)", afterCountry, beforeCountry
                 ), 1)
         );
     }
@@ -947,6 +963,14 @@ public class DBConnection {
     public Date getBirthDate(int person_id) throws DBException {
         return genericDateFetcher(
                 String.format("SELECT BIRTH_DATE FROM PERSON WHERE ID=%s", person_id)
+        );
+    }
+
+    public List<IDName> getPersonsOrderByBirthDate(int country_id, int count) throws DBException {
+        return genericIntStringListFetcher(
+                String.format(
+                        "SELECT ID, NAME FROM (SELECT ID, NAME, birth_date FROM PERSON WHERE birth_city_id in (SELECT ID FROM CITY WHERE COUNTRY_ID=%s) ORDER BY RAND() LIMIT %s) as TMP ORDER BY birth_date", country_id, count
+                )
         );
     }
 }
