@@ -509,6 +509,20 @@ public class DAO {
     }
 
 
+    /* --- University --- */
+
+
+
+    /* --- Business --- */
+
+
+
+
+    /* --- Artifact --- */
+
+
+
+
     /* --- Complex Questions --- */
 
     /**
@@ -544,4 +558,6 @@ public class DAO {
             throw new DAOException("Error while fetching data" + e.getMessage());
         }
     }
+
+
 }
