@@ -466,7 +466,7 @@ public class DBConnection {
         return genericStringCollectionFetcher(String.format("SELECT ID FROM USER WHERE NAME='%s'", name));
     }
 
-    public int getUserAnsweredCorrectly(int userID) throws DBException {
+    public Integer getUserAnsweredCorrectly(int userID) throws DBException {
         return genericIntFetcher(
                 String.format("SELECT number_of_correct_answers FROM USER WHERE ID=%s", userID));
     }
@@ -477,7 +477,7 @@ public class DBConnection {
         );
     }
 
-    public int getUserAnsweredWrong(int userID) throws DBException {
+    public Integer getUserAnsweredWrong(int userID) throws DBException {
         return genericIntFetcher(
                 String.format("SELECT number_of_wrong_answers FROM USER WHERE ID=%s", userID)
         );
@@ -489,7 +489,7 @@ public class DBConnection {
         );
     }
 
-    public int setUserStartedNewGame(int userID) throws DBException {
+    public Integer setUserStartedNewGame(int userID) throws DBException {
         return genericIntFetcher(
                 String.format("SELECT number_of_games_played FROM USER WHERE ID=%s", userID)
         );
@@ -532,7 +532,7 @@ public class DBConnection {
         );
     }
 
-    public int getEntityID(String entity_type, String name) throws DBException {
+    public Integer getEntityID(String entity_type, String name) throws DBException {
         return genericIntFetcher(String.format("SELECT ID FROM %s WHERE NAME='%s'", entity_type, name));
     }
 
@@ -576,11 +576,27 @@ public class DBConnection {
         }
     }
 
-    private int genericIntFetcher(String select) throws DBException {
+    private Integer genericIntFetcher(String select) throws DBException {
         try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(select)) {
-            rs.next();
+
+            if (!rs.next()) {
+                return null;
+            }
             return rs.getInt(1);
+        } catch (SQLException e) {
+            throw new DBException("Could not fetch data: " + e.getMessage());
+        }
+    }
+
+    private List<Integer> genericListIntFetcher(String select) throws DBException {
+        List<Integer> result = new LinkedList<>();
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(select)) {
+            while(rs.next()) {
+                result.add(rs.getInt(1));
+            }
+            return result;
         } catch (SQLException e) {
             throw new DBException("Could not fetch data: " + e.getMessage());
         }
@@ -591,6 +607,19 @@ public class DBConnection {
              ResultSet rs = stmt.executeQuery(select)) {
             rs.next();
             return rs.getLong(1);
+        } catch (SQLException e) {
+            throw new DBException("Could not fetch data: " + e.getMessage());
+        }
+    }
+
+    private List<Long> genericListLongFetcher(String select) throws DBException {
+        List<Long> result = new LinkedList<>();
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(select)) {
+            while(rs.next()) {
+                result.add(rs.getLong(1));
+            }
+            return result;
         } catch (SQLException e) {
             throw new DBException("Could not fetch data: " + e.getMessage());
         }
@@ -763,23 +792,84 @@ public class DBConnection {
     private static String DEFAULT_SCHEMA = "toyt";
 
 
-    public long getNumberOfPeopleInCountry(int country_id) throws DBException {
-        return genericLongFetcher("SELECT POPULATION FROM COUNTRY WHERE ID=" + country_id);
+    public long getNumberOfPeopleInCountryOrderDescResult(int countryID) throws DBException {
+        return genericLongFetcher("SELECT POPULATION FROM COUNTRY WHERE ID=" + countryID);
+    }
+
+    public List<Long> getNumberOfPeopleInCountryOrderDescResult(List<Integer> countryID) throws DBException {
+        return genericListLongFetcher("SELECT POPULATION FROM COUNTRY WHERE ID in " + listToStringForQuery(countryID));
     }
 
     public Collection<String> getUserName(int id) throws DBException {
         return genericStringCollectionFetcher("SELECT NAME FROM USER WHERE ID=" + id);
     }
 
-    public Date getCountryCreationDate(int country_id) throws DBException {
-        return genericDateFetcher("SELECT CREATION_DATE FROM COUNTRY WHERE ID=" + country_id);
+    public Date getCountryCreationDate(int countryID) throws DBException {
+        return genericDateFetcher("SELECT CREATION_DATE FROM COUNTRY WHERE ID=" + countryID);
     }
 
-    public int getCountOf(String entity_type, int id) throws DBException {
-        return genericIntFetcher(String.format("SELECT COUNT(*) FROM %s WHERE ID=%s", entity_type, id));
+    public Integer getCountOf(String entityType, int id) throws DBException {
+        return genericIntFetcher(String.format("SELECT COUNT(*) FROM %s WHERE ID=%s", entityType, id));
     }
 
-    public int getCountOf(String entity_type, String name) throws DBException {
-        return genericIntFetcher(String.format("SELECT COUNT(*) FROM %s WHERE NAME='%s'", entity_type, name));
+    public List<Integer> getCountOf(String entityType, List<Integer> id) throws DBException {
+        return genericListIntFetcher(String.format("SELECT COUNT(*) FROM %s WHERE ID in %s GROUP BY ID", entityType, listToStringForQuery(id)));
+    }
+
+    public Integer getCountOf(String entityType, String name) throws DBException {
+        return genericIntFetcher(String.format("SELECT COUNT(*) FROM %s WHERE NAME='%s'", entityType, name));
+    }
+
+    private String listToStringForQuery(List<?> l) {
+        StringBuilder s = new StringBuilder();
+        s.append("(");
+        for (Object str : l) {
+            s.append(str);
+            s.append(",");
+        }
+        s.deleteCharAt(s.length()-1);
+        s.append(")");
+        return s.toString();
+    }
+
+    public Integer getMostPopulatedCountry(List<Integer> countryIDList) throws DBException {
+        return genericIntFetcher(String.format("SELECT ID FROM COUNTRY WHERE ID IN %s ORDER BY POPULATION DESC",
+                listToStringForQuery(countryIDList)));
+    }
+
+    public Integer getLeastPopulatedCountry(List<Integer> countryIDList) throws DBException {
+        return genericIntFetcher(String.format("SELECT ID FROM COUNTRY WHERE ID IN %s ORDER BY POPULATION ASC",
+                listToStringForQuery(countryIDList)));
+    }
+
+    public List<Integer> getCountryThatIsMorePopulatedThan(int countryID, int count) throws DBException {
+        return genericListIntFetcher(
+                addRandomLimitToQuery(String.format(
+                                "SELECT ID FROM COUNTRY WHERE POPULATION > (SELECT POPULATION FROM COUNTRY WHERE ID=%s)",
+                                countryID), count)
+        );
+    }
+
+    public List<Integer> getCountryThatIsLessPopulatedThan(int countryID, int count) throws DBException {
+        return genericListIntFetcher(
+                addRandomLimitToQuery(
+                        String.format("SELECT ID FROM COUNTRY WHERE POPULATION < (SELECT POPULATION FROM COUNTRY WHERE ID=%s) AND POPULATION > 0", countryID), count
+                )
+        );
+    }
+
+    public Integer getTheOldestCountry(List<Integer> countriesList) throws DBException {
+        return genericIntFetcher(
+          String.format("SELECT ID FROM COUNTRY WHERE ID IN %s ORDER BY CREATION_DATE ASC", listToStringForQuery(countriesList))
+        );
+    }
+
+    public Integer getCountryCreatedBetween(int afterCountry, int beforeCountry) throws DBException {
+        return genericIntFetcher(
+                addRandomLimitToQuery(
+                String.format(
+                        "SELECT ID FROM COUNTRY WHERE CREATION_DATE > (SELECT CREATION_DATE FROM COUNTRY WHERE ID=%s) AND CREATION_DATE < (SELECT CREATION_DATE FROM COUNTRY WHERE ID=%s)", afterCountry, beforeCountry
+                ), 1)
+        );
     }
 }
