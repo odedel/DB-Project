@@ -51,10 +51,7 @@ public class DAO {
     public Boolean checkIfEntityExists(String entityType, int id) throws DAOException {
         try {
             int answer = connection.getCountOf(entityType, id);
-            if (answer == 0) {
-                return false;
-            }
-            return true;
+            return answer != 0;
         } catch (DBException e) {
             throw new DAOException("Could not fetch data: " + e.getMessage());
         }
@@ -81,21 +78,21 @@ public class DAO {
     }
     private void validateCountryExists(List<Integer> countryIDList) throws EntityNotFound, DAOException {
         if (!checkIfEntityExists("country", countryIDList)) {
-            throw new EntityNotFound(String.format("One of the countries does not exists"));
+            throw new EntityNotFound("One of the countries does not exists");
         }
     }
 
-    private void validateCityExists(int cityID) throws EntityNotFound, DAOException {
-        if (!checkIfEntityExists("city", cityID)) {
-            throw new EntityNotFound(String.format("City ID %s does not exists", cityID));
-        }
-    }
-
-    private void validatePersonExists(int personID) throws EntityNotFound, DAOException {
-        if (!checkIfEntityExists("person", personID)) {
-            throw new EntityNotFound(String.format("Person ID %s does not exists", personID));
-        }
-    }
+//    private void validateCityExists(int cityID) throws EntityNotFound, DAOException {
+//        if (!checkIfEntityExists("city", cityID)) {
+//            throw new EntityNotFound(String.format("City ID %s does not exists", cityID));
+//        }
+//    }
+//
+//    private void validatePersonExists(int personID) throws EntityNotFound, DAOException {
+//        if (!checkIfEntityExists("person", personID)) {
+//            throw new EntityNotFound(String.format("Person ID %s does not exists", personID));
+//        }
+//    }
 
     /* --- Upload data from Yago --- */
 
