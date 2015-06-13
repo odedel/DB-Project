@@ -10,7 +10,7 @@ public class Check {
 
         dao.connect(DBUser.MODIFIER);
 
-        System.out.println(dao.getUserName(1222));
+        System.out.println(dao.getID("country", "vla"));
 
         dao.disconnect();
     }

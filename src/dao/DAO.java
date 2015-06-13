@@ -82,7 +82,6 @@ public class DAO {
         }
     }
 
-
     /* --- Upload data from Yago --- */
 
     public void uploadDataCollector(DataCollector dataCollector) throws DAOException {
@@ -175,9 +174,12 @@ public class DAO {
      * Returns entity's ID.
      * Example: getID("country", "Israel")
      */
-    public int getID(String entity_type, String name) throws DAOException {
+    public int getID(String entity_type, String name) throws DAOException, DataNotFoundException {
         try {
-            return connection.getEntityID(entity_type, name);
+            if (connection.getCountOf(entity_type, name) > 0) {
+                return connection.getEntityID(entity_type, name);
+            }
+            throw new DataNotFoundException(String.format("%s with name %s does not Exists", entity_type, name));
         } catch (DBException e) {
             throw new DAOException("Could not fetch country ID: " + e.getMessage());
         }

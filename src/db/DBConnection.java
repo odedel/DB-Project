@@ -778,4 +778,8 @@ public class DBConnection {
     public int getCountOf(String entity_type, int id) throws DBException {
         return genericIntFetcher(String.format("SELECT COUNT(*) FROM %s WHERE ID=%s", entity_type, id));
     }
+
+    public int getCountOf(String entity_type, String name) throws DBException {
+        return genericIntFetcher(String.format("SELECT COUNT(*) FROM %s WHERE NAME='%s'", entity_type, name));
+    }
 }
