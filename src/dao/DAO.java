@@ -125,11 +125,9 @@ public class DAO {
     public int getUserID(String name) throws DAOException, DataNotFoundException {
         try {
             Collection<String> result = connection.getUserID(name);
-
             if (result.isEmpty()) {
                 throw new DataNotFoundException("Could not find user " + name);
             }
-
             return Integer.parseInt(result.iterator().next());
         } catch (DBException e) {
             throw new DAOException("Could not fetch user ID: " + e.getMessage());
@@ -139,7 +137,6 @@ public class DAO {
     public String getUserName(int id) throws DAOException, EntityNotFound {
         try {
             validateUserExists(id);
-
             return connection.getUserName(id).iterator().next();
         } catch (DBException e) {
             throw new DAOException("Could not fetch data: " + e.getMessage());
@@ -150,7 +147,6 @@ public class DAO {
     public void setUserAnsweredCorrectly(int userID) throws DAOException, EntityNotFound {
         try {
             validateUserExists(userID);
-
             connection.setUserAnsweredCorrectly(userID,
                     connection.getUserAnsweredCorrectly(userID) + 1);
         } catch (DBException e) {
@@ -161,7 +157,6 @@ public class DAO {
     public void setUserAnsweredWrong(int userID) throws DAOException, EntityNotFound {
         try {
             validateUserExists(userID);
-
             connection.setUserAnsweredWrong(userID,
                     connection.getUserAnsweredWrong(userID) + 1);
         } catch (DBException e) {
@@ -172,7 +167,6 @@ public class DAO {
     public void setUserStartedNewGame(int userID) throws DAOException, EntityNotFound {
         try {
             validateUserExists(userID);
-
             connection.setUserStartedNewGame(userID,
                     connection.setUserStartedNewGame(userID) + 1);
         } catch (DBException e) {
@@ -219,11 +213,10 @@ public class DAO {
     }
 
     /* How many people lives in X? */
-    public long getNumberOfPeopleInCountry(int countryID) throws DAOException, DataNotFoundException, EntityNotFound {
+    public int getNumberOfPeopleInCountry(int countryID) throws DAOException, DataNotFoundException, EntityNotFound {
         try {
             validateCountryExists(countryID);
-
-            long numberOfPeople = connection.getNumberOfPeopleInCountryOrderDescResult(countryID);
+            int numberOfPeople = connection.getNumberOfPeopleInCountryOrderDescResult(countryID);
             if (numberOfPeople > 0)
                 return numberOfPeople;
             throw new DataNotFoundException("Data is not found in DB");
@@ -241,7 +234,6 @@ public class DAO {
     public int getMostPopulatedCountry(List<Integer> countryIDList) throws DAOException, DataNotFoundException, EntityNotFound {
         try {
             validateCountryExists(countryIDList);
-
             return connection.getMostPopulatedCountry(countryIDList);
         } catch (DBException e) {
             throw new DAOException("Could not fetch data: " + e.getMessage());
@@ -257,7 +249,6 @@ public class DAO {
     public int getLeastPopulatedCountry(List<Integer> countryIDList) throws DAOException, DataNotFoundException, EntityNotFound {
         try {
             validateCountryExists(countryIDList);
-
             return connection.getLeastPopulatedCountry(countryIDList);
         } catch (DBException e) {
             throw new DAOException("Could not fetch data: " + e.getMessage());
@@ -271,7 +262,6 @@ public class DAO {
      */
     public List<Integer> getCountryThatIsMorePopulatedThan(int countryID, int count) throws DAOException, EntityNotFound, DataNotFoundException {
         validateCountryExists(countryID);
-
         try {
             List<Integer> answer = connection.getCountryThatIsMorePopulatedThan(countryID, count);
             if(answer.size() == count) {
@@ -288,7 +278,6 @@ public class DAO {
      */
     public List<Integer> getCountryThatIsLessPopulatedThan(int countryID, int count) throws DAOException, EntityNotFound, DataNotFoundException {
         validateCountryExists(countryID);
-
         try {
             List<Integer> answer = connection.getCountryThatIsLessPopulatedThan(countryID, count);
             if(answer.size() == count) {

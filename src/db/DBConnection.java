@@ -580,10 +580,10 @@ public class DBConnection {
         try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(select)) {
 
-            if (!rs.next()) {
-                return null;
+            if (rs.next()) {
+                return rs.getInt(1);
             }
-            return rs.getInt(1);
+            return null;
         } catch (SQLException e) {
             throw new DBException("Could not fetch data: " + e.getMessage());
         }
@@ -597,16 +597,6 @@ public class DBConnection {
                 result.add(rs.getInt(1));
             }
             return result;
-        } catch (SQLException e) {
-            throw new DBException("Could not fetch data: " + e.getMessage());
-        }
-    }
-
-    private long genericLongFetcher(String select) throws DBException {
-        try (Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(select)) {
-            rs.next();
-            return rs.getLong(1);
         } catch (SQLException e) {
             throw new DBException("Could not fetch data: " + e.getMessage());
         }
@@ -628,8 +618,9 @@ public class DBConnection {
     private Date genericDateFetcher(String select) throws DBException {
         try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(select)) {
-            rs.next();
-            return rs.getDate(1);
+            if (rs.next())
+                return rs.getDate(1);
+            return null;
         } catch (SQLException e) {
             throw new DBException("Could not fetch data: " + e.getMessage());
         }
@@ -792,8 +783,8 @@ public class DBConnection {
     private static String DEFAULT_SCHEMA = "toyt";
 
 
-    public long getNumberOfPeopleInCountryOrderDescResult(int countryID) throws DBException {
-        return genericLongFetcher("SELECT POPULATION FROM COUNTRY WHERE ID=" + countryID);
+    public Integer getNumberOfPeopleInCountryOrderDescResult(int countryID) throws DBException {
+        return genericIntFetcher("SELECT POPULATION FROM COUNTRY WHERE ID=" + countryID);
     }
 
     public List<Long> getNumberOfPeopleInCountryOrderDescResult(List<Integer> countryID) throws DBException {
