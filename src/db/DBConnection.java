@@ -3,6 +3,7 @@ package db;
 import collect_data.entities.*;
 import collect_data.util.Utils;
 import utils.DBUser;
+import utils.IDName;
 import utils.IntegrityException;
 
 import java.sql.*;
@@ -526,12 +527,12 @@ public class DBConnection {
         }
     }
 
-    public Collection<String> getAllCountries() throws DBException {
-        return genericStringCollectionFetcher("SELECT NAME FROM COUNTRY");
+    public Collection<IDName> getAllCountries() throws DBException {
+        return genericIntStringCollectionFetcher("SELECT NAME FROM COUNTRY");
     }
 
-    public Collection<String> getRandomCountries(int count) throws DBException {
-        return genericStringCollectionFetcher(
+    public Collection<IDName> getRandomCountries(int count) throws DBException {
+        return genericIntStringCollectionFetcher(
                 addRandomLimitToQuery("SELECT NAME FROM COUNTRY", count)
         );
     }
@@ -540,9 +541,9 @@ public class DBConnection {
         return genericIntFetcher(String.format("SELECT ID FROM %s WHERE NAME='%s'", entity_type, name));
     }
 
-    public Collection<Integer> getCities(int country, int count) throws DBException {
-        return genericIntCollectionFetcher(
-                addRandomLimitToQuery(String.format("SELECT ID FROM CITY WHERE CITY.COUNTRY_ID='%s'", country), count)
+    public Collection<IDName> getCities(int country, int count) throws DBException {
+        return genericIntStringCollectionFetcher(
+                addRandomLimitToQuery(String.format("SELECT ID, NAME FROM CITY WHERE CITY.COUNTRY_ID='%s'", country), count)
         );
     }
 
@@ -564,30 +565,17 @@ public class DBConnection {
         }
     }
 
-    private Collection<Integer> genericIntCollectionFetcher(String select) throws DBException {
+    private Collection<IDName> genericIntStringCollectionFetcher(String select) throws DBException {
         try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(select)) {
 
-            Collection<Integer> integerCollection = new HashSet<>();
+            Collection<IDName> idNameCollection = new HashSet<>();
             while (rs.next()) {
-                integerCollection.add(rs.getInt(1));
+                int id = rs.getInt(1);
+                String name = rs.getString(2);
+                idNameCollection.add(new IDName(id, name));
             }
-            return integerCollection;
-        } catch (SQLException e) {
-            throw new DBException("Error while fetching countries: " + e.getMessage());
-        }
-    }
-
-    private Collection<List<String>> genericListCollectionFetcher(String select) throws DBException {
-        try (Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(select)) {
-
-            Collection<String> stringCollection = new HashSet<>();
-            while (rs.next()) {
-                stringCollection.add(rs.getString(1));
-            }
-
-            return new HashSet<>();
+            return idNameCollection;
         } catch (SQLException e) {
             throw new DBException("Error while fetching countries: " + e.getMessage());
         }
@@ -598,6 +586,16 @@ public class DBConnection {
              ResultSet rs = stmt.executeQuery(select)) {
             rs.next();
             return rs.getInt(1);
+        } catch (SQLException e) {
+            throw new DBException("Could not fetch data: " + e.getMessage());
+        }
+    }
+
+    private long genericLongFetcher(String select) throws DBException {
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(select)) {
+            rs.next();
+            return rs.getLong(1);
         } catch (SQLException e) {
             throw new DBException("Could not fetch data: " + e.getMessage());
         }
@@ -760,4 +758,7 @@ public class DBConnection {
     private static String DEFAULT_SCHEMA = "toyt";
 
 
+    public long getNumberOfPeopleInCountry(int country_id) throws DBException {
+        return genericLongFetcher("SELECT POPULATION FROM COUNTRY WHERE ID=" + country_id);
+    }
 }
