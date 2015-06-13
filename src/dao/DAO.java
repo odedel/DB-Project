@@ -5,8 +5,10 @@ import db.DBConnection;
 import db.DBException;
 import utils.DBUser;
 import utils.DataNotFoundException;
+import utils.EntityNotFound;
 import utils.IDName;
 
+import java.sql.Date;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -43,6 +45,26 @@ public class DAO {
         }
     }
 
+    /* --- Entity existence validation --- */
+
+    public Boolean checkIfEntityExists(String entity_type, int id) throws DAOException {
+        try {
+            int answer = connection.getCountOf(entity_type, id);
+            if (answer == 0) {
+                return false;
+            }
+            return true;
+        } catch (DBException e) {
+            throw new DAOException("Could not fetch data: " + e.getMessage());
+        }
+    }
+
+    private void validateUserExists(int userID) throws EntityNotFound, DAOException {
+        if (!checkIfEntityExists("user", userID))
+            throw new EntityNotFound(String.format("User ID %s is not found", userID));
+    }
+
+
     /* --- Upload data from Yago --- */
 
     public void uploadDataCollector(DataCollector dataCollector) throws DAOException {
@@ -73,23 +95,32 @@ public class DAO {
 
     public int getUserID(String name) throws DAOException, DataNotFoundException {
         try {
-            return connection.getUserID(name);
+            Collection<String> result = connection.getUserID(name);
+
+            if (result.isEmpty()) {
+                throw new DataNotFoundException("Could not find user " + name);
+            }
+
+            return Integer.parseInt(result.iterator().next());
         } catch (DBException e) {
             throw new DAOException("Could not fetch user ID: " + e.getMessage());
         }
     }
 
-    public String getUserName(int id) throws DAOException, DataNotFoundException {
+    public String getUserName(int id) throws DAOException, EntityNotFound {
         try {
-            return connection.getUserName(id);
+            validateUserExists(id);
+
+            return connection.getUserName(id).iterator().next();
         } catch (DBException e) {
             throw new DAOException("Could not fetch data: " + e.getMessage());
         }
     }
 
-    public void setUserAnsweredCorrectly(int userID) throws DAOException, DataNotFoundException {
+
+    public void setUserAnsweredCorrectly(int userID) throws DAOException, EntityNotFound {
         try {
-            getUserName(userID);  // Check if user exists
+            validateUserExists(userID);
 
             connection.setUserAnsweredCorrectly(userID,
                     connection.getUserAnsweredCorrectly(userID) + 1);
@@ -98,9 +129,9 @@ public class DAO {
         }
     }
 
-    public void setUserAnsweredWrong(int userID) throws DAOException, DataNotFoundException {
+    public void setUserAnsweredWrong(int userID) throws DAOException, EntityNotFound {
         try {
-            getUserName(userID);  // Check if user exists
+            validateUserExists(userID);
 
             connection.setUserAnsweredWrong(userID,
                     connection.getUserAnsweredWrong(userID) + 1);
@@ -109,9 +140,9 @@ public class DAO {
         }
     }
 
-    public void setUserStartedNewGame(int userID) throws DAOException, DataNotFoundException {
+    public void setUserStartedNewGame(int userID) throws DAOException, EntityNotFound {
         try {
-            getUserName(userID);  // Check if user exists
+            validateUserExists(userID);
 
             connection.setUserStartedNewGame(userID,
                     connection.setUserStartedNewGame(userID) + 1);
@@ -172,13 +203,17 @@ public class DAO {
     /* When does X created? */
     /* Which country is the oldest/newest? */
     /* Which country Created before X but after Y?      Note: should first get the answers and than ask the question */
-//    public Date getCreationDate(int country_id) throws DAOException {
-//        try {
-//            connection.getCountryCreationDate(country_id);
-//        } catch (DBException e) {
-//            throw new DAOException("Could not fetch data: " + e.getMessage());
-//        }
-//    }
+    public Date getCreationDate(int country_id) throws DAOException, DataNotFoundException {
+        try {
+            Date creation_date = connection.getCountryCreationDate(country_id);
+            if (creation_date != null) {
+                return creation_date;
+            }
+            throw new DataNotFoundException(String.format("Creation date of %s does not in DB", country_id));
+        } catch (DBException e) {
+            throw new DAOException("Could not fetch data: " + e.getMessage());
+        }
+    }
 
 
 //    /* --- Cities --- */

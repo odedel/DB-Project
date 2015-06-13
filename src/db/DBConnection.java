@@ -7,6 +7,7 @@ import utils.DataNotFoundException;
 import utils.IDName;
 
 import java.sql.*;
+import java.sql.Date;
 import java.util.*;
 
 public class DBConnection {
@@ -461,14 +462,8 @@ public class DBConnection {
         }
     }
 
-    public int getUserID(String name) throws DBException, DataNotFoundException {
-        Collection<String> result = genericStringCollectionFetcher(String.format("SELECT ID FROM USER WHERE NAME='%s'", name));
-
-        if (result.isEmpty()) {
-            throw new DataNotFoundException("Could not find user " + name);
-        }
-
-        return Integer.parseInt(result.iterator().next());
+    public Collection<String> getUserID(String name) throws DBException {
+        return genericStringCollectionFetcher(String.format("SELECT ID FROM USER WHERE NAME='%s'", name));
     }
 
     public int getUserAnsweredCorrectly(int userID) throws DBException {
@@ -596,6 +591,16 @@ public class DBConnection {
              ResultSet rs = stmt.executeQuery(select)) {
             rs.next();
             return rs.getLong(1);
+        } catch (SQLException e) {
+            throw new DBException("Could not fetch data: " + e.getMessage());
+        }
+    }
+
+    private Date genericDateFetcher(String select) throws DBException {
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(select)) {
+            rs.next();
+            return rs.getDate(1);
         } catch (SQLException e) {
             throw new DBException("Could not fetch data: " + e.getMessage());
         }
@@ -762,11 +767,15 @@ public class DBConnection {
         return genericLongFetcher("SELECT POPULATION FROM COUNTRY WHERE ID=" + country_id);
     }
 
-    public String getUserName(int id) throws DataNotFoundException, DBException {
-        Collection<String> answer = genericStringCollectionFetcher("SELECT NAME FROM USER WHERE ID=" + id);
-        if (answer.isEmpty()) {
-            throw new DataNotFoundException(String.format("User id %s does not exists", id));
-        }
-        return answer.iterator().next();
+    public Collection<String> getUserName(int id) throws DBException {
+        return genericStringCollectionFetcher("SELECT NAME FROM USER WHERE ID=" + id);
+    }
+
+    public Date getCountryCreationDate(int country_id) throws DBException {
+        return genericDateFetcher("SELECT CREATION_DATE FROM COUNTRY WHERE ID=" + country_id);
+    }
+
+    public int getCountOf(String entity_type, int id) throws DBException {
+        return genericIntFetcher(String.format("SELECT COUNT(*) FROM %s WHERE ID=%s", entity_type, id));
     }
 }
