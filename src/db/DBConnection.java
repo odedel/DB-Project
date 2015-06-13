@@ -3,8 +3,8 @@ package db;
 import collect_data.entities.*;
 import collect_data.util.Utils;
 import utils.DBUser;
+import utils.DataNotFoundException;
 import utils.IDName;
-import utils.IntegrityException;
 
 import java.sql.*;
 import java.util.*;
@@ -461,11 +461,11 @@ public class DBConnection {
         }
     }
 
-    public int getUserID(String name) throws DBException, IntegrityException {
+    public int getUserID(String name) throws DBException, DataNotFoundException {
         Collection<String> result = genericStringCollectionFetcher(String.format("SELECT ID FROM USER WHERE NAME='%s'", name));
 
         if (result.isEmpty()) {
-            throw new IntegrityException("Could not find user " + name);
+            throw new DataNotFoundException("Could not find user " + name);
         }
 
         return Integer.parseInt(result.iterator().next());
@@ -760,5 +760,13 @@ public class DBConnection {
 
     public long getNumberOfPeopleInCountry(int country_id) throws DBException {
         return genericLongFetcher("SELECT POPULATION FROM COUNTRY WHERE ID=" + country_id);
+    }
+
+    public String getUserName(int id) throws DataNotFoundException, DBException {
+        Collection<String> answer = genericStringCollectionFetcher("SELECT NAME FROM USER WHERE ID=" + id);
+        if (answer.isEmpty()) {
+            throw new DataNotFoundException(String.format("User id %s does not exists", id));
+        }
+        return answer.iterator().next();
     }
 }

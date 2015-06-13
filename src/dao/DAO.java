@@ -6,9 +6,7 @@ import db.DBException;
 import utils.DBUser;
 import utils.DataNotFoundException;
 import utils.IDName;
-import utils.IntegrityException;
 
-import java.net.IDN;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -73,7 +71,7 @@ public class DAO {
         }
     }
 
-    public int getUserID(String name) throws DAOException, IntegrityException {
+    public int getUserID(String name) throws DAOException, DataNotFoundException {
         try {
             return connection.getUserID(name);
         } catch (DBException e) {
@@ -81,8 +79,18 @@ public class DAO {
         }
     }
 
-    public void setUserAnsweredCorrectly(int userID) throws DAOException {
+    public String getUserName(int id) throws DAOException, DataNotFoundException {
         try {
+            return connection.getUserName(id);
+        } catch (DBException e) {
+            throw new DAOException("Could not fetch data: " + e.getMessage());
+        }
+    }
+
+    public void setUserAnsweredCorrectly(int userID) throws DAOException, DataNotFoundException {
+        try {
+            getUserName(userID);  // Check if user exists
+
             connection.setUserAnsweredCorrectly(userID,
                     connection.getUserAnsweredCorrectly(userID) + 1);
         } catch (DBException e) {
@@ -90,8 +98,10 @@ public class DAO {
         }
     }
 
-    public void setUserAnsweredWrong(int userID) throws DAOException {
+    public void setUserAnsweredWrong(int userID) throws DAOException, DataNotFoundException {
         try {
+            getUserName(userID);  // Check if user exists
+
             connection.setUserAnsweredWrong(userID,
                     connection.getUserAnsweredWrong(userID) + 1);
         } catch (DBException e) {
@@ -99,8 +109,10 @@ public class DAO {
         }
     }
 
-    public void setUserStartedNewGame(int userID) throws DAOException {
+    public void setUserStartedNewGame(int userID) throws DAOException, DataNotFoundException {
         try {
+            getUserName(userID);  // Check if user exists
+
             connection.setUserStartedNewGame(userID,
                     connection.setUserStartedNewGame(userID) + 1);
         } catch (DBException e) {
@@ -151,15 +163,15 @@ public class DAO {
             long numberOfPeople = connection.getNumberOfPeopleInCountry(country_id);
             if (numberOfPeople > 0)
                 return numberOfPeople;
-            throw new DataNotFoundException("Data is not found in the DB");
+            throw new DataNotFoundException("Data is not found in DB");
         } catch (DBException e) {
             throw new DAOException("Could not fetch data: " + e.getMessage());
         }
     }
-//
-//    /* When does X created? */
-//    /* Which country is the oldest/newest? */
-//    /* Which country Created before X but after Y?      Note: should first get the answers and than ask the question */
+
+    /* When does X created? */
+    /* Which country is the oldest/newest? */
+    /* Which country Created before X but after Y?      Note: should first get the answers and than ask the question */
 //    public Date getCreationDate(int country_id) throws DAOException {
 //        try {
 //            connection.getCountryCreationDate(country_id);
@@ -167,8 +179,8 @@ public class DAO {
 //            throw new DAOException("Could not fetch data: " + e.getMessage());
 //        }
 //    }
-//
-//
+
+
 //    /* --- Cities --- */
 //
 //    /* Which country is in X? */

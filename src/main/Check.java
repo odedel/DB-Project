@@ -3,19 +3,16 @@ package main;
 import dao.DAO;
 import dao.DAOException;
 import utils.DBUser;
-import utils.IDName;
-import utils.IntegrityException;
-
-import java.util.Collection;
+import utils.DataNotFoundException;
 
 public class Check {
 
-    public static void main(String[] args) throws DAOException, IntegrityException {
+    public static void main(String[] args) throws DAOException, DataNotFoundException {
         DAO dao = new DAO();
 
         dao.connect(DBUser.MODIFIER);
 
-        System.out.println(dao.getNumberOfPeopleInCountry(2692));
+        System.out.println(dao.getUserName(2692));
 
         dao.disconnect();
     }
