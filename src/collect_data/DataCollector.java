@@ -8,6 +8,7 @@ import collect_data.generic.GenericObjectLinkCallback;
 import collect_data.util.*;
 
 import java.io.IOException;
+import java.sql.SQLOutput;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -141,10 +142,9 @@ public class DataCollector {
 
     private void postProcessCountries() {
         List<String> toRemove = new LinkedList<>();
-        for(String name : countries.keySet()) {
-            Country country = countries.get(name);
-            if(country.population == 0 && country.creationDate == null && country.poverty == 0) {
-                toRemove.add(name);
+        for (Map.Entry<String, Country> countryEntry : countries.entrySet()) {
+            if (countryEntry.getValue().population == 0 && countryEntry.getValue().creationDate == null && countryEntry.getValue().poverty == 0) {
+                toRemove.add(countryEntry.getKey());
             }
         }
         toRemove.forEach(countries::remove);
@@ -153,7 +153,11 @@ public class DataCollector {
     private void postCitiesProcessor() {
         List<String> citiesToRemove = new ArrayList<>();
 
-        citiesToRemove.addAll(cities.entrySet().stream().filter(entry -> entry.getValue().getCountry() == null).map(Map.Entry::getKey).collect(Collectors.toList()));
+        for (Map.Entry<String, City> cityEntry : cities.entrySet()) {
+            if (cityEntry.getValue().country == null || !countries.containsKey(cityEntry.getValue().country.entity)) {
+                citiesToRemove.add(cityEntry.getKey());
+            }
+        }
         citiesToRemove.forEach(cities::remove);
     }
 
