@@ -917,4 +917,10 @@ public class DBConnection {
                 )
         );
     }
+
+    public IDName getBirthPlace(int person_id) throws DBException {
+        return genericIntStringFetcher(
+                String.format("SELECT ID, NAME FROM CITY WHERE ID in (SELECT BIRTH_CITY_ID FROM PERSON WHERE ID=%s)", person_id)
+        );
+    }
 }

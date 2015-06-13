@@ -8,6 +8,7 @@ import utils.DataNotFoundException;
 import utils.EntityNotFound;
 import utils.IDName;
 
+import javax.xml.crypto.Data;
 import java.sql.Date;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -435,14 +436,19 @@ public class DAO {
         }
     }
 
-//    /* Where does X born?   NOTE: X may not has birth place, you should ask again and again until there is */
-//    public IDName getBirthPlace(int person_id) throws DAOException {
-//        try {
-//            return connection.getBirthPlace(person_id);
-//        } catch (DBException e) {
-//            throw new DAOException("Could not fetch birth place: " + e.getMessage());
-//        }
-//    }
+    /* Where does X born? (CITIES) */
+    public IDName getBirthPlace(int person_id) throws DAOException, DataNotFoundException, EntityNotFound {
+        validatePersonExists(person_id);
+        try {
+            IDName result = connection.getBirthPlace(person_id);
+            if (result == null) {
+                throw new DataNotFoundException(String.format("%s does not have birth place", person_id));
+            }
+            return result;
+        } catch (DBException e) {
+            throw new DAOException("Could not fetch birth place: " + e.getMessage());
+        }
+    }
 //
 //    /* Which person was born in the same place as X? */
 //    /* Which person was not born in the same place as X? */
