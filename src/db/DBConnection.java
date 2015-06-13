@@ -886,9 +886,9 @@ public class DBConnection {
     public IDName getCountryCreatedBetween(int afterCountry, int beforeCountry) throws DBException {
         return genericIntStringFetcher(
                 addRandomLimitToQuery(
-                String.format(
-                        "SELECT ID, NAME FROM COUNTRY WHERE CREATION_DATE > (SELECT CREATION_DATE FROM COUNTRY WHERE ID=%s) AND CREATION_DATE < (SELECT CREATION_DATE FROM COUNTRY WHERE ID=%s)", afterCountry, beforeCountry
-                ), 1)
+                        String.format(
+                                "SELECT ID, NAME FROM COUNTRY WHERE CREATION_DATE > (SELECT CREATION_DATE FROM COUNTRY WHERE ID=%s) AND CREATION_DATE < (SELECT CREATION_DATE FROM COUNTRY WHERE ID=%s)", afterCountry, beforeCountry
+                        ), 1)
         );
     }
 
@@ -972,5 +972,39 @@ public class DBConnection {
                         "SELECT ID, NAME FROM (SELECT ID, NAME, birth_date FROM PERSON WHERE birth_city_id in (SELECT ID FROM CITY WHERE COUNTRY_ID=%s) ORDER BY RAND() LIMIT %s) as TMP ORDER BY birth_date", country_id, count
                 )
         );
+    }
+
+    public List<IDName> getTwoBusinessesThatOneOfEachOneCreatorLearnedInTheSameCountryAsTheOtherOne(int countryID) throws DBException {
+        String query = String.format("SELECT B1.id, B1.name, B2.id, B2.name FROM BUSINESS B1, BUSINESS B2, business_creator_relation bcr1, university_person_relation upr1, university_country_relation ucr1, university_country_relation ucr2, business_creator_relation bcr2, university_person_relation upr2 WHERE B1.id != B2.id AND b1.id=bcr1.business_id and bcr1.creator_id=upr1.person_id and upr1.university_id = ucr1.university_id AND b2.id=bcr2.business_id and bcr2.creator_id=upr2.person_id and upr2.university_id = ucr2.university_id and ucr1.country_id=ucr2.country_id and ucr1.country_id=%s ORDER BY RAND() LIMIT 1", countryID);
+
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+            if (rs.next()) {
+                List<IDName> result = new LinkedList<>();
+                result.add(new IDName(rs.getInt(1), rs.getString(2)));
+                result.add(new IDName(rs.getInt(3), rs.getString(4)));
+                return result;
+            }
+            return null;
+        } catch (SQLException e) {
+            throw new DBException("Error while fetching data: " + e.getMessage());
+        }
+    }
+
+    public List<IDName> getTwoBusinessesThatThereIsNotOneOfEachOneCreatorLearnedInTheSameCountryAsTheOtherOne(int countryID) throws DBException {
+        String query = String.format("SELECT B1.id, B1.name, B2.id, B2.name FROM BUSINESS B1, BUSINESS B2, business_creator_relation bcr1, university_person_relation upr1, university_country_relation ucr1, university_country_relation ucr2, business_creator_relation bcr2, university_person_relation upr2 WHERE B1.id != B2.id AND b1.id=bcr1.business_id and bcr1.creator_id=upr1.person_id and upr1.university_id = ucr1.university_id AND b2.id=bcr2.business_id and bcr2.creator_id=upr2.person_id and upr2.university_id = ucr2.university_id and ucr1.country_id!=ucr2.country_id and ucr1.country_id=%s ORDER BY RAND() LIMIT 1", countryID);
+
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+            if (rs.next()) {
+                List<IDName> result = new LinkedList<>();
+                result.add(new IDName(rs.getInt(1), rs.getString(2)));
+                result.add(new IDName(rs.getInt(3), rs.getString(4)));
+                return result;
+            }
+            return null;
+        } catch (SQLException e) {
+            throw new DBException("Error while fetching data: " + e.getMessage());
+        }
     }
 }
