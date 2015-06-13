@@ -406,26 +406,35 @@ public class DAO {
     }
 
 
-//    /* --- Persons --- */
-//
-//    /* Which person lives in COUNTRY_ID? */
-//    /* Which person lives in other country than the other three? */
-//    /* In Which country does person X lives? */
-//    public Collection<IDName> getRandomPersonsByCountry(int country_id, int count) throws DAOException {
-//        try {
-//            return conection.getPersons(country_id, count);
-//        } catch (DBException e) {
-//            throw new DAOException("Could not get random persons: " + e.getMessage());
-//        }
-//    }
-//    public Collection<IDName> getRandomPersonsNotInCountry(int country_id, int count) throws DAOException {
-//        try {
-//            return connection.getPersonsNotIN(country_id, count);
-//        } catch (DBException e) {
-//            throw new DAOException("Cold not get random persons: " + e.getMessage());
-//        }
-//    }
-//
+    /* --- Persons --- */
+
+    /* Which person born in COUNTRY_ID? */
+    /* Which person lives in other country than the other three? */
+    public Collection<IDName> getRandomPersonsBornInCountry(int country_id, int count) throws DAOException, EntityNotFound, DataNotFoundException {
+        validateCountryExists(country_id);
+        try {
+            Collection<IDName> result = connection.getPersonsByBirthCountry(country_id, count);
+            if (result.size() != count) {
+                throw new DataNotFoundException(String.format("Could not find %s persons that lives in %s", count, country_id));
+            }
+            return result;
+        } catch (DBException e) {
+            throw new DAOException("Could not get random persons: " + e.getMessage());
+        }
+    }
+    public Collection<IDName> getRandomPersonsNotBornInCountry(int country_id, int count) throws DAOException, EntityNotFound, DataNotFoundException {
+        validateCountryExists(country_id);
+        try {
+            Collection<IDName> result = connection.getPersonsByNotBirthCountry(country_id, count);
+            if (result.size() != count) {
+                throw new DataNotFoundException(String.format("Could not find %s persons that lives in %s", count, country_id));
+            }
+            return result;
+        } catch (DBException e) {
+            throw new DAOException("Could not get random persons: " + e.getMessage());
+        }
+    }
+
 //    /* Where does X born?   NOTE: X may not has birth place, you should ask again and again until there is */
 //    public IDName getBirthPlace(int person_id) throws DAOException {
 //        try {

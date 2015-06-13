@@ -901,4 +901,20 @@ public class DBConnection {
                 addRandomLimitToQuery(String.format("SELECT ID, NAME FROM CITY WHERE COUNTRY_ID=(SELECT COUNTRY_ID FROM CITY WHERE ID=%s) AND CREATION_DATE > (SELECT CREATION_DATE FROM CITY WHERE ID=%s)", city_id, city_id), count)
         );
     }
+
+    public Collection<IDName> getPersonsByBirthCountry(int country_id, int count) throws DBException {
+        return genericIntStringCollectionFetcher(
+                addRandomLimitToQuery(
+                        String.format("SELECT ID, NAME FROM PERSON WHERE BIRTH_CITY_ID IN (SELECT ID FROM CITY WHERE COUNTRY_ID=%s)", country_id), count
+                )
+        );
+    }
+
+    public Collection<IDName> getPersonsByNotBirthCountry(int country_id, int count) throws DBException {
+        return genericIntStringCollectionFetcher(
+                addRandomLimitToQuery(
+                        String.format("SELECT ID, NAME FROM PERSON WHERE BIRTH_CITY_ID NOT IN (SELECT ID FROM CITY WHERE COUNTRY_ID=%s)", country_id), count
+                )
+        );
+    }
 }
