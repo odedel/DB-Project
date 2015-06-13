@@ -337,7 +337,8 @@ public class DAO {
     /* Which city is in X? */
     /* Which city is not in X? */
     /* Which city is different? */
-    public Collection<IDName> getRandomCitiesByCountry(int country_id, int count) throws DAOException, DataNotFoundException {
+    public Collection<IDName> getRandomCitiesByCountry(int country_id, int count) throws DAOException, DataNotFoundException, EntityNotFound {
+        validateCountryExists(country_id);
         try {
             Collection<IDName> answer = connection.getCities(country_id, count);
             if(answer.size() != count) {
@@ -348,7 +349,8 @@ public class DAO {
             throw new DAOException("Could not get random cities: " + e.getMessage());
         }
     }
-    public Collection<IDName> getRansomCitiesNotInCountry(int country_id, int count) throws DAOException, DataNotFoundException {
+    public Collection<IDName> getRansomCitiesNotInCountry(int country_id, int count) throws DAOException, DataNotFoundException, EntityNotFound {
+        validateCountryExists(country_id);
         try {
             Collection<IDName> answer = connection.getCitiesNotIn(country_id, count);
             if (answer.size() != count) {
@@ -361,7 +363,8 @@ public class DAO {
     }
 
     /* What is the oldest city in X? */
-    public IDName getOldestCity(int country_id) throws DAOException, DataNotFoundException {
+    public IDName getOldestCity(int country_id) throws DAOException, DataNotFoundException, EntityNotFound {
+        validateCountryExists(country_id);
         try {
             IDName answer = connection.getOldestCity(country_id);
             if (answer == null) {
@@ -373,24 +376,36 @@ public class DAO {
         }
     }
 
-//    /* Which city is older then X? */
-//    /* Which city is newer then X? */
-//    public Collection<IDName> getOlderCityThan(int city_id, int count) throws DAOException {
-//        try {
-//            return connection.getOlderCityThan(city_id, count);
-//        } catch (DBException e) {
-//            throw new DAOException("Could not fetch data: " + e.getMessage());
-//        }
-//    }
-//    public Collection<IDName> getNewerCityThan(int city_id, int count) throws DAOException {
-//        try {
-//            return connection.getNewerCityThan(city_id, count);
-//        } catch (DBException e) {
-//            throw new DAOException("Could not fetch data: " + e.getMessage());
-//        }
-//    }
-//
-//
+    /* Which city is older then X? */
+    /* Which city is newer then X? */
+    public Collection<IDName> getOlderCityThan(int city_id, int count) throws DAOException, EntityNotFound, DataNotFoundException {
+        validateCityExists(city_id);
+        try {
+            Collection<IDName> answer = connection.getOlderCityThan(city_id, count);
+            if (answer.size() != count) {
+                throw new DataNotFoundException(String.format("Can not find %s cities that are older than %s", count, city_id));
+            }
+            return answer;
+        } catch (DBException e) {
+            throw new DAOException("Could not fetch data: " + e.getMessage());
+        }
+    }
+
+    /* Which city is older then X but in the same country? */
+    public Collection<IDName> getOlderCityThanInTheSameCountry(int city_id, int count) throws DAOException, EntityNotFound, DataNotFoundException {
+        validateCityExists(city_id);
+        try {
+            Collection<IDName> answer = connection.getOlderCityThanInTheSameCountry(city_id, count);
+            if (answer.size() != count) {
+                throw new DataNotFoundException(String.format("Can not find %s cities that are older than %s", count, city_id));
+            }
+            return answer;
+        } catch (DBException e) {
+            throw new DAOException("Could not fetch data: " + e.getMessage());
+        }
+    }
+
+
 //    /* --- Persons --- */
 //
 //    /* Which person lives in COUNTRY_ID? */

@@ -889,4 +889,16 @@ public class DBConnection {
                 String.format("SELECT ID, NAME FROM CITY WHERE COUNTRY_ID=%s and CREATION_DATE is not null ORDER BY CREATION_DATE ASC LIMIT 1", country_id)
         );
     }
+
+    public Collection<IDName> getOlderCityThan(int city_id, int count) throws DBException {
+        return genericIntStringCollectionFetcher(
+                addRandomLimitToQuery(String.format("SELECT ID, NAME FROM CITY WHERE CREATION_DATE > (SELECT CREATION_DATE FROM CITY WHERE ID=%s)", city_id), count)
+        );
+    }
+
+    public Collection<IDName> getOlderCityThanInTheSameCountry(int city_id, int count) throws DBException {
+        return genericIntStringCollectionFetcher(
+                addRandomLimitToQuery(String.format("SELECT ID, NAME FROM CITY WHERE COUNTRY_ID=(SELECT COUNTRY_ID FROM CITY WHERE ID=%s) AND CREATION_DATE > (SELECT CREATION_DATE FROM CITY WHERE ID=%s)", city_id, city_id), count)
+        );
+    }
 }
