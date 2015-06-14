@@ -1,9 +1,17 @@
 package BL;
 
 import java.util.ArrayList;
+import java.util.Collection;
+
+import utils.IDName;
+import dao.DAO;
+import dao.DAOException;
 
 public class gameRunner {
-
+	  
+	public static void main(String[] args) throws Exception {
+		new gameRunner();
+	  }
 	private User playerOne = null;
 	private User playerTwo = null;
 	private Question currQuestion;
@@ -12,12 +20,21 @@ public class gameRunner {
 	private int nPlayerOneWorngAnswers;
 	private int nPlayerTwoWorngAnswers;
 	private final int NUMBER_OF_WORNG_ALLOWED = 2;
+	private DAO access;
+	private Collection<IDName> allCountries;
 	
-	public gameRunner() {
+	public gameRunner() throws DAOException {
 		//CreateFactoryHere
 		this.nPlayerOneWorngAnswers = 0;
 		this.nPlayerTwoWorngAnswers = 0;
 		this.qFactory = new QuestionFactory();
+		this.access = new DAO();
+		this.allCountries = this.access.getAllCountries();
+	}
+	
+	public Collection<IDName> getAllCounter() throws DAOException
+	{
+		return(this.allCountries);
 	}
 	
 	public String getCurrentQuestion()
@@ -48,7 +65,7 @@ public class gameRunner {
 	}
 	
 	//Return false if user Register failed or Not
-	public boolean registerUser(String strUserName, String strPassword)
+	public boolean registerUser(String strUserName, String strPassword) throws DAOException
 	{
 		return(User.registerUser(strUserName, strPassword));
 	}
@@ -89,7 +106,7 @@ public class gameRunner {
 	}
 	
 	// This function check if player right, add score and continue to next Q
-	public boolean checkPlayerAnswer(String strAns)
+	public boolean checkPlayerAnswer(String strAns) throws Exception
 	{
 		Boolean isRight = false;
 		

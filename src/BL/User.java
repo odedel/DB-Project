@@ -1,13 +1,15 @@
 package BL;
 
-//import DAO;
+import utils.IDName;
+import dao.*;
 
 public class User {
 
 	private boolean isLogged = false;
 	private String strUserName;
-	private String strFavCountry = null;
+	private IDName strFavCountry = null;
 	private int playerScore;
+	private static DAO access = new DAO();
 	
 	public User(String userName, String password) {
 		this.strUserName = userName;
@@ -26,12 +28,12 @@ public class User {
 		return this.isLogged;
 	}
 	
-	public void setFavCountry(String strCountry)
+	public void setFavCountry(IDName strCountry)
 	{
 		this.strFavCountry = strCountry;
 	}
 
-	public String getFavCountry()
+	public IDName getFavCountry()
 	{
 		return (this.strFavCountry);
 	}
@@ -54,10 +56,11 @@ public class User {
 		return (true);
 	}
 	
-	public static boolean registerUser(String userName, String Password)
+	public static boolean registerUser(String userName, String Password) throws DAOException
 	{
 		//add here saving player Score to DB
-		createUser(userName);
+		access.createUser(userName);
+		
 		//Return success
 		return (true);
 	}
