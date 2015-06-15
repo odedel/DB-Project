@@ -3,8 +3,8 @@ package db;
 import collect_data.entities.*;
 import collect_data.util.Utils;
 import utils.DBUser;
-import utils.DataNotFoundException;
 import utils.IDName;
+import utils.UserIDScoreDate;
 
 import java.sql.*;
 import java.sql.Date;
@@ -1013,4 +1013,36 @@ public class DBConnection {
     }
 
 
+    public List<UserIDScoreDate> getTopScore(int howMany) throws DBException {
+        return genericIDScoreDateFetcher("SELECT USER_ID, SCORE, DATE FROM SCORE ORDER BY SCORE DESC LIMIT " + howMany);
+
+    }
+
+    public List<UserIDScoreDate> getTopScoreByUser(int userID, int howMany) throws DBException {
+        return genericIDScoreDateFetcher(String.format("SELECT USER_ID, SCORE, DATE  FROM SCORE WHERE USER_ID='%s' ORDER BY SCORE DESC LIMIT %s", userID, howMany));
+    }
+
+    private List<UserIDScoreDate> genericIDScoreDateFetcher(String select) throws DBException {
+        List<UserIDScoreDate> result = new LinkedList<>();
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(select)) {
+            while(rs.next()) {
+                result.add(new UserIDScoreDate(rs.getInt(1), rs.getInt(2), rs.getTimestamp(3)));
+            }
+            return result;
+        } catch (SQLException e) {
+            throw new DBException("Could not fetch data: " + e.getMessage());
+        }
+    }
+
+    public void setScore(int userID, int score, java.util.Date date) throws DBException {
+        try (PreparedStatement pstmt = conn.prepareStatement("INSERT INTO Score(user_id, score, date) VALUES (?, ?, ?)")) {
+            pstmt.setInt(1, userID);
+            pstmt.setInt(2, score);
+            pstmt.setTimestamp(3, new Timestamp(date.getTime()));
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new DBException("Could not insert score: " + e.getMessage());
+        }
+    }
 }

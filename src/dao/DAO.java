@@ -3,10 +3,7 @@ package dao;
 import collect_data.DataCollector;
 import db.DBConnection;
 import db.DBException;
-import utils.DBUser;
-import utils.DataNotFoundException;
-import utils.EntityNotFound;
-import utils.IDName;
+import utils.*;
 
 import java.sql.Date;
 import java.util.ArrayList;
@@ -123,8 +120,9 @@ public class DAO {
         }
     }
 
-    public boolean checkPassword(int userID, String givenPassword) throws DAOException {
+    public boolean checkPassword(int userID, String givenPassword) throws DAOException, EntityNotFound {
         try {
+            validateUserExists(userID);
             if (1 == connection.checkPassword(userID, givenPassword)) {
                 return true;
             }
@@ -186,7 +184,32 @@ public class DAO {
         }
     }
 
+    public void setScore(int userID, int score, java.util.Date date) throws DAOException, EntityNotFound {
+        try {
+            validateUserExists(userID);
+            connection.setScore(userID, score, date);
+        } catch (DBException e) {
+            throw new DAOException("Could not fetch data: " + e.getMessage());
+        }
+    }
 
+    public List<UserIDScoreDate> getTopScore(int howMany) throws DAOException {
+        try {
+
+            return connection.getTopScore(howMany);
+        } catch (DBException e) {
+            throw new DAOException("Could not fetch data: " + e.getMessage());
+        }
+    }
+
+    public List<UserIDScoreDate> getTopScoreByUser(int userID, int howMany) throws DAOException, EntityNotFound {
+        try {
+            validateUserExists(userID);
+            return connection.getTopScoreByUser(userID, howMany);
+        } catch (DBException e) {
+            throw new DAOException("Could not fetch data: " + e.getMessage());
+        }
+    }
 
     /* --- General Entities --- */
 

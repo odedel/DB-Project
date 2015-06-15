@@ -2,9 +2,9 @@ package main;
 
 import dao.DAO;
 import utils.DBUser;
+import utils.UserIDScoreDate;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Date;
 
 public class Check {
 
@@ -13,7 +13,9 @@ public class Check {
 
         dao.connect(DBUser.MODIFIER);
 
-        System.out.println(dao.checkPassword(1, "Ode12312d"));
+        for (UserIDScoreDate x : dao.getTopScoreByUser(1, 100000)) {
+            System.out.println(x.getUserID() + " " + x.getScore() + " " + x.getDate());
+        }
 
         dao.disconnect();
     }
