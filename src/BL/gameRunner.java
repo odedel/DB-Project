@@ -31,12 +31,13 @@ public class gameRunner {
 	private Collection<IDName> allCountries;
 	
 	public gameRunner() throws DAOException {
+		
 		//CreateFactoryHere
 		this.nPlayerOneWorngAnswers = 0;
 		this.nPlayerTwoWorngAnswers = 0;
-		this.qFactory = new QuestionFactory();
 		this.access = new DAO();
 		this.access.connect(DBUser.MODIFIER);
+		this.qFactory = new QuestionFactory(this.access);
 		this.allCountries = this.access.getAllCountries();
 	}
 	

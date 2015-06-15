@@ -18,8 +18,8 @@ public class QuestionFactory {
 	final int NUMBER_OF_QUESTIONS = 17;
 	private DAO access;
 	
-	public QuestionFactory() {
-		this.access = new DAO();
+	public QuestionFactory(DAO acc) {
+		this.access = acc;
 	}
 
 	public Question createNewQuestion(IDName strFavCountry) throws DAOException, DataNotFoundException, EntityNotFound
