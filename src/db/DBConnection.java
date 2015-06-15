@@ -896,6 +896,15 @@ public class DBConnection {
         );
     }
 
+    public IDName getCountryNotCreatedBetween(int afterCountry, int beforeCountry) throws DBException {
+        return genericIntStringFetcher(
+                addRandomLimitToQuery(
+                        String.format(
+                                "SELECT ID, NAME FROM COUNTRY WHERE NOT(CREATION_DATE > (SELECT CREATION_DATE FROM COUNTRY WHERE ID=%s) AND CREATION_DATE < (SELECT CREATION_DATE FROM COUNTRY WHERE ID=%s))", afterCountry, beforeCountry
+                        ), 1)
+        );
+    }
+
     public Collection<IDName> getCitiesNotIn(int country_id, int count) throws DBException {
         return genericIntStringCollectionFetcher(
                 addRandomLimitToQuery(
@@ -1045,4 +1054,6 @@ public class DBConnection {
             throw new DBException("Could not insert score: " + e.getMessage());
         }
     }
+
+
 }
