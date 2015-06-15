@@ -441,10 +441,10 @@ public class DBConnection {
         }
     }
 
-    public int createUser(String user) throws DBException {
+    public int createUser(String user, String password) throws DBException {
         ResultSet rs = null;
         try (Statement stmt = conn.createStatement()) {
-            stmt.executeUpdate(String.format("INSERT INTO USER(name) VALUES ('%s')", user), new String[] { "ID" });
+            stmt.executeUpdate(String.format("INSERT INTO USER(name, password) VALUES ('%s', '%s')", user, password), new String[] { "ID" });
 
             rs = stmt.getGeneratedKeys();
             rs.next();
@@ -464,6 +464,10 @@ public class DBConnection {
 
     public Collection<String> getUserID(String name) throws DBException {
         return genericStringCollectionFetcher(String.format("SELECT ID FROM USER WHERE NAME='%s'", name));
+    }
+
+    public int checkPassword(int userID, String givenPassword) throws DBException {
+        return genericIntFetcher(String.format("SELECT '%s' = password FROM user WHERE ID=%s", givenPassword, userID));
     }
 
     public Integer getUserAnsweredCorrectly(int userID) throws DBException {
@@ -1007,4 +1011,6 @@ public class DBConnection {
             throw new DBException("Error while fetching data: " + e.getMessage());
         }
     }
+
+
 }

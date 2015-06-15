@@ -56,10 +56,10 @@ public class User {
 		return (true);
 	}
 	
-	public static boolean registerUser(String userName, String Password) throws DAOException
+	public static boolean registerUser(String userName, String password) throws DAOException
 	{
 		//add here saving player Score to DB
-		access.createUser(userName);
+		access.createUser(userName, password);
 		
 		//Return success
 		return (true);

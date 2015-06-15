@@ -13,12 +13,7 @@ public class Check {
 
         dao.connect(DBUser.MODIFIER);
 
-        List<Integer> l = new LinkedList<>();
-        l.add(1132);
-        l.add(1258);
-        l.add(1118);
-
-        System.out.println(dao.getTwoBusinessesThatThereIsNotOneOfEachOneCreatorLearnedInTheSameCountryAsTheOtherOne(1190));
+        System.out.println(dao.checkPassword(1, "Ode12312d"));
 
         dao.disconnect();
     }

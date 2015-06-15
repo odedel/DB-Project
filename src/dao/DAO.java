@@ -115,11 +115,22 @@ public class DAO {
     /**
      * @return user id
      */
-    public int createUser(String name) throws DAOException {
+    public int createUser(String name, String password) throws DAOException {
         try {
-            return connection.createUser(name);
+            return connection.createUser(name, password);
         } catch (DBException e) {
             throw new DAOException("Could not create user: " + e.getMessage());
+        }
+    }
+
+    public boolean checkPassword(int userID, String givenPassword) throws DAOException {
+        try {
+            if (1 == connection.checkPassword(userID, givenPassword)) {
+                return true;
+            }
+            return false;
+        } catch (DBException e) {
+            throw new DAOException("Could not check password: " + e.getMessage());
         }
     }
 
@@ -174,6 +185,8 @@ public class DAO {
             throw new DAOException("Could not add answer to user");
         }
     }
+
+
 
     /* --- General Entities --- */
 
