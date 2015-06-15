@@ -1,5 +1,6 @@
 package BL;
 
+import java.awt.List;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,6 +13,7 @@ import utils.IDName;
 import dao.DAO;
 import dao.DAOException;
 import main.*;
+import utils.*;
 
 public class gameRunner {
 	  
@@ -71,7 +73,7 @@ public class gameRunner {
 	}
 	
 	//Return false if user login failed or two player ar already logged
-	public boolean logInUser(String strUserName, String strPassword) throws DAOException, DataNotFoundException
+	public boolean logInUser(String strUserName, String strPassword) throws DAOException, DataNotFoundException, EntityNotFound
 	{
 		if(this.playerOne == null)
 		{
@@ -90,7 +92,7 @@ public class gameRunner {
 	//Return false if user Register failed or Not
 	public boolean registerUser(String strUserName, String strPassword) throws DAOException
 	{
-		return(User.registerUser(strUserName, strPassword,this.access));
+		return(User.registerUser(strUserName, strPassword,this.access) != 0);
 	}
 	
 	//This function continue the game (switch player if need and get new Ques)
@@ -237,5 +239,10 @@ public class gameRunner {
 		}
 		
 		return (nCount);
+	}
+	
+	public Collection<UserIDScoreDate> getBestScores() throws DAOException
+	{
+		return(this.access.getTopScore(10));
 	}
 }

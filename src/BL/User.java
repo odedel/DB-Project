@@ -1,5 +1,12 @@
 package BL;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+import utils.DataNotFoundException;
+import utils.EntityNotFound;
 import utils.IDName;
 import dao.*;
 
@@ -7,20 +14,16 @@ public class User {
 
 	private boolean isLogged = false;
 	private String strUserName;
+	private int nUserId;
 	private IDName strFavCountry = null;
 	private int playerScore;
-	private static DAO access = new DAO();
+	private DAO access;
 	
-	public User(String userName, String password) {
+	public User(String userName, String password, DAO access) throws DAOException, DataNotFoundException, EntityNotFound {
+		this.access = access;
+		this.nUserId = this.access.getUserID(userName);
 		this.strUserName = userName;
-		this.isLogged = this.login(password); 
-	}
-	
-	public boolean login(String pass)
-	{
-		//Call them log in
-		//this.isLogged =
-		return (true);
+		this.isLogged = this.access.checkPassword(this.nUserId, password); 
 	}
 	
 	public boolean isLoggedIn()
@@ -47,21 +50,44 @@ public class User {
 	{
 		this.playerScore++;
 	}
-	
-	public boolean savePlayerScore()
+
+	public void initPlayerScore()
 	{
-		//add here saving player Score to DB
-		
-		//Return success
-		return (true);
+		this.playerScore = 0;
 	}
 	
-	public static boolean registerUser(String userName, String password) throws DAOException
+	public boolean savePlayerScore(int score) throws DAOException, EntityNotFound
 	{
-		//add here saving player Score to DB
-		access.createUser(userName, password);
-		
-		//Return success
+		   //get current date time with Date()
+		   java.util.Date date = new Date();
+		   date.getTime();
+			this.access.setScore(this.nUserId,score, date);
+			
 		return (true);
+	}
+
+	//update on db user statistic
+	public void setUserAnsweredCorrectly() throws DAOException, EntityNotFound
+	{
+		this.access.setUserAnsweredCorrectly(this.nUserId);
+	}
+	
+	//update on db user statistic
+	public void setUserAnsweredWrong() throws DAOException, EntityNotFound
+	{
+		this.access.setUserAnsweredWrong(this.nUserId);
+	}
+	
+	//Update User latest game in DB
+	public void setUserStartedNewGame() throws DAOException, EntityNotFound
+	{
+		this.access.setUserStartedNewGame(this.nUserId);
+	}
+	
+	public static int registerUser(String userName, String Password, DAO access) throws DAOException
+	{
+		//add here saving player Score to DB		 
+		//Return success
+		return (access.createUser(userName, Password));
 	}
 }

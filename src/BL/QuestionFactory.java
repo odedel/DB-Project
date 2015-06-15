@@ -14,8 +14,8 @@ import dao.*;
 
 public class QuestionFactory {
 
-	final int NUMBER_OF_QUESTIONS_WITH_COUNTRY = 11;
-	final int NUMBER_OF_QUESTIONS = 17;
+	final int NUMBER_OF_QUESTIONS_WITH_COUNTRY = 15;
+	final int NUMBER_OF_QUESTIONS = 21;
 	private DAO access;
 	
 	public QuestionFactory(DAO acc) {
@@ -89,28 +89,48 @@ public class QuestionFactory {
 			}
 			case(12):
 			{
-				//To be Filled
-				return null;
+				return(OlderCityHereQues(strFavCountry));
 			}
 			case(13):
 			{
-				return(MostpopQues());
+				return(newerCityHereQues(strFavCountry));
 			}
 			case(14):
 			{
-				return(leastpopQues());
+				return(BornLastQues(strFavCountry));
 			}
 			case(15):
 			{
+				return(BornfirstQues(strFavCountry));
+			}
+			//Start of general Questions
+			case(16):
+			{
+				return(CreateBeforeAndAfterCountryQues());
+			}
+			case(17):
+			{
+				return(MostpopQues());
+			}
+			case(18):
+			{
+				return(leastpopQues());
+			}
+			case(19):
+			{
 				return(MorepopQues());
 			}
-			case(16):
+			case(20):
 			{
 				return(LesspopQues());
 			}		
-			case(17):
+			case(21):
 			{
 				return(OldestCountryQues());
+			}
+			case(22):
+			{
+				return(CreateBeforeAndAfterCountryQues());
 			}
 		}
 		
@@ -268,43 +288,71 @@ public class QuestionFactory {
 							answer3.toString()));
 	}
 	
-	/*
-	public Question BornLastQues(IDName country) throws DAOException, DataNotFoundException, EntityNotFound
+	public Question OlderCityHereQues(IDName country) throws DAOException, DataNotFoundException, EntityNotFound
 	{
-		Date answer1, answer2, answer3;
-		ArrayList<IDName> person = (ArrayList<IDName>) this.access.getRandomPersonsBornInCountry(country.getId(), 4);
+		IDName answer1, answer2, answer3, city;
+		city = (IDName) this.access.getRandomCitiesByCountry(country.getId(), 1).toArray()[0];
+		IDName nAnswer = (IDName) this.access.getOlderCityThan(country.getId(), 1);
+		ArrayList<IDName> cities = (ArrayList<IDName>) this.access.getNewerCityThan(country.getId(), 3);
+		answer1 = (IDName) cities.toArray()[0];
+		answer2 = (IDName) cities.toArray()[1];
+		answer3 = (IDName) cities.toArray()[2];
 		
-		Date nAnswer = this.access.getPersonBirthDate(((IDName) person.toArray()[0]).getId());
-		answer1 = this.access.getPersonBirthDate(((IDName) person.toArray()[1]).getId());
-		answer2 = this.access.getPersonBirthDate(((IDName) person.toArray()[2]).getId());
-		answer3 = this.access.getPersonBirthDate(((IDName) person.toArray()[3]).getId());
-
-		return(new Question("Which person was not born in the same country as " +((IDName) person.toArray()[0]).getName() +"?", 
-							nAnswer.toString(), 
-							answer1.toString(), 
-							answer2.toString(), 
-							answer3.toString()));
+		return(new Question("Which city is older then ? " + city.getName(), 
+							nAnswer.getName().toString(), answer1.getName().toString(), answer2.getName().toString(), answer3.getName().toString()));
 	}
 	
-	public Question BornFirstQues(IDName country) throws DAOException, DataNotFoundException, EntityNotFound
+	public Question newerCityHereQues(IDName country) throws DAOException, DataNotFoundException, EntityNotFound
 	{
-		Date answer1, answer2, answer3;
-		ArrayList<IDName> person = (ArrayList<IDName>) this.access.getRandomPersonsBornInCountry(country.getId(), 4);
+		IDName answer1, answer2, answer3, city;
+		city = (IDName) this.access.getRandomCitiesByCountry(country.getId(), 1).toArray()[0];
+		IDName nAnswer = (IDName) this.access.getNewerCityThan(country.getId(), 1);
+		ArrayList<IDName> cities = (ArrayList<IDName>) this.access.getOlderCityThan(country.getId(), 3);
+		answer1 = (IDName) cities.toArray()[0];
+		answer2 = (IDName) cities.toArray()[1];
+		answer3 = (IDName) cities.toArray()[2];
 		
-		Date nAnswer = this.access.getPersonBirthDate(((IDName) person.toArray()[0]).getId());
-		answer1 = this.access.getPersonBirthDate(((IDName) person.toArray()[1]).getId());
-		answer2 = this.access.getPersonBirthDate(((IDName) person.toArray()[2]).getId());
-		answer3 = this.access.getPersonBirthDate(((IDName) person.toArray()[3]).getId());
+		return(new Question("Which city is older then ? " + city.getName(), 
+							nAnswer.getName().toString(), answer1.getName().toString(), answer2.getName().toString(), answer3.getName().toString()));
+	}
+	
+	
+	public Question BornLastQues(IDName country) throws DAOException, DataNotFoundException, EntityNotFound
+	{
+		IDName answer1, answer2, answer3;
+		ArrayList<IDName> person = (ArrayList<IDName>) this.access.getPersonsOrderByBirthDate(country.getId(), 4);
+		
+		IDName nAnswer = ((IDName)person.toArray()[0]);
+		answer1 = ((IDName)person.toArray()[1]);
+		answer2 = ((IDName)person.toArray()[2]);
+		answer3 = ((IDName)person.toArray()[3]);
 
-		return(new Question("Which person was not born in the same country as " +((IDName) person.toArray()[0]).getName() +"?", 
-							nAnswer.toString(), 
-							answer1.toString(), 
-							answer2.toString(), 
-							answer3.toString()));
-	}*/
+		return(new Question("Who was born last", 
+							nAnswer.getName(), 
+							answer1.getName(), 
+							answer2.getName(), 
+							answer3.getName()));
+	}
 	
-	//All Questions withOUT option to FAVORITE COUNTRY
 	
+	public Question BornfirstQues(IDName country) throws DAOException, DataNotFoundException, EntityNotFound
+	{
+		IDName answer1, answer2, answer3;
+		ArrayList<IDName> person = (ArrayList<IDName>) this.access.getPersonsOrderByBirthDate(country.getId(), 4);
+		
+		IDName nAnswer = ((IDName)person.toArray()[3]);
+		answer1 = ((IDName)person.toArray()[1]);
+		answer2 = ((IDName)person.toArray()[2]);
+		answer3 = ((IDName)person.toArray()[0]);
+
+		return(new Question("Who was born first", 
+							nAnswer.getName(), 
+							answer1.getName(), 
+							answer2.getName(), 
+							answer3.getName()));
+	}
+
+	/**********************************************************************************************************/
 	public Question MostpopQues() throws DAOException, DataNotFoundException, EntityNotFound
 	{
 		String[] answers = new String[3];
@@ -425,18 +473,27 @@ public class QuestionFactory {
 		return(new Question("Which country is the oldest?", answerRight, answers[0], answers[1], answers[2]));
 	}
 	
-	/*
+	
 	public Question CreateBeforeAndAfterCountryQues() throws DAOException, DataNotFoundException, EntityNotFound
 	{
 		ArrayList<IDName> Beforecountry = (ArrayList<IDName>) this.access.getRandomCountries(1);
 		ArrayList<IDName> Aftercountry = (ArrayList<IDName>) this.access.getRandomCountries(1);
 		ArrayList<IDName> countries =  new ArrayList<IDName>();
+		IDName answer, temp;
 		
-		for (int i = 0; i < 4; i++) {
-			countries.add((IDName) this.access.getCountryCreatedBetween(((IDName)Beforecountry.toArray()[0]).getId(),((IDName)Aftercountry.toArray()[0]).getId()));
-		}
+		temp = ((IDName)this.access.getCountryNotCreatedBetween(((IDName)Beforecountry.toArray()[0]).getId(),((IDName)Aftercountry.toArray()[0]).getId()));
+		countries.add(temp);
+		temp = ((IDName)this.access.getCountryNotCreatedBetween(temp.getId(),((IDName)Aftercountry.toArray()[0]).getId()));
+		countries.add(temp);
+		temp = ((IDName)this.access.getCountryNotCreatedBetween(temp.getId(),((IDName)Aftercountry.toArray()[0]).getId()));
+		countries.add(temp);
+		
+		answer = ((IDName)this.access.getCountryCreatedBetween(((IDName)Beforecountry.toArray()[0]).getId(),((IDName)Aftercountry.toArray()[0]).getId()));
 		
 		return(new Question(" Which country Created before " + ((IDName)Beforecountry.toArray()[0]).getName() + " but after " +((IDName)Aftercountry.toArray()[0]).getName()
-						, answerRight, answers[0], answers[1], answers[2]));
-	}*/
+						, answer.getName(),
+						((IDName)countries.toArray()[0]).getName(),
+						((IDName)countries.toArray()[1]).getName(),
+						((IDName)countries.toArray()[2]).getName()));
+	}
 }
