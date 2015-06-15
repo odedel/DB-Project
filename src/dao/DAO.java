@@ -444,7 +444,7 @@ public class DAO {
     public Collection<IDName> getNewerCityThan(int cityId, int count) throws DAOException, EntityNotFound, DataNotFoundException {
         validateCityExists(cityId);
         try {
-            Collection<IDName> answer = connection.getOlderCityThan(cityId, count);
+            Collection<IDName> answer = connection.getNewerCityThan(cityId, count);
             if (answer.size() != count) {
                 throw new DataNotFoundException(String.format("Can not find %s cities that are older than %s", count, cityId));
             }

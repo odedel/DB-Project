@@ -13,7 +13,7 @@ public class Check {
 
         dao.connect(DBUser.MODIFIER);
 
-        System.out.println(dao.getCountryNotCreatedBetween(363, 364));
+        System.out.println(dao.getOlderCityThan(117756, 2));
 
         dao.disconnect();
     }
