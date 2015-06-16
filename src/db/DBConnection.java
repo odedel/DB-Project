@@ -31,8 +31,8 @@ public class DBConnection {
         // creating the connection
         System.out.print("Trying to connect... ");
         try {
-            conn = DriverManager.getConnection(String.format(CONNECTION_STRING, DEFAULT_HOST, DEFAULT_SCHEMA),
-                    user.toString().toLowerCase(), user.toString().toLowerCase());
+            String format = String.format(CONNECTION_STRING, DEFAULT_HOST, DEFAULT_SCHEMA);
+            conn = DriverManager.getConnection(format, "DbMysql19", "DbMysql19");
         } catch (SQLException e) {
             conn = null;
             throw new DBException("Unable to connect: " + e.getMessage());
@@ -63,24 +63,24 @@ public class DBConnection {
 
     public void uploadCountries(List<Country> countries) throws DBException {
         try (PreparedStatement pstmt = conn
-                .prepareStatement("INSERT INTO country(name, creation_date, economic_growth, poverty, population, unemployment, gini, inflation, population_density) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                .prepareStatement("INSERT INTO Country(name, creation_date, economic_growth, poverty, population, unemployment, gini, inflation, population_density) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)",
                         Statement.RETURN_GENERATED_KEYS)) {
 
             conn.setAutoCommit(false);
 
             List<Entity> batchingList = new LinkedList<>();
-            for (Country country : countries) {
-                pstmt.setString(1, country.getName());
-                pstmt.setDate(2, Utils.localDateToDate(country.getCreationDate()));
-                pstmt.setFloat(3, country.getEconomicGrowth());
-                pstmt.setFloat(4, country.getPoverty());
-                pstmt.setLong(5, country.getPopulation());
-                pstmt.setFloat(6, country.getUnemployment());
-                pstmt.setFloat(7, country.getGini());
-                pstmt.setFloat(8, country.getInflation());
-                pstmt.setFloat(9, country.getPopulationDensity());
+            for (Country Country : countries) {
+                pstmt.setString(1, Country.getName());
+                pstmt.setDate(2, Utils.localDateToDate(Country.getCreationDate()));
+                pstmt.setFloat(3, Country.getEconomicGrowth());
+                pstmt.setFloat(4, Country.getPoverty());
+                pstmt.setLong(5, Country.getPopulation());
+                pstmt.setFloat(6, Country.getUnemployment());
+                pstmt.setFloat(7, Country.getGini());
+                pstmt.setFloat(8, Country.getInflation());
+                pstmt.setFloat(9, Country.getPopulationDensity());
 
-                addBatchAndExecuteIfNeeded(pstmt, batchingList, country, true);
+                addBatchAndExecuteIfNeeded(pstmt, batchingList, Country, true);
             }
             executeBatch(pstmt, batchingList);
 
@@ -94,26 +94,26 @@ public class DBConnection {
 
     public void uploadCities(List<City> cities) throws DBException {
         try (PreparedStatement pstmt = conn
-                .prepareStatement("INSERT INTO city(name, country_id, creation_date, economic_growth, poverty, population, unemployment, gini, inflation, population_density) " +
+                .prepareStatement("INSERT INTO City(name, Country_id, creation_date, economic_growth, poverty, population, unemployment, gini, inflation, population_density) " +
                                 "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                         Statement.RETURN_GENERATED_KEYS)) {
 
             conn.setAutoCommit(false);
 
             List<Entity> batchingList = new LinkedList<>();
-            for (City city : cities) {
-                pstmt.setString(1, city.getName());
-                pstmt.setInt(2, city.getCountry().getId());
-                pstmt.setDate(3, Utils.localDateToDate(city.getCreationDate()));
-                pstmt.setFloat(4, city.getEconomicGrowth());
-                pstmt.setFloat(5, city.getPoverty());
-                pstmt.setLong(6, city.getPopulation());
-                pstmt.setFloat(7, city.getUnemployment());
-                pstmt.setFloat(8, city.getGini());
-                pstmt.setFloat(9, city.getInflation());
-                pstmt.setFloat(10, city.getPopulationDensity());
+            for (City City : cities) {
+                pstmt.setString(1, City.getName());
+                pstmt.setInt(2, City.getCountry().getId());
+                pstmt.setDate(3, Utils.localDateToDate(City.getCreationDate()));
+                pstmt.setFloat(4, City.getEconomicGrowth());
+                pstmt.setFloat(5, City.getPoverty());
+                pstmt.setLong(6, City.getPopulation());
+                pstmt.setFloat(7, City.getUnemployment());
+                pstmt.setFloat(8, City.getGini());
+                pstmt.setFloat(9, City.getInflation());
+                pstmt.setFloat(10, City.getPopulationDensity());
 
-                addBatchAndExecuteIfNeeded(pstmt, batchingList, city, true);
+                addBatchAndExecuteIfNeeded(pstmt, batchingList, City, true);
             }
             executeBatch(pstmt, batchingList);
 
@@ -143,16 +143,16 @@ public class DBConnection {
 
     private void uploadUniversitiesEntities(List<University> universities) throws DBException {
         try (PreparedStatement pstmt = conn
-                .prepareStatement("INSERT INTO university(name, creation_date) " +
+                .prepareStatement("INSERT INTO University(name, creation_date) " +
                                 "VALUES(?, ?)",
                         Statement.RETURN_GENERATED_KEYS)) {
 
             List<Entity> batchingList = new LinkedList<>();
-            for (University university : universities) {
-                pstmt.setString(1, university.getName());
-                pstmt.setDate(2, Utils.localDateToDate(university.getCreationDate()));
+            for (University University : universities) {
+                pstmt.setString(1, University.getName());
+                pstmt.setDate(2, Utils.localDateToDate(University.getCreationDate()));
 
-                addBatchAndExecuteIfNeeded(pstmt, batchingList, university, true);
+                addBatchAndExecuteIfNeeded(pstmt, batchingList, University, true);
             }
             executeBatch(pstmt, batchingList);
         } catch (SQLException e) {
@@ -162,14 +162,14 @@ public class DBConnection {
 
     private void uploadUniversityCountryRelation(List<University> universities) throws DBException {
         try (PreparedStatement pstmt = conn
-                .prepareStatement("INSERT INTO University_Country_Relation(university_id, country_id) " +
+                .prepareStatement("INSERT INTO University_Country_Relation(University_id, Country_id) " +
                         "VALUES(?, ?)")) {
 
             List<Entity> batchingList = new LinkedList<>();
-            for (University university : universities) {
-                for (Country country : university.getCountries()) {
-                    createRelation(pstmt, university, country);
-                    addBatchAndExecuteIfNeeded(pstmt, batchingList, country, false);
+            for (University University : universities) {
+                for (Country Country : University.getCountries()) {
+                    createRelation(pstmt, University, Country);
+                    addBatchAndExecuteIfNeeded(pstmt, batchingList, Country, false);
                 }
             }
             executeBatch(pstmt, null);
@@ -180,14 +180,14 @@ public class DBConnection {
 
     private void uploadUniversityCityRelation(List<University> universities) throws DBException {
         try (PreparedStatement pstmt = conn
-                .prepareStatement("INSERT INTO University_City_Relation(university_id, city_id) " +
+                .prepareStatement("INSERT INTO University_City_Relation(University_id, City_id) " +
                         "VALUES(?, ?)")) {
 
             List<Entity> batchingList = new LinkedList<>();
-            for (University university : universities) {
-                for (City city : university.getCities()) {
-                    createRelation(pstmt, university, city);
-                    addBatchAndExecuteIfNeeded(pstmt, batchingList, university, false);
+            for (University University : universities) {
+                for (City City : University.getCities()) {
+                    createRelation(pstmt, University, City);
+                    addBatchAndExecuteIfNeeded(pstmt, batchingList, University, false);
                 }
             }
             executeBatch(pstmt, null);
@@ -196,65 +196,65 @@ public class DBConnection {
         }
     }
 
-    public void uploadPersons(List<Person> persons) throws DBException {
+    public void uploadPersons(List<Person> Persons) throws DBException {
         try {
             conn.setAutoCommit(false);
 
-            uploadPersonsEntities(persons);
-            uploadPoliticianUniversityRelation(persons);
-            uploadPersonsPoliticianOfCountryRelation(persons);
-            uploadBusinessCreatorRelation(persons);
+            uploadPersonsEntities(Persons);
+            uploadPoliticianUniversityRelation(Persons);
+            uploadPersonsPoliticianOfCountryRelation(Persons);
+            uploadBusinessCreatorRelation(Persons);
 
             conn.commit();
         } catch (SQLException e) {
-            throw new DBException("Error while uploading persons: " + e.getMessage());
+            throw new DBException("Error while uploading Persons: " + e.getMessage());
         } finally {
             safelySetAutoCommit();
         }
     }
 
-    private void uploadPersonsEntities(List<Person> persons) throws DBException {
+    private void uploadPersonsEntities(List<Person> Persons) throws DBException {
         try (PreparedStatement pstmt = conn
-                .prepareStatement("INSERT INTO person(name, birth_city_id, birth_date, death_city_id, death_date) " +
+                .prepareStatement("INSERT INTO Person(name, birth_City_id, birth_date, death_City_id, death_date) " +
                                 "VALUES(?, ?, ?, ?, ?)",
                         Statement.RETURN_GENERATED_KEYS)) {
 
             List<Entity> batchingList = new LinkedList<>();
-            for (Person person : persons) {
-                pstmt.setString(1, person.getName());
+            for (Person Person : Persons) {
+                pstmt.setString(1, Person.getName());
 
-                if (person.getBirthCity() != null) {
-                    pstmt.setInt(2, person.getBirthCity().getId());
+                if (Person.getBirthCity() != null) {
+                    pstmt.setInt(2, Person.getBirthCity().getId());
                 } else {
                     pstmt.setNull(2, java.sql.Types.INTEGER);
                 }
-                pstmt.setDate(3, Utils.localDateToDate(person.getBirthDate()));
+                pstmt.setDate(3, Utils.localDateToDate(Person.getBirthDate()));
 
-                if (person.getDeathCity() != null) {
-                    pstmt.setInt(4, person.getDeathCity().getId());
+                if (Person.getDeathCity() != null) {
+                    pstmt.setInt(4, Person.getDeathCity().getId());
                 } else {
                     pstmt.setNull(4, java.sql.Types.INTEGER);
                 }
-                pstmt.setDate(5, Utils.localDateToDate(person.getDeathDate()));
+                pstmt.setDate(5, Utils.localDateToDate(Person.getDeathDate()));
 
-                addBatchAndExecuteIfNeeded(pstmt, batchingList, person, true);
+                addBatchAndExecuteIfNeeded(pstmt, batchingList, Person, true);
             }
             executeBatch(pstmt, batchingList);
         } catch (SQLException e) {
-            throw new DBException("Error while uploading persons: " + e.getMessage());
+            throw new DBException("Error while uploading Persons: " + e.getMessage());
         }
     }
 
-    private void uploadPersonsPoliticianOfCountryRelation(List<Person> persons) throws DBException {
+    private void uploadPersonsPoliticianOfCountryRelation(List<Person> Persons) throws DBException {
         try (PreparedStatement pstmt = conn
-                .prepareStatement("INSERT INTO Person_Politician_Of_Country_Relation(country_id, politician_id) " +
+                .prepareStatement("INSERT INTO Person_Politician_Of_Country_Relation(Country_id, politician_id) " +
                                 "VALUES(?, ?)")) {
 
             List<Entity> batchingList = new LinkedList<>();
-            for (Person person : persons) {
-                for (Country country : person.getPoliticianOf()) {
-                    createRelation(pstmt, country, person);
-                    addBatchAndExecuteIfNeeded(pstmt, batchingList, country, false);
+            for (Person Person : Persons) {
+                for (Country Country : Person.getPoliticianOf()) {
+                    createRelation(pstmt, Country, Person);
+                    addBatchAndExecuteIfNeeded(pstmt, batchingList, Country, false);
                 }
             }
             executeBatch(pstmt, null);
@@ -263,16 +263,16 @@ public class DBConnection {
         }
     }
 
-    private void uploadPoliticianUniversityRelation(List<Person> persons) throws DBException {
+    private void uploadPoliticianUniversityRelation(List<Person> Persons) throws DBException {
         try (PreparedStatement pstmt = conn
-                .prepareStatement("INSERT INTO University_Person_Relation(person_id, university_id) " +
+                .prepareStatement("INSERT INTO University_Person_Relation(Person_id, University_id) " +
                         "VALUES(?, ?)")) {
 
             List<Entity> batchingList = new LinkedList<>();
-            for (Person person : persons) {
-                for (University university : person.getUniversities()) {
-                    createRelation(pstmt, person, university);
-                     addBatchAndExecuteIfNeeded(pstmt, batchingList, university, false);
+            for (Person Person : Persons) {
+                for (University University : Person.getUniversities()) {
+                    createRelation(pstmt, Person, University);
+                     addBatchAndExecuteIfNeeded(pstmt, batchingList, University, false);
                 }
             }
             executeBatch(pstmt, null);
@@ -281,33 +281,33 @@ public class DBConnection {
         }
     }
 
-    private void uploadBusinessCreatorRelation(List<Person> persons) throws DBException {
+    private void uploadBusinessCreatorRelation(List<Person> Persons) throws DBException {
         try (PreparedStatement pstmt = conn
-                .prepareStatement("INSERT INTO Business_Creator_Relation(creator_id, business_id) " +
+                .prepareStatement("INSERT INTO Business_Creator_Relation(creator_id, Business_id) " +
                         "VALUES(?, ?)")) {
 
             List<Entity> batchingList = new LinkedList<>();
-            for (Person person : persons) {
-                for (Business business : person.getBusinesses()) {
-                    createRelation(pstmt, person, business);
-                    addBatchAndExecuteIfNeeded(pstmt, batchingList, business, false);
+            for (Person Person : Persons) {
+                for (Business Business : Person.getBusinesses()) {
+                    createRelation(pstmt, Person, Business);
+                    addBatchAndExecuteIfNeeded(pstmt, batchingList, Business, false);
                 }
             }
             executeBatch(pstmt, null);
         } catch (SQLException e) {
-            throw new DBException("Error while uploading business-creator-relation: " + e.getMessage());
+            throw new DBException("Error while uploading Business-creator-relation: " + e.getMessage());
         }
     }
 
-    private void uploadArtifactPersonRelation(List<Artifact> artifacts) throws DBException {
+    private void uploadArtifactPersonRelation(List<Artifact> Artifacts) throws DBException {
         try (PreparedStatement pstmt = conn
-                .prepareStatement("INSERT INTO Artifact_Creator_Relation(creator_id, artifact_id) " +
+                .prepareStatement("INSERT INTO Artifact_Creator_Relation(creator_id, Artifact_id) " +
                         "VALUES(?, ?)")) {
 
             List<Entity> batchingList = new LinkedList<>();
-            for (Artifact artifact : artifacts) {
-                for (Person creator : artifact.getCreators()) {
-                    createRelation(pstmt, creator, artifact);
+            for (Artifact Artifact : Artifacts) {
+                for (Person creator : Artifact.getCreators()) {
+                    createRelation(pstmt, creator, Artifact);
                     addBatchAndExecuteIfNeeded(pstmt, batchingList, creator, false);
                 }
             }
@@ -317,35 +317,35 @@ public class DBConnection {
         }
     }
 
-    public void uploadBusinesses(List<Business> businesses) throws DBException {
+    public void uploadBusinesses(List<Business> Businesses) throws DBException {
         try {
             conn.setAutoCommit(false);
 
-            uploadBusinessesEntity(businesses);
-            uploadBusinessCityRelation(businesses);
-            uploadBusinessCountryRelation(businesses);
+            uploadBusinessesEntity(Businesses);
+            uploadBusinessCityRelation(Businesses);
+            uploadBusinessCountryRelation(Businesses);
 
             conn.commit();
         } catch(SQLException e) {
-            throw new DBException("Error while uploading businesses: " + e.getMessage());
+            throw new DBException("Error while uploading Businesses: " + e.getMessage());
         } finally {
             safelySetAutoCommit();
         }
     }
 
-    private void uploadBusinessesEntity(List<Business> businesses) throws DBException {
+    private void uploadBusinessesEntity(List<Business> Businesses) throws DBException {
         try (PreparedStatement pstmt = conn
-                .prepareStatement("INSERT INTO business(name, creation_date, number_of_employees) " +
+                .prepareStatement("INSERT INTO Business(name, creation_date, number_of_employees) " +
                                 "VALUES(?, ?, ?)",
                         Statement.RETURN_GENERATED_KEYS)) {
 
             List<Entity> batchingList = new LinkedList<>();
-            for (Business business : businesses) {
-                pstmt.setString(1, business.getName());
-                pstmt.setDate(2, Utils.localDateToDate(business.getCreationDate()));
-                pstmt.setLong(3, business.getNumberOfEmployees());
+            for (Business Business : Businesses) {
+                pstmt.setString(1, Business.getName());
+                pstmt.setDate(2, Utils.localDateToDate(Business.getCreationDate()));
+                pstmt.setLong(3, Business.getNumberOfEmployees());
 
-                addBatchAndExecuteIfNeeded(pstmt, batchingList, business, true);
+                addBatchAndExecuteIfNeeded(pstmt, batchingList, Business, true);
             }
             executeBatch(pstmt, batchingList);
         } catch (SQLException e) {
@@ -353,34 +353,34 @@ public class DBConnection {
         }
     }
 
-    private void uploadBusinessCityRelation(List<Business> businesses) throws DBException {
+    private void uploadBusinessCityRelation(List<Business> Businesses) throws DBException {
         try (PreparedStatement pstmt = conn
-                .prepareStatement("INSERT INTO Business_City_Relation(business_id, city_id) " +
+                .prepareStatement("INSERT INTO Business_city_relation(Business_id, City_id) " +
                         "VALUES(?, ?)")) {
 
             List<Entity> batchingList = new LinkedList<>();
-            for (Business business : businesses) {
-                for (City city : business.getCities()) {
-                    createRelation(pstmt, business, city);
-                    addBatchAndExecuteIfNeeded(pstmt, batchingList, city, false);
+            for (Business Business : Businesses) {
+                for (City City : Business.getCities()) {
+                    createRelation(pstmt, Business, City);
+                    addBatchAndExecuteIfNeeded(pstmt, batchingList, City, false);
                 }
             }
             executeBatch(pstmt, null);
         } catch (SQLException e) {
-            throw new DBException("Error while uploading businesses: " + e.getMessage());
+            throw new DBException("Error while uploading Businesses: " + e.getMessage());
         }
     }
 
-    private void uploadBusinessCountryRelation(List<Business> businesses) throws DBException {
+    private void uploadBusinessCountryRelation(List<Business> Businesses) throws DBException {
         try (PreparedStatement pstmt = conn
-                .prepareStatement("INSERT INTO Business_Country_Relation(country_id, business_id) " +
+                .prepareStatement("INSERT INTO Business_Country_Relation(Country_id, Business_id) " +
                         "VALUES(?, ?)")) {
 
             List<Entity> batchingList = new LinkedList<>();
-            for (Business business : businesses) {
-                for (Country country : business.getCountries()) {
-                    createRelation(pstmt, country, business);
-                    addBatchAndExecuteIfNeeded(pstmt, batchingList, country, false);
+            for (Business Business : Businesses) {
+                for (Country Country : Business.getCountries()) {
+                    createRelation(pstmt, Country, Business);
+                    addBatchAndExecuteIfNeeded(pstmt, batchingList, Country, false);
                 }
             }
             executeBatch(pstmt, null);
@@ -389,55 +389,55 @@ public class DBConnection {
         }
     }
 
-    public void uploadArtifacts(List<Artifact> artifacts) throws DBException {
+    public void uploadArtifacts(List<Artifact> Artifacts) throws DBException {
         try {
             conn.setAutoCommit(false);
 
-            uploadArtifactsEntity(artifacts);
-            uploadArtifactPersonRelation(artifacts);
-            uploadBusinessArtifactRelation(artifacts);
+            uploadArtifactsEntity(Artifacts);
+            uploadArtifactPersonRelation(Artifacts);
+            uploadBusinessArtifactRelation(Artifacts);
 
             conn.commit();
         } catch(SQLException e) {
-            throw new DBException("Error while uploading artifacts: " + e.getMessage());
+            throw new DBException("Error while uploading Artifacts: " + e.getMessage());
         } finally {
             safelySetAutoCommit();
         }
     }
 
-    private void uploadBusinessArtifactRelation(List<Artifact> artifacts) throws DBException {
+    private void uploadBusinessArtifactRelation(List<Artifact> Artifacts) throws DBException {
         try (PreparedStatement pstmt = conn
-                .prepareStatement("INSERT INTO Business_Artifact_Relation(business_id, artifact_id) " +
+                .prepareStatement("INSERT INTO Business_Artifact_Relation(Business_id, Artifact_id) " +
                         "VALUES(?, ?)")) {
 
             List<Entity> batchingList = new LinkedList<>();
-            for (Artifact artifact : artifacts) {
-                for (Business business : artifact.getBusinesses()) {
-                    createRelation(pstmt, business, artifact);
-                    addBatchAndExecuteIfNeeded(pstmt, batchingList, artifact, false);
+            for (Artifact Artifact : Artifacts) {
+                for (Business Business : Artifact.getBusinesses()) {
+                    createRelation(pstmt, Business, Artifact);
+                    addBatchAndExecuteIfNeeded(pstmt, batchingList, Artifact, false);
                 }
             }
             executeBatch(pstmt, null);
         } catch (SQLException e) {
-            throw new DBException("Error while uploading businesses: " + e.getMessage());
+            throw new DBException("Error while uploading Businesses: " + e.getMessage());
         }
     }
 
-    private void uploadArtifactsEntity(List<Artifact> artifacts) throws DBException {
+    private void uploadArtifactsEntity(List<Artifact> Artifacts) throws DBException {
         try (PreparedStatement pstmt = conn
-                .prepareStatement("INSERT INTO artifact(name, creation_date) " +
+                .prepareStatement("INSERT INTO Artifact(name, creation_date) " +
                                 "VALUES(?, ?)",
                         Statement.RETURN_GENERATED_KEYS)) {
 
             List<Entity> batchingList = new LinkedList<>();
-            for (Artifact artifact : artifacts) {
-                pstmt.setString(1, artifact.getName());
-                pstmt.setDate(2, Utils.localDateToDate(artifact.getCreationDate()));
-                addBatchAndExecuteIfNeeded(pstmt, batchingList, artifact, true);
+            for (Artifact Artifact : Artifacts) {
+                pstmt.setString(1, Artifact.getName());
+                pstmt.setDate(2, Utils.localDateToDate(Artifact.getCreationDate()));
+                addBatchAndExecuteIfNeeded(pstmt, batchingList, Artifact, true);
             }
             executeBatch(pstmt, batchingList);
         } catch (SQLException e) {
-            throw new DBException("Error while uploading artifacts: " + e.getMessage());
+            throw new DBException("Error while uploading Artifacts: " + e.getMessage());
         }
     }
 
@@ -510,7 +510,7 @@ public class DBConnection {
      */
     public int getCountOfCountries() throws DBException {
         try (Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM country")) {
+            ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM Country")) {
             return rs.getInt(1);
         } catch (SQLException e) {
             throw new DBException("Error while counting countries: " + e.getMessage());
@@ -519,7 +519,7 @@ public class DBConnection {
 
     public int getCountOfCities() throws DBException {
         try (Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM city")) {
+             ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM City")) {
             return rs.getInt(1);
         } catch (SQLException e) {
             throw new DBException("Error while counting countries: " + e.getMessage());
@@ -527,12 +527,12 @@ public class DBConnection {
     }
 
     public Collection<IDName> getAllCountries() throws DBException {
-        return genericIntStringCollectionFetcher("SELECT NAME FROM COUNTRY");
+        return genericIntStringCollectionFetcher("SELECT NAME FROM Country");
     }
 
     public Collection<IDName> getRandomCountries(int count) throws DBException {
         return genericIntStringCollectionFetcher(
-                addRandomLimitToQuery("SELECT NAME FROM COUNTRY", count)
+                addRandomLimitToQuery("SELECT NAME FROM Country", count)
         );
     }
 
@@ -540,9 +540,9 @@ public class DBConnection {
         return genericIntFetcher(String.format("SELECT ID FROM %s WHERE NAME='%s'", entity_type, name));
     }
 
-    public Collection<IDName> getCities(int country, int count) throws DBException {
+    public Collection<IDName> getCities(int Country, int count) throws DBException {
         return genericIntStringCollectionFetcher(
-                addRandomLimitToQuery(String.format("SELECT ID, NAME FROM CITY WHERE CITY.COUNTRY_ID='%s'", country), count)
+                addRandomLimitToQuery(String.format("SELECT ID, NAME FROM City WHERE City.Country_ID='%s'", Country), count)
         );
     }
 
@@ -670,27 +670,27 @@ public class DBConnection {
 //        Map<Integer, Country> countries = new HashMap<>();
 //
 //        try (Statement stmt = conn.createStatement()) {
-//            ResultSet rs = stmt.executeQuery("SELECT * FROM COUNTRY");
+//            ResultSet rs = stmt.executeQuery("SELECT * FROM Country");
 //
 //            while (rs.next()) {
-//                Country country = new Country();
+//                Country Country = new Country();
 //
-//                country.id = rs.getInt("id");
-//                country.name = rs.getString("name");
+//                Country.id = rs.getInt("id");
+//                Country.name = rs.getString("name");
 //
 //                Date creationDate = rs.getDate("creation_date");
 //                if (creationDate != null) {
-//                    country.creationDate = creationDate.toLocalDate();
+//                    Country.creationDate = creationDate.toLocalDate();
 //                }
-//                country.economicGrowth = rs.getFloat("economic_growth");
-//                country.poverty = rs.getFloat("poverty");
-//                country.population = rs.getLong("population");
-//                country.unemployment = rs.getFloat("unemployment");
-//                country.gini = rs.getFloat("gini");
-//                country.inflation = rs.getFloat("inflation");
-//                country.populationDensity = rs.getFloat("population_density");
+//                Country.economicGrowth = rs.getFloat("economic_growth");
+//                Country.poverty = rs.getFloat("poverty");
+//                Country.population = rs.getLong("population");
+//                Country.unemployment = rs.getFloat("unemployment");
+//                Country.gini = rs.getFloat("gini");
+//                Country.inflation = rs.getFloat("inflation");
+//                Country.populationDensity = rs.getFloat("population_density");
 //
-//                countries.put(country.id, country);
+//                countries.put(Country.id, Country);
 //            }
 //
 //        } catch (SQLException e) {
@@ -703,27 +703,27 @@ public class DBConnection {
 //        Map<Integer, City> cities = new HashMap<>();
 //
 //        try (Statement stmt = conn.createStatement()) {
-//            ResultSet rs = stmt.executeQuery("SELECT * FROM CITY");
+//            ResultSet rs = stmt.executeQuery("SELECT * FROM City");
 //
 //            while (rs.next()) {
-//                City city = new City();
+//                City City = new City();
 //
-//                city.id = rs.getInt("id");
-//                city.name = rs.getString("name");
-//                city.country = countries.get(rs.getInt("country_id"));
+//                City.id = rs.getInt("id");
+//                City.name = rs.getString("name");
+//                City.Country = countries.get(rs.getInt("Country_id"));
 //                Date creationDate = rs.getDate("creation_date");
 //                if (creationDate != null) {
-//                    city.creationDate = creationDate.toLocalDate();
+//                    City.creationDate = creationDate.toLocalDate();
 //                }
-//                city.economicGrowth = rs.getFloat("economic_growth");
-//                city.poverty = rs.getFloat("poverty");
-//                city.population = rs.getLong("population");
-//                city.unemployment = rs.getFloat("unemployment");
-//                city.gini = rs.getFloat("gini");
-//                city.inflation = rs.getFloat("inflation");
-//                city.populationDensity = rs.getFloat("population_density");
+//                City.economicGrowth = rs.getFloat("economic_growth");
+//                City.poverty = rs.getFloat("poverty");
+//                City.population = rs.getLong("population");
+//                City.unemployment = rs.getFloat("unemployment");
+//                City.gini = rs.getFloat("gini");
+//                City.inflation = rs.getFloat("inflation");
+//                City.populationDensity = rs.getFloat("population_density");
 //
-//                cities.put(city.id, city);
+//                cities.put(City.id, City);
 //            }
 //
 //        } catch (SQLException e) {
@@ -737,14 +737,14 @@ public class DBConnection {
      */
     public void deleteData() throws DBException {
         try (Statement stmt = conn.createStatement()) {
-            stmt.executeUpdate("DELETE FROM UNIVERSITY");
-            stmt.executeUpdate("DELETE FROM CITY");
-            stmt.executeUpdate("DELETE FROM BUSINESS");
-            stmt.executeUpdate("DELETE FROM ARTIFACT");
-            stmt.executeUpdate("DELETE FROM PERSON");
-            stmt.executeUpdate("DELETE FROM country");
+            stmt.executeUpdate("DELETE FROM University");
+            stmt.executeUpdate("DELETE FROM City");
+            stmt.executeUpdate("DELETE FROM Business");
+            stmt.executeUpdate("DELETE FROM Artifact");
+            stmt.executeUpdate("DELETE FROM Person");
+            stmt.executeUpdate("DELETE FROM Country");
         } catch (SQLException e) {
-            throw new DBException("Error while deleting collect_data from country: " + e.getMessage());
+            throw new DBException("Error while deleting collect_data from Country: " + e.getMessage());
         }
     }
 
@@ -811,24 +811,24 @@ public class DBConnection {
 
     private static String JDBC_DRIVER = "com.mysql.jdbc.Driver";
     private static String CONNECTION_STRING = "jdbc:mysql://%s/%s";
-    private static String DEFAULT_HOST = "localhost:3306";
-    private static String DEFAULT_SCHEMA = "toyt";
+    private static String DEFAULT_HOST = "localhost:3305";
+    private static String DEFAULT_SCHEMA = "DbMysql19";
 
 
-    public Integer getNumberOfPeopleInCountryOrderDescResult(int countryID) throws DBException {
-        return genericIntFetcher("SELECT POPULATION FROM COUNTRY WHERE ID=" + countryID);
+    public Integer getNumberOfPeopleInCountryOrderDescResult(int CountryID) throws DBException {
+        return genericIntFetcher("SELECT POPULATION FROM Country WHERE ID=" + CountryID);
     }
 
-    public List<Long> getNumberOfPeopleInCountryOrderDescResult(List<Integer> countryID) throws DBException {
-        return genericListLongFetcher("SELECT POPULATION FROM COUNTRY WHERE ID in " + listToStringForQuery(countryID));
+    public List<Long> getNumberOfPeopleInCountryOrderDescResult(List<Integer> CountryID) throws DBException {
+        return genericListLongFetcher("SELECT POPULATION FROM Country WHERE ID in " + listToStringForQuery(CountryID));
     }
 
     public Collection<String> getUserName(int id) throws DBException {
         return genericStringCollectionFetcher("SELECT NAME FROM USER WHERE ID=" + id);
     }
 
-    public Date getCountryCreationDate(int countryID) throws DBException {
-        return genericDateFetcher("SELECT CREATION_DATE FROM COUNTRY WHERE ID=" + countryID);
+    public Date getCountryCreationDate(int CountryID) throws DBException {
+        return genericDateFetcher("SELECT CREATION_DATE FROM Country WHERE ID=" + CountryID);
     }
 
     public Integer getCountOf(String entityType, int id) throws DBException {
@@ -855,35 +855,35 @@ public class DBConnection {
         return s.toString();
     }
 
-    public Integer getMostPopulatedCountry(List<Integer> countryIDList) throws DBException {
-        return genericIntFetcher(String.format("SELECT ID FROM COUNTRY WHERE ID IN %s ORDER BY POPULATION DESC",
-                listToStringForQuery(countryIDList)));
+    public Integer getMostPopulatedCountry(List<Integer> CountryIDList) throws DBException {
+        return genericIntFetcher(String.format("SELECT ID FROM Country WHERE ID IN %s ORDER BY POPULATION DESC",
+                listToStringForQuery(CountryIDList)));
     }
 
-    public Integer getLeastPopulatedCountry(List<Integer> countryIDList) throws DBException {
-        return genericIntFetcher(String.format("SELECT ID FROM COUNTRY WHERE ID IN %s ORDER BY POPULATION ASC",
-                listToStringForQuery(countryIDList)));
+    public Integer getLeastPopulatedCountry(List<Integer> CountryIDList) throws DBException {
+        return genericIntFetcher(String.format("SELECT ID FROM Country WHERE ID IN %s ORDER BY POPULATION ASC",
+                listToStringForQuery(CountryIDList)));
     }
 
-    public Collection<IDName> getCountryThatIsMorePopulatedThan(int countryID, int count) throws DBException {
+    public Collection<IDName> getCountryThatIsMorePopulatedThan(int CountryID, int count) throws DBException {
         return genericIntStringCollectionFetcher(
                 addRandomLimitToQuery(String.format(
-                        "SELECT ID FROM COUNTRY WHERE POPULATION > (SELECT POPULATION FROM COUNTRY WHERE ID=%s)",
-                        countryID), count)
+                        "SELECT ID FROM Country WHERE POPULATION > (SELECT POPULATION FROM Country WHERE ID=%s)",
+                        CountryID), count)
         );
     }
 
-    public Collection<IDName> getCountryThatIsLessPopulatedThan(int countryID, int count) throws DBException {
+    public Collection<IDName> getCountryThatIsLessPopulatedThan(int CountryID, int count) throws DBException {
         return genericIntStringCollectionFetcher(
                 addRandomLimitToQuery(
-                        String.format("SELECT ID FROM COUNTRY WHERE POPULATION < (SELECT POPULATION FROM COUNTRY WHERE ID=%s) AND POPULATION > 0", countryID), count
+                        String.format("SELECT ID FROM Country WHERE POPULATION < (SELECT POPULATION FROM Country WHERE ID=%s) AND POPULATION > 0", CountryID), count
                 )
         );
     }
 
     public Integer getTheOldestCountry(List<Integer> countriesList) throws DBException {
         return genericIntFetcher(
-          String.format("SELECT ID FROM COUNTRY WHERE ID IN %s ORDER BY CREATION_DATE ASC", listToStringForQuery(countriesList))
+          String.format("SELECT ID FROM Country WHERE ID IN %s ORDER BY CREATION_DATE ASC", listToStringForQuery(countriesList))
         );
     }
 
@@ -891,95 +891,95 @@ public class DBConnection {
         return genericIntStringFetcher(
                 addRandomLimitToQuery(
                         String.format(
-                                "SELECT ID, NAME FROM COUNTRY WHERE CREATION_DATE > (SELECT CREATION_DATE FROM COUNTRY WHERE ID=%s) AND CREATION_DATE < (SELECT CREATION_DATE FROM COUNTRY WHERE ID=%s)", afterCountry, beforeCountry
+                                "SELECT ID, NAME FROM Country WHERE CREATION_DATE > (SELECT CREATION_DATE FROM Country WHERE ID=%s) AND CREATION_DATE < (SELECT CREATION_DATE FROM Country WHERE ID=%s)", afterCountry, beforeCountry
                         ), 1)
         );
     }
 
-    public Collection<IDName> getCitiesNotIn(int country_id, int count) throws DBException {
+    public Collection<IDName> getCitiesNotIn(int Country_id, int count) throws DBException {
         return genericIntStringCollectionFetcher(
                 addRandomLimitToQuery(
-                    String.format("SELECT ID, NAME FROM CITY WHERE COUNTRY_ID != %s", country_id),
+                    String.format("SELECT ID, NAME FROM City WHERE Country_ID != %s", Country_id),
                         count)
         );
     }
 
-    public IDName getOldestCity(int country_id) throws DBException {
+    public IDName getOldestCity(int Country_id) throws DBException {
         return genericIntStringFetcher(
-                String.format("SELECT ID, NAME FROM CITY WHERE COUNTRY_ID=%s and CREATION_DATE is not null ORDER BY CREATION_DATE ASC LIMIT 1", country_id)
+                String.format("SELECT ID, NAME FROM City WHERE Country_ID=%s and CREATION_DATE is not null ORDER BY CREATION_DATE ASC LIMIT 1", Country_id)
         );
     }
 
-    public Collection<IDName> getOlderCityThan(int city_id, int count) throws DBException {
+    public Collection<IDName> getOlderCityThan(int City_id, int count) throws DBException {
         return genericIntStringCollectionFetcher(
-                addRandomLimitToQuery(String.format("SELECT ID, NAME FROM CITY WHERE CREATION_DATE > (SELECT CREATION_DATE FROM CITY WHERE ID=%s)", city_id), count)
+                addRandomLimitToQuery(String.format("SELECT ID, NAME FROM City WHERE CREATION_DATE > (SELECT CREATION_DATE FROM City WHERE ID=%s)", City_id), count)
         );
     }
 
-    public Collection<IDName> getOlderCityThanInTheSameCountry(int city_id, int count) throws DBException {
+    public Collection<IDName> getOlderCityThanInTheSameCountry(int City_id, int count) throws DBException {
         return genericIntStringCollectionFetcher(
-                addRandomLimitToQuery(String.format("SELECT ID, NAME FROM CITY WHERE COUNTRY_ID=(SELECT COUNTRY_ID FROM CITY WHERE ID=%s) AND CREATION_DATE > (SELECT CREATION_DATE FROM CITY WHERE ID=%s)", city_id, city_id), count)
+                addRandomLimitToQuery(String.format("SELECT ID, NAME FROM City WHERE Country_ID=(SELECT Country_ID FROM City WHERE ID=%s) AND CREATION_DATE > (SELECT CREATION_DATE FROM City WHERE ID=%s)", City_id, City_id), count)
         );
     }
 
-    public Collection<IDName> getPersonsByBirthCountry(int country_id, int count) throws DBException {
+    public Collection<IDName> getPersonsByBirthCountry(int Country_id, int count) throws DBException {
         return genericIntStringCollectionFetcher(
                 addRandomLimitToQuery(
-                        String.format("SELECT ID, NAME FROM PERSON WHERE BIRTH_CITY_ID IN (SELECT ID FROM CITY WHERE COUNTRY_ID=%s)", country_id), count
+                        String.format("SELECT ID, NAME FROM Person WHERE BIRTH_City_ID IN (SELECT ID FROM City WHERE Country_ID=%s)", Country_id), count
                 )
         );
     }
 
-    public Collection<IDName> getPersonsByNotBirthCountry(int country_id, int count) throws DBException {
+    public Collection<IDName> getPersonsByNotBirthCountry(int Country_id, int count) throws DBException {
         return genericIntStringCollectionFetcher(
                 addRandomLimitToQuery(
-                        String.format("SELECT ID, NAME FROM PERSON WHERE BIRTH_CITY_ID NOT IN (SELECT ID FROM CITY WHERE COUNTRY_ID=%s)", country_id), count
+                        String.format("SELECT ID, NAME FROM Person WHERE BIRTH_City_ID NOT IN (SELECT ID FROM City WHERE Country_ID=%s)", Country_id), count
                 )
         );
     }
 
-    public IDName getBirthCity(int person_id) throws DBException {
+    public IDName getBirthCity(int Person_id) throws DBException {
         return genericIntStringFetcher(
-                String.format("SELECT ID, NAME FROM CITY WHERE ID in (SELECT BIRTH_CITY_ID FROM PERSON WHERE ID=%s)", person_id)
+                String.format("SELECT ID, NAME FROM City WHERE ID in (SELECT BIRTH_City_ID FROM Person WHERE ID=%s)", Person_id)
         );
     }
 
-    public Collection<IDName> getPersonsBornInSameCountry(int person_id, int count) throws DBException {
+    public Collection<IDName> getPersonsBornInSameCountry(int Person_id, int count) throws DBException {
         return genericIntStringCollectionFetcher(
                 addRandomLimitToQuery(
-                        String.format("SELECT ID, NAME FROM person WHERE birth_city_id in (SELECT ID from city where " +
-                                        "country_id in (SELECT COUNTRY.ID FROM COUNTRY, PERSON, CITY WHERE " +
-                                        "CITY.country_id=COUNTRY.ID AND PERSON.birth_city_id=CITY.ID AND PERSON.ID=%s))", person_id
+                        String.format("SELECT ID, NAME FROM Person WHERE birth_City_id in (SELECT ID from City where " +
+                                        "Country_id in (SELECT Country.ID FROM Country, Person, City WHERE " +
+                                        "City.Country_id=Country.ID AND Person.birth_City_id=City.ID AND Person.ID=%s))", Person_id
                                         )
                                 , count));
     }
 
-    public Collection<IDName> getPersonsNotBornInSameCountry(int person_id, int count) throws DBException {
+    public Collection<IDName> getPersonsNotBornInSameCountry(int Person_id, int count) throws DBException {
         return genericIntStringCollectionFetcher(
                 addRandomLimitToQuery(
-                        String.format("SELECT ID, NAME FROM person WHERE birth_city_id not in (SELECT ID from city where " +
-                                        "country_id in (SELECT COUNTRY.ID FROM COUNTRY, PERSON, CITY WHERE " +
-                                        "CITY.country_id=COUNTRY.ID AND PERSON.birth_city_id=CITY.ID AND PERSON.ID=%s))", person_id
+                        String.format("SELECT ID, NAME FROM Person WHERE birth_City_id not in (SELECT ID from City where " +
+                                        "Country_id in (SELECT Country.ID FROM Country, Person, City WHERE " +
+                                        "City.Country_id=Country.ID AND Person.birth_City_id=City.ID AND Person.ID=%s))", Person_id
                         )
                         , count));
     }
 
-    public Date getBirthDate(int person_id) throws DBException {
+    public Date getBirthDate(int Person_id) throws DBException {
         return genericDateFetcher(
-                String.format("SELECT BIRTH_DATE FROM PERSON WHERE ID=%s", person_id)
+                String.format("SELECT BIRTH_DATE FROM Person WHERE ID=%s", Person_id)
         );
     }
 
-    public List<IDName> getPersonsOrderByBirthDate(int country_id, int count) throws DBException {
+    public List<IDName> getPersonsOrderByBirthDate(int Country_id, int count) throws DBException {
         return genericIntStringListFetcher(
                 String.format(
-                        "SELECT ID, NAME FROM (SELECT ID, NAME, birth_date FROM PERSON WHERE birth_city_id in (SELECT ID FROM CITY WHERE COUNTRY_ID=%s) ORDER BY RAND() LIMIT %s) as TMP ORDER BY birth_date", country_id, count
+                        "SELECT ID, NAME FROM (SELECT ID, NAME, birth_date FROM Person WHERE birth_City_id in (SELECT ID FROM City WHERE Country_ID=%s) ORDER BY RAND() LIMIT %s) as TMP ORDER BY birth_date", Country_id, count
                 )
         );
     }
 
-    public List<IDName> getTwoBusinessesThatOneOfEachOneCreatorLearnedInTheSameCountryAsTheOtherOne(int countryID) throws DBException {
-        String query = String.format("SELECT B1.id, B1.name, B2.id, B2.name FROM BUSINESS B1, BUSINESS B2, business_creator_relation bcr1, university_person_relation upr1, university_country_relation ucr1, university_country_relation ucr2, business_creator_relation bcr2, university_person_relation upr2 WHERE B1.id != B2.id AND b1.id=bcr1.business_id and bcr1.creator_id=upr1.person_id and upr1.university_id = ucr1.university_id AND b2.id=bcr2.business_id and bcr2.creator_id=upr2.person_id and upr2.university_id = ucr2.university_id and ucr1.country_id=ucr2.country_id and ucr1.country_id=%s ORDER BY RAND() LIMIT 1", countryID);
+    public List<IDName> getTwoBusinessesThatOneOfEachOneCreatorLearnedInTheSameCountryAsTheOtherOne(int CountryID) throws DBException {
+        String query = String.format("SELECT B1.id, B1.name, B2.id, B2.name FROM Business B1, Business B2, Business_creator_relation bcr1, University_Person_relation upr1, University_Country_relation ucr1, University_Country_relation ucr2, Business_creator_relation bcr2, University_Person_relation upr2 WHERE B1.id != B2.id AND b1.id=bcr1.Business_id and bcr1.creator_id=upr1.Person_id and upr1.University_id = ucr1.University_id AND b2.id=bcr2.Business_id and bcr2.creator_id=upr2.Person_id and upr2.University_id = ucr2.University_id and ucr1.Country_id=ucr2.Country_id and ucr1.Country_id=%s ORDER BY RAND() LIMIT 1", CountryID);
 
         try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
@@ -995,8 +995,8 @@ public class DBConnection {
         }
     }
 
-    public List<IDName> getTwoBusinessesThatThereIsNotOneOfEachOneCreatorLearnedInTheSameCountryAsTheOtherOne(int countryID) throws DBException {
-        String query = String.format("SELECT B1.id, B1.name, B2.id, B2.name FROM BUSINESS B1, BUSINESS B2, business_creator_relation bcr1, university_person_relation upr1, university_country_relation ucr1, university_country_relation ucr2, business_creator_relation bcr2, university_person_relation upr2 WHERE B1.id != B2.id AND b1.id=bcr1.business_id and bcr1.creator_id=upr1.person_id and upr1.university_id = ucr1.university_id AND b2.id=bcr2.business_id and bcr2.creator_id=upr2.person_id and upr2.university_id = ucr2.university_id and ucr1.country_id!=ucr2.country_id and ucr1.country_id=%s ORDER BY RAND() LIMIT 1", countryID);
+    public List<IDName> getTwoBusinessesThatThereIsNotOneOfEachOneCreatorLearnedInTheSameCountryAsTheOtherOne(int CountryID) throws DBException {
+        String query = String.format("SELECT B1.id, B1.name, B2.id, B2.name FROM Business B1, Business B2, Business_creator_relation bcr1, University_Person_relation upr1, University_Country_relation ucr1, University_Country_relation ucr2, Business_creator_relation bcr2, University_Person_relation upr2 WHERE B1.id != B2.id AND b1.id=bcr1.Business_id and bcr1.creator_id=upr1.Person_id and upr1.University_id = ucr1.University_id AND b2.id=bcr2.Business_id and bcr2.creator_id=upr2.Person_id and upr2.University_id = ucr2.University_id and ucr1.Country_id!=ucr2.Country_id and ucr1.Country_id=%s ORDER BY RAND() LIMIT 1", CountryID);
 
         try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
