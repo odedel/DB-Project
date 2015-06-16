@@ -532,7 +532,7 @@ public class DBConnection {
 
     public Collection<IDName> getRandomCountries(int count) throws DBException {
         return genericIntStringCollectionFetcher(
-                addRandomLimitToQuery("SELECT NAME FROM COUNTRY", count)
+                addRandomLimitToQuery("SELECT ID, NAME FROM COUNTRY", count)
         );
     }
 
