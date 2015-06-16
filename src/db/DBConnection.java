@@ -527,7 +527,7 @@ public class DBConnection {
     }
 
     public Collection<IDName> getAllCountries() throws DBException {
-        return genericIntStringCollectionFetcher("SELECT NAME FROM COUNTRY");
+        return genericIntStringCollectionFetcher("SELECT ID, NAME FROM COUNTRY");
     }
 
     public Collection<IDName> getRandomCountries(int count) throws DBException {
