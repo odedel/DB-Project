@@ -353,13 +353,27 @@ public class DAO {
         }
     }
 
-    /* Which country Created before X but after Y?      Note: should first get the answers and than ask the question */
+    /* Which country Created before X but after Y? */
     public IDName getCountryCreatedBetween(int afterCountry, int beforeCountry) throws DAOException, EntityNotFound, DataNotFoundException {
         validateCountryExists(afterCountry);
         validateCountryExists(beforeCountry);
 
         try {
             IDName result = connection.getCountryCreatedBetween(afterCountry, beforeCountry);
+            if (result == null) {
+                throw new DataNotFoundException("Can not find entity between countries");
+            }
+            return result;
+        } catch (DBException e) {
+            throw new DAOException("Could not fetch data: " + e.getMessage());
+        }
+    }
+    public IDName getCountryNotCreatedBetween(int afterCountry, int beforeCountry) throws DAOException, EntityNotFound, DataNotFoundException {
+        validateCountryExists(afterCountry);
+        validateCountryExists(beforeCountry);
+
+        try {
+            IDName result = connection.getCountryNotCreatedBetween(afterCountry, beforeCountry);
             if (result == null) {
                 throw new DataNotFoundException("Can not find entity between countries");
             }
@@ -419,6 +433,18 @@ public class DAO {
         validateCityExists(cityId);
         try {
             Collection<IDName> answer = connection.getOlderCityThan(cityId, count);
+            if (answer.size() != count) {
+                throw new DataNotFoundException(String.format("Can not find %s cities that are older than %s", count, cityId));
+            }
+            return answer;
+        } catch (DBException e) {
+            throw new DAOException("Could not fetch data: " + e.getMessage());
+        }
+    }
+    public Collection<IDName> getNewerCityThan(int cityId, int count) throws DAOException, EntityNotFound, DataNotFoundException {
+        validateCityExists(cityId);
+        try {
+            Collection<IDName> answer = connection.getNewerCityThan(cityId, count);
             if (answer.size() != count) {
                 throw new DataNotFoundException(String.format("Can not find %s cities that are older than %s", count, cityId));
             }

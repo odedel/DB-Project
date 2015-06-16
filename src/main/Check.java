@@ -13,9 +13,7 @@ public class Check {
 
         dao.connect(DBUser.MODIFIER);
 
-        for (UserIDScoreDate x : dao.getTopScoreByUser(1, 100000)) {
-            System.out.println(x.getUserID() + " " + x.getScore() + " " + x.getDate());
-        }
+        System.out.println(dao.getOlderCityThan(117756, 2));
 
         dao.disconnect();
     }
