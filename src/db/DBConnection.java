@@ -868,7 +868,7 @@ public class DBConnection {
     public Collection<IDName> getCountryThatIsMorePopulatedThan(int countryID, int count) throws DBException {
         return genericIntStringCollectionFetcher(
                 addRandomLimitToQuery(String.format(
-                        "SELECT ID FROM COUNTRY WHERE POPULATION > (SELECT POPULATION FROM COUNTRY WHERE ID=%s)",
+                        "SELECT ID, NAME FROM COUNTRY WHERE POPULATION > (SELECT POPULATION FROM COUNTRY WHERE ID=%s)",
                         countryID), count)
         );
     }
@@ -876,7 +876,7 @@ public class DBConnection {
     public Collection<IDName> getCountryThatIsLessPopulatedThan(int countryID, int count) throws DBException {
         return genericIntStringCollectionFetcher(
                 addRandomLimitToQuery(
-                        String.format("SELECT ID FROM COUNTRY WHERE POPULATION < (SELECT POPULATION FROM COUNTRY WHERE ID=%s) AND POPULATION > 0", countryID), count
+                        String.format("SELECT ID, NAME FROM COUNTRY WHERE POPULATION < (SELECT POPULATION FROM COUNTRY WHERE ID=%s) AND POPULATION > 0", countryID), count
                 )
         );
     }
