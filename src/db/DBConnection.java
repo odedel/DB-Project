@@ -527,12 +527,12 @@ public class DBConnection {
     }
 
     public Collection<IDName> getAllCountries() throws DBException {
-        return genericIntStringCollectionFetcher("SELECT NAME FROM Country");
+        return genericIntStringCollectionFetcher("SELECT ID, NAME FROM Country");
     }
 
     public Collection<IDName> getRandomCountries(int count) throws DBException {
         return genericIntStringCollectionFetcher(
-                addRandomLimitToQuery("SELECT NAME FROM Country", count)
+                addRandomLimitToQuery("SELECT ID, NAME FROM Country", count)
         );
     }
 
@@ -868,7 +868,7 @@ public class DBConnection {
     public Collection<IDName> getCountryThatIsMorePopulatedThan(int CountryID, int count) throws DBException {
         return genericIntStringCollectionFetcher(
                 addRandomLimitToQuery(String.format(
-                        "SELECT ID FROM Country WHERE POPULATION > (SELECT POPULATION FROM Country WHERE ID=%s)",
+                        "SELECT ID, NAME FROM Country WHERE POPULATION > (SELECT POPULATION FROM Country WHERE ID=%s)",
                         CountryID), count)
         );
     }
@@ -876,14 +876,14 @@ public class DBConnection {
     public Collection<IDName> getCountryThatIsLessPopulatedThan(int CountryID, int count) throws DBException {
         return genericIntStringCollectionFetcher(
                 addRandomLimitToQuery(
-                        String.format("SELECT ID FROM Country WHERE POPULATION < (SELECT POPULATION FROM Country WHERE ID=%s) AND POPULATION > 0", CountryID), count
+                        String.format("SELECT ID, NAME FROM Country WHERE POPULATION < (SELECT POPULATION FROM Country WHERE ID=%s) AND POPULATION > 0", CountryID), count
                 )
         );
     }
 
     public Integer getTheOldestCountry(List<Integer> countriesList) throws DBException {
         return genericIntFetcher(
-          String.format("SELECT ID FROM Country WHERE ID IN %s ORDER BY CREATION_DATE ASC", listToStringForQuery(countriesList))
+                String.format("SELECT ID FROM Country WHERE ID IN %s ORDER BY CREATION_DATE ASC", listToStringForQuery(countriesList))
         );
     }
 
@@ -896,44 +896,54 @@ public class DBConnection {
         );
     }
 
-    public Collection<IDName> getCitiesNotIn(int Country_id, int count) throws DBException {
+    public IDName getCountryNotCreatedBetween(int afterCountry, int beforeCountry) throws DBException {
+        return genericIntStringFetcher(
+                addRandomLimitToQuery(
+                        String.format(
+                                "SELECT ID, NAME FROM Country WHERE NOT(CREATION_DATE > (SELECT CREATION_DATE FROM Country WHERE ID=%s) AND CREATION_DATE < (SELECT CREATION_DATE FROM Country WHERE ID=%s))", afterCountry, beforeCountry
+                        ), 1)
+        );
+    }
+
+
+    public Collection<IDName> getCitiesNotIn(int countryId, int count) throws DBException {
         return genericIntStringCollectionFetcher(
                 addRandomLimitToQuery(
-                    String.format("SELECT ID, NAME FROM City WHERE Country_ID != %s", Country_id),
+                    String.format("SELECT ID, NAME FROM City WHERE Country_ID != %s", countryId),
                         count)
         );
     }
 
-    public IDName getOldestCity(int Country_id) throws DBException {
+    public IDName getOldestCity(int countryId) throws DBException {
         return genericIntStringFetcher(
-                String.format("SELECT ID, NAME FROM City WHERE Country_ID=%s and CREATION_DATE is not null ORDER BY CREATION_DATE ASC LIMIT 1", Country_id)
+                String.format("SELECT ID, NAME FROM City WHERE Country_ID=%s and CREATION_DATE is not null ORDER BY CREATION_DATE ASC LIMIT 1", countryId)
         );
     }
 
-    public Collection<IDName> getOlderCityThan(int City_id, int count) throws DBException {
+    public Collection<IDName> getOlderCityThan(int cityId, int count) throws DBException {
         return genericIntStringCollectionFetcher(
-                addRandomLimitToQuery(String.format("SELECT ID, NAME FROM City WHERE CREATION_DATE > (SELECT CREATION_DATE FROM City WHERE ID=%s)", City_id), count)
+                addRandomLimitToQuery(String.format("SELECT ID, NAME FROM City WHERE CREATION_DATE > (SELECT CREATION_DATE FROM City WHERE ID=%s)", cityId), count)
         );
     }
 
-    public Collection<IDName> getOlderCityThanInTheSameCountry(int City_id, int count) throws DBException {
+    public Collection<IDName> getOlderCityThanInTheSameCountry(int cityId, int count) throws DBException {
         return genericIntStringCollectionFetcher(
-                addRandomLimitToQuery(String.format("SELECT ID, NAME FROM City WHERE Country_ID=(SELECT Country_ID FROM City WHERE ID=%s) AND CREATION_DATE > (SELECT CREATION_DATE FROM City WHERE ID=%s)", City_id, City_id), count)
+                addRandomLimitToQuery(String.format("SELECT ID, NAME FROM City WHERE Country_ID=(SELECT Country_ID FROM City WHERE ID=%s) AND CREATION_DATE > (SELECT CREATION_DATE FROM City WHERE ID=%s)", cityId, cityId), count)
         );
     }
 
-    public Collection<IDName> getPersonsByBirthCountry(int Country_id, int count) throws DBException {
+    public Collection<IDName> getPersonsByBirthCountry(int countryId, int count) throws DBException {
         return genericIntStringCollectionFetcher(
                 addRandomLimitToQuery(
-                        String.format("SELECT ID, NAME FROM Person WHERE BIRTH_City_ID IN (SELECT ID FROM City WHERE Country_ID=%s)", Country_id), count
+                        String.format("SELECT ID, NAME FROM Person WHERE BIRTH_City_ID IN (SELECT ID FROM City WHERE Country_ID=%s)", countryId), count
                 )
         );
     }
 
-    public Collection<IDName> getPersonsByNotBirthCountry(int Country_id, int count) throws DBException {
+    public Collection<IDName> getPersonsByNotBirthCountry(int countryId, int count) throws DBException {
         return genericIntStringCollectionFetcher(
                 addRandomLimitToQuery(
-                        String.format("SELECT ID, NAME FROM Person WHERE BIRTH_City_ID NOT IN (SELECT ID FROM City WHERE Country_ID=%s)", Country_id), count
+                        String.format("SELECT ID, NAME FROM Person WHERE BIRTH_City_ID NOT IN (SELECT ID FROM City WHERE Country_ID=%s)", countryId), count
                 )
         );
     }
