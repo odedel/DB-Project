@@ -928,13 +928,13 @@ public class DBConnection {
 
     public Collection<IDName> getNewerCityThan(int cityID, int count) throws DBException {
         return genericIntStringCollectionFetcher(
-                addRandomLimitToQuery(String.format("SELECT ID, NAME FROM CITY WHERE CREATION_DATE > (SELECT CREATION_DATE FROM City WHERE ID=%s)", cityID), count)
+                addRandomLimitToQuery(String.format("SELECT ID, NAME FROM City WHERE CREATION_DATE > (SELECT CREATION_DATE FROM City WHERE ID=%s)", cityID), count)
         );
     }
 
     public Collection<IDName> getOlderCityThanInTheSameCountry(int cityId, int count) throws DBException {
         return genericIntStringCollectionFetcher(
-                addRandomLimitToQuery(String.format("SELECT ID, NAME FROM City WHERE Country_ID=(SELECT Country_ID FROM City WHERE ID=%s) AND CREATION_DATE > (SELECT CREATION_DATE FROM City WHERE ID=%s)", cityId, cityId), count)
+                addRandomLimitToQuery(String.format("SELECT ID, NAME FROM City WHERE Country_ID=(SELECT Country_ID FROM City WHERE ID=%s) AND CREATION_DATE < (SELECT CREATION_DATE FROM City WHERE ID=%s)", cityId, cityId), count)
         );
     }
 
