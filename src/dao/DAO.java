@@ -65,29 +65,29 @@ public class DAO {
     }
 
     private void validateUserExists(int userID) throws EntityNotFound, DAOException {
-        if (!checkIfEntityExists("user", userID))
+        if (!checkIfEntityExists("User", userID))
             throw new EntityNotFound(String.format("User ID %s does not exists", userID));
     }
 
     private void validateCountryExists(int countryID) throws EntityNotFound, DAOException {
-        if (!checkIfEntityExists("country", countryID)) {
+        if (!checkIfEntityExists("Country", countryID)) {
             throw new EntityNotFound(String.format("Country ID %s does not exists", countryID));
         }
     }
     private void validateCountryExists(Collection<Integer> countryIDCollection) throws EntityNotFound, DAOException {
-        if (!checkIfEntityExists("country", countryIDCollection)) {
+        if (!checkIfEntityExists("Country", countryIDCollection)) {
             throw new EntityNotFound("One of the countries does not exists");
         }
     }
 
     private void validateCityExists(int cityID) throws EntityNotFound, DAOException {
-        if (!checkIfEntityExists("city", cityID)) {
+        if (!checkIfEntityExists("City", cityID)) {
             throw new EntityNotFound(String.format("City ID %s does not exists", cityID));
         }
     }
 
     private void validatePersonExists(int personID) throws EntityNotFound, DAOException {
-        if (!checkIfEntityExists("person", personID)) {
+        if (!checkIfEntityExists("Person", personID)) {
             throw new EntityNotFound(String.format("Person ID %s does not exists", personID));
         }
     }

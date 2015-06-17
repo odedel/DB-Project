@@ -444,7 +444,7 @@ public class DBConnection {
     public int createUser(String user, String password) throws DBException {
         ResultSet rs = null;
         try (Statement stmt = conn.createStatement()) {
-            stmt.executeUpdate(String.format("INSERT INTO USER(name, password) VALUES ('%s', '%s')", user, password), new String[] { "ID" });
+            stmt.executeUpdate(String.format("INSERT INTO User(name, password) VALUES ('%s', '%s')", user, password), new String[] { "ID" });
 
             rs = stmt.getGeneratedKeys();
             rs.next();
@@ -463,45 +463,45 @@ public class DBConnection {
     }
 
     public Collection<String> getUserID(String name) throws DBException {
-        return genericStringCollectionFetcher(String.format("SELECT ID FROM USER WHERE NAME='%s'", name));
+        return genericStringCollectionFetcher(String.format("SELECT ID FROM User WHERE NAME='%s'", name));
     }
 
     public int checkPassword(int userID, String givenPassword) throws DBException {
-        return genericIntFetcher(String.format("SELECT '%s' = password FROM user WHERE ID=%s", givenPassword, userID));
+        return genericIntFetcher(String.format("SELECT '%s' = password FROM User WHERE ID=%s", givenPassword, userID));
     }
 
     public Integer getUserAnsweredCorrectly(int userID) throws DBException {
         return genericIntFetcher(
-                String.format("SELECT number_of_correct_answers FROM USER WHERE ID=%s", userID));
+                String.format("SELECT number_of_correct_answers FROM User WHERE ID=%s", userID));
     }
 
     public void setUserAnsweredCorrectly(int userID, int number) throws DBException {
         genericUpdater(
-                String.format("UPDATE USER SET number_of_correct_answers=%s WHERE ID=%s", number, userID)
+                String.format("UPDATE User SET number_of_correct_answers=%s WHERE ID=%s", number, userID)
         );
     }
 
     public Integer getUserAnsweredWrong(int userID) throws DBException {
         return genericIntFetcher(
-                String.format("SELECT number_of_wrong_answers FROM USER WHERE ID=%s", userID)
+                String.format("SELECT number_of_wrong_answers FROM User WHERE ID=%s", userID)
         );
     }
 
     public void setUserAnsweredWrong(int userID, int number) throws DBException {
         genericUpdater(
-                String.format("UPDATE USER SET number_of_wrong_answers=%s WHERE ID=%s", number, userID)
+                String.format("UPDATE User SET number_of_wrong_answers=%s WHERE ID=%s", number, userID)
         );
     }
 
     public Integer setUserStartedNewGame(int userID) throws DBException {
         return genericIntFetcher(
-                String.format("SELECT number_of_games_played FROM USER WHERE ID=%s", userID)
+                String.format("SELECT number_of_games_played FROM User WHERE ID=%s", userID)
         );
     }
 
     public void setUserStartedNewGame(int userID, int number) throws DBException {
         genericUpdater(
-                String.format("UPDATE USER SET number_of_games_played=%s WHERE ID=%s", number, userID)
+                String.format("UPDATE User SET number_of_games_played=%s WHERE ID=%s", number, userID)
         );
     }
 
@@ -824,7 +824,7 @@ public class DBConnection {
     }
 
     public Collection<String> getUserName(int id) throws DBException {
-        return genericStringCollectionFetcher("SELECT NAME FROM USER WHERE ID=" + id);
+        return genericStringCollectionFetcher("SELECT NAME FROM User WHERE ID=" + id);
     }
 
     public Date getCountryCreationDate(int CountryID) throws DBException {
@@ -928,7 +928,7 @@ public class DBConnection {
 
     public Collection<IDName> getNewerCityThan(int cityID, int count) throws DBException {
         return genericIntStringCollectionFetcher(
-                addRandomLimitToQuery(String.format("SELECT ID, NAME FROM CITY WHERE CREATION_DATE > (SELECT CREATION_DATE FROM CITY WHERE ID=%s)", cityID), count)
+                addRandomLimitToQuery(String.format("SELECT ID, NAME FROM CITY WHERE CREATION_DATE > (SELECT CREATION_DATE FROM City WHERE ID=%s)", cityID), count)
         );
     }
 
@@ -1030,12 +1030,12 @@ public class DBConnection {
 
 
     public List<UserIDScoreDate> getTopScore(int howMany) throws DBException {
-        return genericIDScoreDateFetcher("SELECT USER_ID, SCORE, DATE FROM SCORE ORDER BY SCORE DESC LIMIT " + howMany);
+        return genericIDScoreDateFetcher("SELECT USER_ID, SCORE, DATE FROM Score ORDER BY SCORE DESC LIMIT " + howMany);
 
     }
 
     public List<UserIDScoreDate> getTopScoreByUser(int userID, int howMany) throws DBException {
-        return genericIDScoreDateFetcher(String.format("SELECT USER_ID, SCORE, DATE  FROM SCORE WHERE USER_ID='%s' ORDER BY SCORE DESC LIMIT %s", userID, howMany));
+        return genericIDScoreDateFetcher(String.format("SELECT USER_ID, SCORE, DATE  FROM Score WHERE USER_ID='%s' ORDER BY SCORE DESC LIMIT %s", userID, howMany));
     }
 
     private List<UserIDScoreDate> genericIDScoreDateFetcher(String select) throws DBException {
