@@ -995,7 +995,7 @@ public class DBConnection {
     }
 
     public List<IDName> getTwoBusinessesThatOneOfEachOneCreatorLearnedInTheSameCountryAsTheOtherOne(int CountryID) throws DBException {
-        String query = String.format("SELECT B1.id, B1.name, B2.id, B2.name FROM Business B1, Business B2, Business_creator_relation bcr1, University_Person_relation upr1, University_Country_relation ucr1, University_Country_relation ucr2, Business_creator_relation bcr2, University_Person_relation upr2 WHERE B1.id != B2.id AND b1.id=bcr1.Business_id and bcr1.creator_id=upr1.Person_id and upr1.University_id = ucr1.University_id AND b2.id=bcr2.Business_id and bcr2.creator_id=upr2.Person_id and upr2.University_id = ucr2.University_id and ucr1.Country_id=ucr2.Country_id and ucr1.Country_id=%s ORDER BY RAND() LIMIT 1", CountryID);
+        String query = String.format("SELECT B1.id, B1.name, B2.id, B2.name FROM Business B1, Business B2, Business_Creator_Relation bcr1, University_Person_Relation upr1, University_Country_Relation ucr1, University_Country_Relation ucr2, Business_Creator_Relation bcr2, University_Person_Relation upr2 WHERE B1.id != B2.id AND B1.id=bcr1.Business_id and bcr1.creator_id=upr1.Person_id and upr1.University_id = ucr1.University_id AND B2.id=bcr2.Business_id and bcr2.creator_id=upr2.Person_id and upr2.University_id = ucr2.University_id and ucr1.Country_id=ucr2.Country_id and ucr1.Country_id=254 ORDER BY RAND() LIMIT 1", CountryID);
 
         try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
@@ -1012,7 +1012,7 @@ public class DBConnection {
     }
 
     public List<IDName> getTwoBusinessesThatThereIsNotOneOfEachOneCreatorLearnedInTheSameCountryAsTheOtherOne(int CountryID) throws DBException {
-        String query = String.format("SELECT B1.id, B1.name, B2.id, B2.name FROM Business B1, Business B2, Business_creator_relation bcr1, University_Person_relation upr1, University_Country_relation ucr1, University_Country_relation ucr2, Business_creator_relation bcr2, University_Person_relation upr2 WHERE B1.id != B2.id AND b1.id=bcr1.Business_id and bcr1.creator_id=upr1.Person_id and upr1.University_id = ucr1.University_id AND b2.id=bcr2.Business_id and bcr2.creator_id=upr2.Person_id and upr2.University_id = ucr2.University_id and ucr1.Country_id!=ucr2.Country_id and ucr1.Country_id=%s ORDER BY RAND() LIMIT 1", CountryID);
+        String query = String.format("SELECT B1.id, B1.name, B2.id, B2.name FROM Business B1, Business B2, Business_Creator_Relation bcr1, University_Person_Relation upr1, University_Country_Relation ucr1, University_Country_Relation ucr2, Business_Creator_Relation bcr2, University_Person_Relation upr2 WHERE B1.id != B2.id AND B1.id=bcr1.Business_id and bcr1.creator_id=upr1.Person_id and upr1.University_id = ucr1.University_id AND B2.id=bcr2.Business_id and bcr2.creator_id=upr2.Person_id and upr2.University_id = ucr2.University_id and ucr1.Country_id!=ucr2.Country_id and ucr1.Country_id=%s ORDER BY RAND() LIMIT 1", CountryID);
 
         try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
