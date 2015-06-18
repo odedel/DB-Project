@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Random;
 
 import utils.DataNotFoundException;
@@ -24,19 +25,18 @@ public class QuestionFactory {
 
 	public Question createNewQuestion(IDName strFavCountry) throws DAOException, DataNotFoundException, EntityNotFound
 	{
-		int nRand;
+		int nRand = 1;
 		Random random = new Random();
 		
 		//this check if the current question is on specific country for the player
 		if(strFavCountry == null)
 		{
-			// 
+			strFavCountry = (IDName) this.access.getRandomCountries(1).toArray()[0];
 			nRand = random.nextInt(NUMBER_OF_QUESTIONS_WITH_COUNTRY - 1) + 1;
 		}
 		//
 		else
 		{
-			strFavCountry = (IDName) this.access.getRandomCountries(1).toArray()[0];
 			nRand = random.nextInt(NUMBER_OF_QUESTIONS - 1) + 1;
 		}
 		
@@ -142,7 +142,7 @@ public class QuestionFactory {
 	public Question popQues(IDName country) throws DAOException, DataNotFoundException, EntityNotFound
 	{
 		int answer1, answer2, answer3;
-		ArrayList<IDName> countries = (ArrayList<IDName>) this.access.getRandomCountries(3);
+		HashSet<IDName> countries = (HashSet<IDName>) this.access.getRandomCountries(3);
 		int nAnswer = this.access.getNumberOfPeopleInCountry(country.getId());
 		answer1 = this.access.getNumberOfPeopleInCountry(((IDName)countries.toArray()[0]).getId());
 		answer2 = this.access.getNumberOfPeopleInCountry(((IDName)countries.toArray()[1]).getId());
@@ -155,7 +155,7 @@ public class QuestionFactory {
 	public Question CreateDateQues(IDName country) throws DAOException, DataNotFoundException, EntityNotFound
 	{
 		Date answer1, answer2, answer3;
-		ArrayList<IDName> countries = (ArrayList<IDName>) this.access.getRandomCountries(3);
+		HashSet<IDName> countries = (HashSet<IDName>) this.access.getRandomCountries(3);
 		Date nAnswer = this.access.getCreationDate(country.getId());
 		answer1 = this.access.getCreationDate(((IDName)countries.toArray()[0]).getId());
 		answer2 = this.access.getCreationDate(((IDName)countries.toArray()[1]).getId());
@@ -168,8 +168,8 @@ public class QuestionFactory {
 	public Question CityInCountryQues(IDName country) throws DAOException, DataNotFoundException, EntityNotFound
 	{
 		IDName answer1, answer2, answer3;
-		ArrayList<IDName> cities = (ArrayList<IDName>) this.access.getRandomCitiesByCountry(country.getId(), 3);
-		IDName nAnswer = (IDName) this.access.getRansomCitiesNotInCountry(country.getId(), 1).toArray()[0];
+		HashSet<IDName> cities = (HashSet<IDName>) this.access.getRansomCitiesNotInCountry(country.getId(), 3);
+		IDName nAnswer = (IDName) this.access.getRandomCitiesByCountry(country.getId(), 1).toArray()[0];
 		answer1 = (IDName) cities.toArray()[0];
 		answer2 = (IDName) cities.toArray()[1];
 		answer3 = (IDName) cities.toArray()[2];
@@ -181,8 +181,8 @@ public class QuestionFactory {
 	public Question CityNotInCountryQues(IDName country) throws DAOException, DataNotFoundException, EntityNotFound
 	{
 		IDName answer1, answer2, answer3;
-		ArrayList<IDName> cities = (ArrayList<IDName>) this.access.getRansomCitiesNotInCountry(country.getId(), 3);
-		IDName nAnswer = (IDName) this.access.getRandomCitiesByCountry(country.getId(), 1).toArray()[0];
+		HashSet<IDName> cities = (HashSet<IDName>) this.access.getRandomCitiesByCountry(country.getId(), 3);
+		IDName nAnswer = (IDName) this.access.getRansomCitiesNotInCountry(country.getId(), 1).toArray()[0];
 		answer1 = (IDName) cities.toArray()[0];
 		answer2 = (IDName) cities.toArray()[1];
 		answer3 = (IDName) cities.toArray()[2];
@@ -194,7 +194,7 @@ public class QuestionFactory {
 	public Question OldestCityInCountryQues(IDName country) throws DAOException, DataNotFoundException, EntityNotFound
 	{
 		IDName answer1, answer2, answer3;
-		ArrayList<IDName> cities = (ArrayList<IDName>) this.access.getRandomCitiesByCountry(country.getId(), 3);
+		HashSet<IDName> cities = (HashSet<IDName>) this.access.getRandomCitiesByCountry(country.getId(), 3);
 		IDName nAnswer = (IDName) this.access.getOldestCity(country.getId());
 		answer1 = (IDName) cities.toArray()[0];
 		answer2 = (IDName) cities.toArray()[1];
@@ -207,7 +207,7 @@ public class QuestionFactory {
 	public Question PersonBornInCountryQues(IDName country) throws DAOException, DataNotFoundException, EntityNotFound
 	{
 		IDName answer1, answer2, answer3;
-		ArrayList<IDName> persons = (ArrayList<IDName>) this.access.getRandomPersonsBornInCountry(country.getId(), 3);
+		HashSet<IDName> persons = (HashSet<IDName>) this.access.getRandomPersonsBornInCountry(country.getId(), 3);
 		IDName nAnswer = (IDName) this.access.getRandomPersonsNotBornInCountry(country.getId(),1).toArray()[0];
 		answer1 = (IDName) persons.toArray()[0];
 		answer2 = (IDName) persons.toArray()[1];
@@ -220,7 +220,7 @@ public class QuestionFactory {
 	public Question PersonNotInCountryQues(IDName country) throws DAOException, DataNotFoundException, EntityNotFound
 	{
 		IDName answer1, answer2, answer3;
-		ArrayList<IDName> persons = (ArrayList<IDName>) this.access.getRandomPersonsBornInCountry(country.getId(), 3);
+		HashSet<IDName> persons = (HashSet<IDName>) this.access.getRandomPersonsBornInCountry(country.getId(), 3);
 		IDName nAnswer = (IDName) this.access.getRandomPersonsNotBornInCountry(country.getId(), 1).toArray()[0];
 		answer1 = (IDName) persons.toArray()[0];
 		answer2 = (IDName) persons.toArray()[1];
@@ -233,7 +233,7 @@ public class QuestionFactory {
 	public Question WhereWasBornQues(IDName country) throws DAOException, DataNotFoundException, EntityNotFound
 	{
 		IDName answer1, answer2, answer3;
-		ArrayList<IDName> persons = (ArrayList<IDName>) this.access.getRandomPersonsBornInCountry(country.getId(), 4);
+		HashSet<IDName> persons = (HashSet<IDName>) this.access.getRandomPersonsBornInCountry(country.getId(), 4);
 		IDName nAnswer = this.access.getBirthCity(((IDName) persons.toArray()[0]).getId());
 		answer1 = this.access.getBirthCity(((IDName) persons.toArray()[1]).getId());
 		answer2 = this.access.getBirthCity(((IDName) persons.toArray()[2]).getId());
@@ -245,8 +245,8 @@ public class QuestionFactory {
 	
 	public Question BornInSameCountryAsQues(IDName country) throws DAOException, DataNotFoundException, EntityNotFound
 	{
-		ArrayList<IDName> person = (ArrayList<IDName>) this.access.getRandomPersonsBornInCountry(country.getId(), 2);
-		ArrayList<IDName> personNot = (ArrayList<IDName>) this.access.getPersonsNotBornInSameCountry(((IDName) person.toArray()[0]).getId(), 3);
+		HashSet<IDName> person = (HashSet<IDName>) this.access.getRandomPersonsBornInCountry(country.getId(), 2);
+		HashSet<IDName> personNot = (HashSet<IDName>) this.access.getPersonsNotBornInSameCountry(((IDName) person.toArray()[0]).getId(), 3);
 		
 		IDName nAnswer = (IDName) person.toArray()[0];
 
@@ -259,8 +259,8 @@ public class QuestionFactory {
 	
 	public Question BornNotInSameCountryAsQues(IDName country) throws DAOException, DataNotFoundException, EntityNotFound
 	{
-		ArrayList<IDName> person = (ArrayList<IDName>) this.access.getRandomPersonsBornInCountry(country.getId(), 4);
-		ArrayList<IDName> personNot = (ArrayList<IDName>) this.access.getPersonsNotBornInSameCountry(((IDName) person.toArray()[0]).getId(), 1);
+		HashSet<IDName> person = (HashSet<IDName>) this.access.getRandomPersonsBornInCountry(country.getId(), 4);
+		HashSet<IDName> personNot = (HashSet<IDName>) this.access.getPersonsNotBornInSameCountry(((IDName) person.toArray()[0]).getId(), 1);
 		
 		IDName nAnswer = (IDName) personNot.toArray()[0];
 
@@ -274,7 +274,7 @@ public class QuestionFactory {
 	public Question WhenBornQues(IDName country) throws DAOException, DataNotFoundException, EntityNotFound
 	{
 		Date answer1, answer2, answer3;
-		ArrayList<IDName> person = (ArrayList<IDName>) this.access.getRandomPersonsBornInCountry(country.getId(), 4);
+		HashSet<IDName> person = (HashSet<IDName>) this.access.getRandomPersonsBornInCountry(country.getId(), 4);
 		
 		Date nAnswer = this.access.getPersonBirthDate(((IDName) person.toArray()[0]).getId());
 		answer1 = this.access.getPersonBirthDate(((IDName) person.toArray()[1]).getId());
@@ -293,7 +293,7 @@ public class QuestionFactory {
 		IDName answer1, answer2, answer3, city;
 		city = (IDName) this.access.getRandomCitiesByCountry(country.getId(), 1).toArray()[0];
 		IDName nAnswer = (IDName) this.access.getOlderCityThan(country.getId(), 1);
-		ArrayList<IDName> cities = (ArrayList<IDName>) this.access.getNewerCityThan(country.getId(), 3);
+		HashSet<IDName> cities = (HashSet<IDName>) this.access.getNewerCityThan(country.getId(), 3);
 		answer1 = (IDName) cities.toArray()[0];
 		answer2 = (IDName) cities.toArray()[1];
 		answer3 = (IDName) cities.toArray()[2];
@@ -307,7 +307,7 @@ public class QuestionFactory {
 		IDName answer1, answer2, answer3, city;
 		city = (IDName) this.access.getRandomCitiesByCountry(country.getId(), 1).toArray()[0];
 		IDName nAnswer = (IDName) this.access.getNewerCityThan(country.getId(), 1);
-		ArrayList<IDName> cities = (ArrayList<IDName>) this.access.getOlderCityThan(country.getId(), 3);
+		HashSet<IDName> cities = (HashSet<IDName>) this.access.getOlderCityThan(country.getId(), 3);
 		answer1 = (IDName) cities.toArray()[0];
 		answer2 = (IDName) cities.toArray()[1];
 		answer3 = (IDName) cities.toArray()[2];
@@ -320,7 +320,7 @@ public class QuestionFactory {
 	public Question BornLastQues(IDName country) throws DAOException, DataNotFoundException, EntityNotFound
 	{
 		IDName answer1, answer2, answer3;
-		ArrayList<IDName> person = (ArrayList<IDName>) this.access.getPersonsOrderByBirthDate(country.getId(), 4);
+		HashSet<IDName> person = (HashSet<IDName>) this.access.getPersonsOrderByBirthDate(country.getId(), 4);
 		
 		IDName nAnswer = ((IDName)person.toArray()[0]);
 		answer1 = ((IDName)person.toArray()[1]);
@@ -338,7 +338,7 @@ public class QuestionFactory {
 	public Question BornfirstQues(IDName country) throws DAOException, DataNotFoundException, EntityNotFound
 	{
 		IDName answer1, answer2, answer3;
-		ArrayList<IDName> person = (ArrayList<IDName>) this.access.getPersonsOrderByBirthDate(country.getId(), 4);
+		HashSet<IDName> person = (HashSet<IDName>) this.access.getPersonsOrderByBirthDate(country.getId(), 4);
 		
 		IDName nAnswer = ((IDName)person.toArray()[3]);
 		answer1 = ((IDName)person.toArray()[1]);
@@ -358,7 +358,7 @@ public class QuestionFactory {
 		String[] answers = new String[3];
 		String answerRight = "";
 		int k = 0;
-		ArrayList<IDName> countries = (ArrayList<IDName>) this.access.getRandomCountries(4);
+		HashSet<IDName> countries = (HashSet<IDName>) this.access.getRandomCountries(4);
 		ArrayList<Integer> ids = new ArrayList<Integer>();
 		
 		//Convert to ids
@@ -390,7 +390,7 @@ public class QuestionFactory {
 		String[] answers = new String[3];
 		String answerRight = "";
 		int k = 0;
-		ArrayList<IDName> countries = (ArrayList<IDName>) this.access.getRandomCountries(4);
+		HashSet<IDName> countries = (HashSet<IDName>) this.access.getRandomCountries(4);
 		//
 		ArrayList<Integer> ids = new ArrayList<Integer>();
 		
@@ -419,9 +419,9 @@ public class QuestionFactory {
 	public Question MorepopQues() throws DAOException, DataNotFoundException, EntityNotFound
 	{
 
-		ArrayList<IDName> country = (ArrayList<IDName>) this.access.getRandomCountries(1);
-		ArrayList<IDName> countries = (ArrayList<IDName>) this.access.getCountryThatIsMorePopulatedThan(((IDName)country.toArray()[0]).getId(),1);
-		ArrayList<IDName> countriesNot = (ArrayList<IDName>) this.access.getCountryThatIsLessPopulatedThan(((IDName)country.toArray()[0]).getId(),3);
+		HashSet<IDName> country = (HashSet<IDName>) this.access.getRandomCountries(1);
+		HashSet<IDName> countries = (HashSet<IDName>) this.access.getCountryThatIsMorePopulatedThan(((IDName)country.toArray()[0]).getId(),1);
+		HashSet<IDName> countriesNot = (HashSet<IDName>) this.access.getCountryThatIsLessPopulatedThan(((IDName)country.toArray()[0]).getId(),3);
 		
 		return(new Question("Which country is more populated than"+ ((IDName)country.toArray()[0]).getName(), 
 				((IDName)countries.toArray()[0]).getName(),
@@ -432,9 +432,9 @@ public class QuestionFactory {
 	
 	public Question LesspopQues() throws DAOException, DataNotFoundException, EntityNotFound
 	{
-		ArrayList<IDName> country = (ArrayList<IDName>) this.access.getRandomCountries(1);
-		ArrayList<IDName> countries = (ArrayList<IDName>) this.access.getCountryThatIsLessPopulatedThan(((IDName)country.toArray()[0]).getId(),1);
-		ArrayList<IDName> countriesNot = (ArrayList<IDName>) this.access.getCountryThatIsMorePopulatedThan(((IDName)country.toArray()[0]).getId(),3);
+		HashSet<IDName> country = (HashSet<IDName>) this.access.getRandomCountries(1);
+		HashSet<IDName> countries = (HashSet<IDName>) this.access.getCountryThatIsLessPopulatedThan(((IDName)country.toArray()[0]).getId(),1);
+		HashSet<IDName> countriesNot = (HashSet<IDName>) this.access.getCountryThatIsMorePopulatedThan(((IDName)country.toArray()[0]).getId(),3);
 		
 		return(new Question("Which country is Less populated than"+ ((IDName)country.toArray()[0]).getName(), 
 				((IDName)countries.toArray()[0]).getName(),
@@ -448,7 +448,7 @@ public class QuestionFactory {
 		String[] answers = new String[3];
 		String answerRight = "";
 		int k = 0;
-		ArrayList<IDName> countries = (ArrayList<IDName>) this.access.getRandomCountries(4);
+		HashSet<IDName> countries = (HashSet<IDName>) this.access.getRandomCountries(4);
 		ArrayList<Integer> ids = new ArrayList<Integer>();
 		
 		for (int i = 0; i < 4; i++)
@@ -476,8 +476,8 @@ public class QuestionFactory {
 	
 	public Question CreateBeforeAndAfterCountryQues() throws DAOException, DataNotFoundException, EntityNotFound
 	{
-		ArrayList<IDName> Beforecountry = (ArrayList<IDName>) this.access.getRandomCountries(1);
-		ArrayList<IDName> Aftercountry = (ArrayList<IDName>) this.access.getRandomCountries(1);
+		HashSet<IDName> Beforecountry = (HashSet<IDName>) this.access.getRandomCountries(1);
+		HashSet<IDName> Aftercountry = (HashSet<IDName>) this.access.getRandomCountries(1);
 		ArrayList<IDName> countries =  new ArrayList<IDName>();
 		IDName answer, temp;
 		
