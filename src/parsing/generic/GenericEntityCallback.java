@@ -1,6 +1,6 @@
-package collect_data.generic;
+package parsing.generic;
 
-import collect_data.util.Row;
+import parsing.util.Row;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

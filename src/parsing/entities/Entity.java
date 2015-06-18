@@ -1,4 +1,4 @@
-package collect_data.entities;
+package parsing.entities;
 
 public class Entity {
 

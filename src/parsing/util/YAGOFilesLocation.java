@@ -1,4 +1,4 @@
-package collect_data.util;
+package parsing.util;
 
 
 public class YAGOFilesLocation {

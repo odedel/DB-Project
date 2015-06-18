@@ -1,7 +1,7 @@
-package db;
+package db.core;
 
-import collect_data.entities.*;
-import collect_data.util.Utils;
+import parsing.entities.*;
+import parsing.util.Utils;
 import utils.DBUser;
 import utils.IDName;
 import utils.UserIDScoreDate;

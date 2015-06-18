@@ -1,14 +1,13 @@
-package collect_data;
+package parsing;
 
-import collect_data.entities.*;
-import collect_data.generic.Callback;
-import collect_data.generic.GenericCallback;
-import collect_data.generic.GenericEntityCallback;
-import collect_data.generic.GenericObjectLinkCallback;
-import collect_data.util.*;
+import parsing.entities.*;
+import parsing.generic.Callback;
+import parsing.generic.GenericCallback;
+import parsing.generic.GenericEntityCallback;
+import parsing.generic.GenericObjectLinkCallback;
+import parsing.util.*;
 
 import java.io.IOException;
-import java.sql.SQLOutput;
 import java.util.*;
 import java.util.stream.Collectors;
 

@@ -1,8 +1,8 @@
-package dao;
+package db.dao;
 
-import collect_data.DataCollector;
-import db.DBConnection;
-import db.DBException;
+import parsing.DataCollector;
+import db.core.DBConnection;
+import db.core.DBException;
 import utils.*;
 
 import java.sql.Date;

@@ -1,9 +1,9 @@
 package main;
 
-import collect_data.DataCollector;
-import collect_data.entities.*;
-import dao.DAO;
-import dao.DAOException;
+import parsing.DataCollector;
+import parsing.entities.*;
+import db.dao.DAO;
+import db.dao.DAOException;
 import utils.DBUser;
 
 import java.io.IOException;

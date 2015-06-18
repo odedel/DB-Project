@@ -1,10 +1,8 @@
 package main;
 
-import dao.DAO;
+import db.dao.DAO;
 import utils.DBUser;
-import utils.UserIDScoreDate;
-
-import java.util.Date;
+import utils.IDName;
 
 public class Check {
 
@@ -13,7 +11,13 @@ public class Check {
 
         dao.connect(DBUser.MODIFIER);
 
-        System.out.println(dao.getOlderCityThan(117756, 2));
+        System.out.println(dao.getPersonBirthDate(32596));
+
+        for(IDName x : dao.getTwoBusinessesThatThereIsNotOneOfEachOneCreatorLearnedInTheSameCountryAsTheOtherOne(254)) {
+            System.out.println(x.getId() + " " + x.getName());
+        }
+
+
 
         dao.disconnect();
     }

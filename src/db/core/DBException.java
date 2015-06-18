@@ -1,4 +1,4 @@
-package db;
+package db.core;
 
 /**
  * Created by Oded on 09/05/2015.
