@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Random;
 
 import utils.DataNotFoundException;
@@ -24,19 +25,18 @@ public class QuestionFactory {
 
 	public Question createNewQuestion(IDName strFavCountry) throws DAOException, DataNotFoundException, EntityNotFound
 	{
-		int nRand;
+		int nRand = 1;
 		Random random = new Random();
 		
 		//this check if the current question is on specific country for the player
 		if(strFavCountry == null)
 		{
-			// 
-			nRand = random.nextInt(NUMBER_OF_QUESTIONS_WITH_COUNTRY - 1) + 1;
+			strFavCountry = (IDName) this.access.getRandomCountries(1).toArray()[0];
+			//nRand = random.nextInt(NUMBER_OF_QUESTIONS_WITH_COUNTRY - 1) + 1;
 		}
 		//
 		else
 		{
-			strFavCountry = (IDName) this.access.getRandomCountries(1).toArray()[0];
 			nRand = random.nextInt(NUMBER_OF_QUESTIONS - 1) + 1;
 		}
 		
@@ -142,7 +142,7 @@ public class QuestionFactory {
 	public Question popQues(IDName country) throws DAOException, DataNotFoundException, EntityNotFound
 	{
 		int answer1, answer2, answer3;
-		ArrayList<IDName> countries = (ArrayList<IDName>) this.access.getRandomCountries(3);
+		HashSet<IDName> countries = (HashSet<IDName>) this.access.getRandomCountries(3);
 		int nAnswer = this.access.getNumberOfPeopleInCountry(country.getId());
 		answer1 = this.access.getNumberOfPeopleInCountry(((IDName)countries.toArray()[0]).getId());
 		answer2 = this.access.getNumberOfPeopleInCountry(((IDName)countries.toArray()[1]).getId());
