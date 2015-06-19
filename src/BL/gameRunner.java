@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.jws.soap.SOAPBinding.Use;
+
 import utils.*;
 import db.dao.DAO;
 import db.dao.DAOException;
@@ -242,7 +244,7 @@ public class gameRunner {
 		return(this.access.getTopScore(10));
 	}
 	
-	public void createNextQues(IDName strFavCountry) throws Exception
+	private void createNextQues(IDName strFavCountry) throws Exception
 	{
 		int nCountOferror = 0;
 		boolean isFinished;
@@ -264,7 +266,7 @@ public class gameRunner {
 					isFinished = true;
 				}
 			}
-			// catch, if
+			// catch, error to try again
 			catch(EntityNotFound e)
 			{
 				nCountOferror++;
@@ -279,5 +281,11 @@ public class gameRunner {
 		{
 			throw new Exception("error - cannot create a question");
 		}
+	}
+	
+	//This function is for PASS - for the project tester - won't count worng ansewer
+	public void passQuestion() throws Exception
+	{
+		createNextQues(this.currentPlayer.getFavCountry());
 	}
 }

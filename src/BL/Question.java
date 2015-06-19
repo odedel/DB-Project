@@ -32,7 +32,6 @@ public class Question {
 		Collections.shuffle(ls);
 		
 		return ls;
-		
 	}
 	
 	public String getQuestion()

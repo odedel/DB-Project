@@ -148,7 +148,7 @@ public class QuestionFactory {
 		answer2 = this.access.getNumberOfPeopleInCountry(((IDName)countries.toArray()[1]).getId());
 		answer3 = this.access.getNumberOfPeopleInCountry(((IDName)countries.toArray()[2]).getId());
 		
-		return(new Question("How many people lives in" + country.getName(), 
+		return(new Question("How many people lives in " + country.getName(), 
 							Integer.toString(nAnswer), Integer.toString(answer1), Integer.toString(answer2), Integer.toString(answer3)));
 	}
 	
@@ -187,7 +187,7 @@ public class QuestionFactory {
 		answer2 = (IDName) cities.toArray()[1];
 		answer3 = (IDName) cities.toArray()[2];
 		
-		return(new Question("Which city is not in" + country.getName(), 
+		return(new Question("Which city is not in " + country.getName(), 
 							nAnswer.getName().toString(), answer1.getName().toString(), answer2.getName().toString(), answer3.getName().toString()));
 	}
 	
@@ -200,7 +200,7 @@ public class QuestionFactory {
 		answer2 = (IDName) cities.toArray()[1];
 		answer3 = (IDName) cities.toArray()[2];
 		
-		return(new Question("What is the oldest city in" + country.getName(), 
+		return(new Question("What is the oldest city in " + country.getName(), 
 							nAnswer.getName().toString(), answer1.getName().toString(), answer2.getName().toString(), answer3.getName().toString()));
 	}
 	
@@ -213,7 +213,7 @@ public class QuestionFactory {
 		answer2 = (IDName) persons.toArray()[1];
 		answer3 = (IDName) persons.toArray()[2];
 		
-		return(new Question("Which person born in" + country.getName(), 
+		return(new Question("Which person born in " + country.getName(), 
 							nAnswer.getName().toString(), answer1.getName().toString(), answer2.getName().toString(), answer3.getName().toString()));
 	}
 	
@@ -226,7 +226,7 @@ public class QuestionFactory {
 		answer2 = (IDName) persons.toArray()[1];
 		answer3 = (IDName) persons.toArray()[2];
 		
-		return(new Question("Which person lives in other country than the other three", 
+		return(new Question("Which person lives in other country than the other three ", 
 							nAnswer.getName().toString(), answer1.getName().toString(), answer2.getName().toString(), answer3.getName().toString()));
 	}
 	
@@ -250,7 +250,7 @@ public class QuestionFactory {
 		
 		IDName nAnswer = (IDName) person.toArray()[0];
 
-		return(new Question("Which person was born in the same country as" +((IDName) person.toArray()[1]).getName() +"?", 
+		return(new Question("Which person was born in the same country as " +((IDName) person.toArray()[1]).getName() +" ?", 
 							nAnswer.getName().toString(), 
 							((IDName)personNot.toArray()[0]).getName().toString(), 
 							((IDName)personNot.toArray()[1]).getName().toString(), 
@@ -264,7 +264,7 @@ public class QuestionFactory {
 		
 		IDName nAnswer = (IDName) personNot.toArray()[0];
 
-		return(new Question("Which person was not born in the same country as " +((IDName) person.toArray()[1]).getName() +"?", 
+		return(new Question("Which person was not born in the same country as " +((IDName) person.toArray()[1]).getName() +" ?", 
 							nAnswer.getName().toString(), 
 							((IDName)person.toArray()[1]).getName().toString(), 
 							((IDName)person.toArray()[2]).getName().toString(), 
@@ -298,7 +298,7 @@ public class QuestionFactory {
 		answer2 = (IDName) cities.toArray()[1];
 		answer3 = (IDName) cities.toArray()[2];
 		
-		return(new Question("Which city is older then ? " + city.getName(), 
+		return(new Question("Which city is older then " + city.getName() +" ?", 
 							nAnswer.getName().toString(), answer1.getName().toString(), answer2.getName().toString(), answer3.getName().toString()));
 	}
 	
@@ -312,7 +312,7 @@ public class QuestionFactory {
 		answer2 = (IDName) cities.toArray()[1];
 		answer3 = (IDName) cities.toArray()[2];
 		
-		return(new Question("Which city is older then ? " + city.getName(), 
+		return(new Question("Which city is newer then  " + city.getName() + " ?", 
 							nAnswer.getName().toString(), answer1.getName().toString(), answer2.getName().toString(), answer3.getName().toString()));
 	}
 	
@@ -327,7 +327,7 @@ public class QuestionFactory {
 		answer2 = ((IDName)person.toArray()[2]);
 		answer3 = ((IDName)person.toArray()[3]);
 
-		return(new Question("Who was born last", 
+		return(new Question("Who was born last ?", 
 							nAnswer.getName(), 
 							answer1.getName(), 
 							answer2.getName(), 
@@ -345,7 +345,7 @@ public class QuestionFactory {
 		answer2 = ((IDName)person.toArray()[2]);
 		answer3 = ((IDName)person.toArray()[0]);
 
-		return(new Question("Who was born first", 
+		return(new Question("Who was born first ?", 
 							nAnswer.getName(), 
 							answer1.getName(), 
 							answer2.getName(), 
