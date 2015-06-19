@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Random;
 
 import utils.DataNotFoundException;
@@ -336,7 +337,7 @@ public class QuestionFactory {
 	public Question BornLastQues(IDName country) throws DAOException, DataNotFoundException, EntityNotFound
 	{
 		IDName answer1, answer2, answer3;
-		HashSet<IDName> person = (HashSet<IDName>) this.access.getPersonsOrderByBirthDate(country.getId(), 4);
+		LinkedList<IDName> person = (LinkedList<IDName>) this.access.getPersonsOrderByBirthDate(country.getId(), 4);
 		
 		IDName nAnswer = ((IDName)person.toArray()[0]);
 		answer1 = ((IDName)person.toArray()[1]);
@@ -354,7 +355,7 @@ public class QuestionFactory {
 	public Question BornfirstQues(IDName country) throws DAOException, DataNotFoundException, EntityNotFound
 	{
 		IDName answer1, answer2, answer3;
-		HashSet<IDName> person = (HashSet<IDName>) this.access.getPersonsOrderByBirthDate(country.getId(), 4);
+		LinkedList<IDName> person = (LinkedList<IDName>) this.access.getPersonsOrderByBirthDate(country.getId(), 4);
 		
 		IDName nAnswer = ((IDName)person.toArray()[3]);
 		answer1 = ((IDName)person.toArray()[1]);

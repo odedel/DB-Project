@@ -224,19 +224,21 @@ public class gameRunner {
 	//this function return who has  
 	public int currentWinner()
 	{
-		int nCount = 0;
+		int nWinner = 0;
 		
-		if(this.playerOne != null)
+		if((this.playerOne != null) && (this.playerTwo != null))
 		{
-			nCount++;
+			if(this.playerOne.getUserScore() > this. playerTwo.getUserScore())
+			{
+				nWinner = 1;
+			}
+			else if(this.playerOne.getUserScore() < this. playerTwo.getUserScore())
+			{
+				nWinner = 2;
+			}
 		}
 		
-		if(this.playerTwo != null)
-		{
-			nCount++;
-		}
-		
-		return (nCount);
+		return (nWinner);
 	}
 	
 	public Collection<UserIDScoreDate> getBestScores() throws DAOException
@@ -287,5 +289,15 @@ public class gameRunner {
 	public void passQuestion() throws Exception
 	{
 		createNextQues(this.currentPlayer.getFavCountry());
+	}
+	
+	public void setCurrUserFavCountry(IDName strFavCountry)
+	{
+		this.currentPlayer.setFavCountry(strFavCountry);
+	}
+	
+	public String getUserNameById(UserIDScoreDate id) throws DAOException, EntityNotFound
+	{
+		return(this.access.getUserName(id.getUserID()));
 	}
 }
