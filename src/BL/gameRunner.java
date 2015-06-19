@@ -1,19 +1,14 @@
-package BL;
+package core;
 
 import java.awt.List;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import collect_data.DataCollector;
-import utils.DBUser;
-import utils.DataNotFoundException;
-import utils.EntityNotFound;
-import utils.IDName;
-import dao.DAO;
-import dao.DAOException;
-import main.*;
 import utils.*;
+import db.dao.DAO;
+import db.dao.DAOException;
+import parsing.*;
 
 public class gameRunner {
 	  
@@ -29,6 +24,7 @@ public class gameRunner {
 	private int nPlayerOneWorngAnswers;
 	private int nPlayerTwoWorngAnswers;
 	private final int NUMBER_OF_WORNG_ALLOWED = 2;
+	private final int NUMBER_OF_ERROR_ALLOWED = 3;
 	private DAO access;
 	private Collection<IDName> allCountries;
 	
@@ -56,11 +52,11 @@ public class gameRunner {
 	}
 	
 	//This function create Question if needed and return question string
-	public String getCurrentQuestion() throws DAOException, DataNotFoundException, EntityNotFound
+	public String getCurrentQuestion() throws Exception
 	{
 		if(this.currQuestion == null)
 		{
-			this. currQuestion = this.qFactory.createNewQuestion(null);
+			this.createNextQues(null);
 		}
 		
 		return this.currQuestion.getQuestion();
@@ -110,7 +106,7 @@ public class gameRunner {
 				this.SwitchPlayer();
 			}
 			
-			this.currQuestion = this.qFactory.createNewQuestion(this.currentPlayer.getFavCountry());
+			this.createNextQues(this.currentPlayer.getFavCountry());
 		}
 		else
 		{
@@ -244,5 +240,44 @@ public class gameRunner {
 	public Collection<UserIDScoreDate> getBestScores() throws DAOException
 	{
 		return(this.access.getTopScore(10));
+	}
+	
+	public void createNextQues(IDName strFavCountry) throws Exception
+	{
+		int nCountOferror = 0;
+		boolean isFinished;
+		isFinished = false;
+		
+		//try to create question as many time we set
+		while((nCountOferror < NUMBER_OF_ERROR_ALLOWED) && (!isFinished))
+		{
+			try
+			{
+				if(strFavCountry == null)
+				{
+					this.currQuestion = this.qFactory.createNewQuestion(null);
+					isFinished = true;
+				}
+				else
+				{
+					this.currQuestion = this.qFactory.createNewQuestion(null);
+					isFinished = true;
+				}
+			}
+			// catch, if
+			catch(EntityNotFound e)
+			{
+				nCountOferror++;
+			}
+			catch(DataNotFoundException e)
+			{
+				nCountOferror++;
+			}
+		}
+		
+		if(!isFinished)
+		{
+			throw new Exception("error - cannot create a question");
+		}
 	}
 }

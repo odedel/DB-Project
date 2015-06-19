@@ -1,4 +1,4 @@
-package BL;
+package core;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -8,7 +8,8 @@ import java.util.Date;
 import utils.DataNotFoundException;
 import utils.EntityNotFound;
 import utils.IDName;
-import dao.*;
+import db.dao.DAO;
+import db.dao.DAOException;
 
 public class User {
 
@@ -61,7 +62,7 @@ public class User {
 		   //get current date time with Date()
 		   java.util.Date date = new Date();
 		   date.getTime();
-			this.access.setScore(this.nUserId,score, date);
+		 this.access.setScore(this.nUserId,score, date);
 			
 		return (true);
 	}

@@ -1,4 +1,4 @@
-package BL;
+package core;
 
 import java.awt.List;
 import java.util.ArrayList;
@@ -11,7 +11,8 @@ import java.util.Random;
 import utils.DataNotFoundException;
 import utils.EntityNotFound;
 import utils.IDName;
-import dao.*; 
+import db.dao.DAO;
+import db.dao.DAOException;
 
 public class QuestionFactory {
 
@@ -39,7 +40,6 @@ public class QuestionFactory {
 		{
 			nRand = random.nextInt(NUMBER_OF_QUESTIONS - 1) + 1;
 		}
-		
 		
 		switch(nRand)
 		{
