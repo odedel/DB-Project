@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import javax.jws.soap.SOAPBinding.Use;
-
 import utils.*;
 import db.dao.DAO;
 import db.dao.DAOException;
@@ -16,7 +14,9 @@ public class gameRunner {
 	  
 	public static void main(String[] args) throws Exception {
 		gameRunner gm = new gameRunner();
-		gm.getCurrentQuestion();
+		String q = gm.getCurrentQuestion();
+		ArrayList<String> ls = gm.getAnswers();
+		int n = 1;
 	  }
 	private User playerOne = null;
 	private User playerTwo = null;
