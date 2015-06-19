@@ -193,15 +193,7 @@ public class gameRunner {
 			this.playerTwo.setUserStartedNewGame();
 		}
 	}
-	
-	//Update DataFrom Yago
-	public void updateDataFromSource() throws DAOException, IOException
-	{
-		this.access.deleteDB();
-		DataCollector dataCollector = new DataCollector();
-		dataCollector.collectData();
-		this.access.uploadDataCollector(dataCollector);
-	}
+
 	
 	//Count how many players connected 
 	public int getHowPlayerConnected()

@@ -13,6 +13,9 @@ public class UploadDataFromYagoMain {
 
     public static void main(String args[]) throws Exception {
 
+        if (args.length < 0 ) {
+            throw new Exception("You must supply first argument as path to folder containing YAGO files.");
+        }
         DAO dao = new DAO();
         try {
             dao.connect(DBUser.MODIFIER);
@@ -21,7 +24,7 @@ public class UploadDataFromYagoMain {
             dao.deleteDB();     // NOTE: The main deletes the data that is already on the DB
 
             System.out.println("Collecting Data ...");
-            DataCollector dataCollector = collectData();
+            DataCollector dataCollector = collectData(args[0]);
             printStats(dataCollector);
 
             System.out.println("Uploading ...");
@@ -35,8 +38,8 @@ public class UploadDataFromYagoMain {
         }
     }
 
-    private static DataCollector collectData() throws IOException {
-        DataCollector dataCollector = new DataCollector();
+    private static DataCollector collectData(String yagoPath) throws IOException {
+        DataCollector dataCollector = new DataCollector(yagoPath);
         dataCollector.collectData();
 
         return dataCollector;
