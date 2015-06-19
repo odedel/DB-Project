@@ -7,6 +7,7 @@ import parsing.generic.GenericEntityCallback;
 import parsing.generic.GenericObjectLinkCallback;
 import parsing.util.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -20,6 +21,12 @@ public class DataCollector {
     private Map<String, Artifact> artifacts = new HashMap<>();
     private Map<String, Person> persons = new HashMap<>();
 
+    private String yagoPath;
+
+    public DataCollector(String yagoPath) {
+        this.yagoPath = yagoPath;
+    }
+
     public void collectData() throws IOException {
         getIDs();
         //noinspection unchecked
@@ -27,6 +34,13 @@ public class DataCollector {
         //noinspection unchecked
         getFacts(countries, cities);
         postProcessData();
+    }
+
+    public static String combine (String path1, String path2)
+    {
+        File file1 = new File(path1);
+        File file2 = new File(file1, path2);
+        return file2.getPath();
     }
 
     /* -------------------- Get Methods -------------------- */
@@ -67,7 +81,7 @@ public class DataCollector {
                 new GenericEntityCallback<>(universities,   University.class,   "<wordnet_university_108286569>"),
         };
         Collections.addAll(callbacks, c);
-        Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(YAGOFilesLocation.YAGO_TYPES_FILE, callbacks);
+        Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(combine(yagoPath, YAGOFilesLocation.YAGO_TYPES_FILE), callbacks);
     }
 
 
@@ -77,12 +91,15 @@ public class DataCollector {
         for (final Map<String, ? extends Entity> entities : entities_maps) {
             callbacks.add(new GenericCallback(entities, ValueType.NAME, "skos:prefLabel", "name"));
         }
-        Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(YAGOFilesLocation.YAGO_LABELS_FILE, callbacks);
+        Utils.reduceEntitiesByAttributeFromCollectionWithMatcher(combine(yagoPath, YAGOFilesLocation.YAGO_LABELS_FILE), callbacks);
     }
 
     @SafeVarargs
     private final void getFacts(final Map<String, ? extends PopulatedRegion>... place_maps) throws IOException {
-        String factFiles[] = new String[]{YAGOFilesLocation.YAGO_DATE_FACTS_FILE, YAGOFilesLocation.YAGO_FACTS_FILE, YAGOFilesLocation.YAGO_LITERAL_FACTS_FILE,};
+        String factFiles[] = new String[]{combine(yagoPath, YAGOFilesLocation.YAGO_DATE_FACTS_FILE)
+                , combine(yagoPath, YAGOFilesLocation.YAGO_FACTS_FILE)
+                , combine(yagoPath, YAGOFilesLocation.YAGO_LITERAL_FACTS_FILE)
+                ,};
 
         List<Callback> callbacks = new LinkedList<>();
 
