@@ -573,16 +573,62 @@ public class DAO {
 
     /* --- University --- */
 
+    /* In Which city there is university? */
+    public Collection<IDName> getCitiesThatHasUniversities(int countryID, int count) throws DAOException, EntityNotFound, DataNotFoundException {
+        validateCountryExists(countryID);
+        try {
+            Collection<IDName> result = connection.getCitiesThatHasUniversities(countryID, count);
+            if(result.size() != count) {
+                throw new DataNotFoundException(String.format("Could not find %s cities", count));
+            }
+            return result;
+        } catch (DBException e) {
+            throw new DAOException("Could not fetch data: " + e.getMessage());
+        }
+    }
+    public Collection<IDName> getCitiesThatHasNtUniversities(int countryID, int count) throws DAOException, EntityNotFound, DataNotFoundException {
+        validateCountryExists(countryID);
+        try {
+            Collection<IDName> result = connection.getCitiesThatHasntUniversities(countryID, count);
+            if(result.size() != count) {
+                throw new DataNotFoundException(String.format("Could not find %s cities", count));
+            }
+            return result;
+        } catch (DBException e) {
+            throw new DAOException("Could not fetch data: " + e.getMessage());
+        }
+    }
 
 
-    /* --- Business --- */
+    /* --- Business & Artifact --- */
 
+    /* Which artifact invented by company that today has branch in COUNTRY_ID */
+    public Collection<IDName> getArtifactThatInventedByComapnyInCountry(int countryID, int count) throws DAOException, EntityNotFound, DataNotFoundException {
+        validateCountryExists(countryID);
 
+        try {
+            Collection<IDName> result = connection.getArtifactThatInventedByComapnyInCountry(countryID, count);
+            if(result.size() != count) {
+                throw new DataNotFoundException(String.format("Could not find %s cities", count));
+            }
+            return result;
+        } catch (DBException e) {
+            throw new DAOException("Could not fetch data: " + e.getMessage());
+        }
+    }
+    public Collection<IDName> getArtifactThatNotInventedByComapnyInCountry(int countryID, int count) throws DAOException, EntityNotFound, DataNotFoundException {
+        validateCountryExists(countryID);
 
-
-    /* --- Artifact --- */
-
-
+        try {
+            Collection<IDName> result = connection.getArtifactThatNotInventedByComapnyInCountry(countryID, count);
+            if(result.size() != count) {
+                throw new DataNotFoundException(String.format("Could not find %s cities", count));
+            }
+            return result;
+        } catch (DBException e) {
+            throw new DAOException("Could not fetch data: " + e.getMessage());
+        }
+    }
 
 
     /* --- Complex Questions --- */

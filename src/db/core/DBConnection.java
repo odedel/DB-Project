@@ -1061,4 +1061,28 @@ public class DBConnection {
             throw new DBException("Could not insert score: " + e.getMessage());
         }
     }
+
+    public Collection<IDName> getCitiesThatHasUniversities(int countryID, int count) throws DBException {
+        return genericIntStringCollectionFetcher(
+                addRandomLimitToQuery(String.format("SELECT ID, NAME FROM City WHERE COUNTRY_ID=%s and ID IN (SELECT CITY_ID FROM University_City_Relation)", countryID), count)
+        );
+    }
+
+    public Collection<IDName> getCitiesThatHasntUniversities(int countryID, int count) throws DBException {
+        return genericIntStringCollectionFetcher(
+                addRandomLimitToQuery(String.format("SELECT ID, NAME FROM City WHERE COUNTRY_ID=%s and ID NOT IN (SELECT CITY_ID FROM University_City_Relation)", countryID), count)
+        );
+    }
+
+    public Collection<IDName> getArtifactThatInventedByComapnyInCountry(int countryID, int count) throws DBException {
+        return genericIntStringCollectionFetcher(
+                addRandomLimitToQuery(String.format("SELECT a.ID, a.NAME FROM Artifact a, Business_Country_Relation bcr, Business_Artifact_Relation bar WHERE a.id=bar.artifact_id and bar.business_id=bcr.business_id and bcr.country_id=%s", countryID), count)
+        );
+    }
+
+    public Collection<IDName> getArtifactThatNotInventedByComapnyInCountry(int countryID, int count) throws DBException {
+        return genericIntStringCollectionFetcher(
+                addRandomLimitToQuery(String.format("SELECT a.ID, a.NAME FROM Artifact a, Business_Country_Relation bcr, Business_Artifact_Relation bar WHERE a.id=bar.artifact_id and bar.business_id=bcr.business_id and bcr.country_id!=%s", countryID), count)
+        );
+    }
 }
