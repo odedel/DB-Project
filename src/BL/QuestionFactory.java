@@ -376,9 +376,9 @@ public class QuestionFactory {
 		HashSet<IDName> citiesRight = (HashSet<IDName>) this.access.getCitiesThatHasNtUniversities(country.getId(), 1);
 		IDName nAnswer = (IDName)citiesRight.toArray()[0];
 		
-		answer1 = ((IDName)cities.toArray()[1]);
-		answer2 = ((IDName)cities.toArray()[2]);
-		answer3 = ((IDName)cities.toArray()[3]);
+		answer1 = ((IDName)cities.toArray()[0]);
+		answer2 = ((IDName)cities.toArray()[1]);
+		answer3 = ((IDName)cities.toArray()[2]);
 
 		return(new Question("In Which city there is university ?", 
 							nAnswer.getName(), 
@@ -395,9 +395,9 @@ public class QuestionFactory {
 
 		IDName nAnswer = (IDName)citiesRight.toArray()[0];
 		
-		answer1 = ((IDName)cities.toArray()[1]);
-		answer2 = ((IDName)cities.toArray()[2]);
-		answer3 = ((IDName)cities.toArray()[3]);
+		answer1 = ((IDName)cities.toArray()[0]);
+		answer2 = ((IDName)cities.toArray()[1]);
+		answer3 = ((IDName)cities.toArray()[2]);
 
 		return(new Question("In Which city there is NO university ?", 
 							nAnswer.getName(), 
@@ -414,9 +414,9 @@ public class QuestionFactory {
 
 		IDName nAnswer = (IDName)artifactRight.toArray()[0];
 		
-		answer1 = ((IDName)artifact.toArray()[1]);
-		answer2 = ((IDName)artifact.toArray()[2]);
-		answer3 = ((IDName)artifact.toArray()[3]);
+		answer1 = ((IDName)artifact.toArray()[0]);
+		answer2 = ((IDName)artifact.toArray()[1]);
+		answer3 = ((IDName)artifact.toArray()[2]);
 
 		return(new Question(" Which artifact invented by company that today has branch in COUNTRY_ID  ?", 
 							nAnswer.getName(), 
@@ -433,9 +433,9 @@ public class QuestionFactory {
 
 		IDName nAnswer = (IDName)artifactRight.toArray()[0];
 		
-		answer1 = ((IDName)artifact.toArray()[1]);
-		answer2 = ((IDName)artifact.toArray()[2]);
-		answer3 = ((IDName)artifact.toArray()[3]);
+		answer1 = ((IDName)artifact.toArray()[0]);
+		answer2 = ((IDName)artifact.toArray()[1]);
+		answer3 = ((IDName)artifact.toArray()[2]);
 
 		return(new Question(" Which artifact invented by company that today has branch in COUNTRY_ID  ?", 
 							nAnswer.getName(), 
@@ -464,7 +464,7 @@ public class QuestionFactory {
 		//Convert to answers string
 		for(int j = 0; j < 4; j++)
 		{
-			if(((IDName)countries.toArray()[0]).getId() == nAnswer)
+			if(((IDName)countries.toArray()[j]).getId() == nAnswer)
 			{
 				answerRight = ((IDName)countries.toArray()[j]).getName();
 			}
@@ -496,7 +496,7 @@ public class QuestionFactory {
 		
 		for(int j = 0; j < 4; j++)
 		{
-			if(((IDName)countries.toArray()[0]).getId() == nAnswer)
+			if(((IDName)countries.toArray()[j]).getId() == nAnswer)
 			{
 				answerRight = ((IDName)countries.toArray()[j]).getName();
 			}
@@ -554,7 +554,7 @@ public class QuestionFactory {
 		
 		for(int j = 0; j < 4; j++)
 		{
-			if(((IDName)countries.toArray()[0]).getId() == nAnswer)
+			if(((IDName)countries.toArray()[j]).getId() == nAnswer)
 			{
 				answerRight = ((IDName)countries.toArray()[j]).getName();
 			}
