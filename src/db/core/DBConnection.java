@@ -6,6 +6,7 @@ import utils.DBUser;
 import utils.IDName;
 import utils.UserIDScoreDate;
 
+import java.io.*;
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
@@ -31,11 +32,20 @@ public class DBConnection {
         // creating the connection
         System.out.print("Trying to connect... ");
         try {
-            String format = String.format(CONNECTION_STRING, host != null ? host : DEFAULT_HOST, DEFAULT_SCHEMA);
-            conn = DriverManager.getConnection(format, "DbMysql19", "DbMysql19");
+            BufferedReader br = new BufferedReader(new FileReader("db.conf"));
+            String hostname, schema, username, password;
+            hostname = br.readLine();
+            schema = br.readLine();
+            username = br.readLine();
+            password = br.readLine();
+
+            String format = String.format(CONNECTION_STRING, hostname, schema);
+            conn = DriverManager.getConnection(format, username, password);
         } catch (SQLException e) {
             conn = null;
             throw new DBException("Unable to connect: " + e.getMessage());
+        } catch (IOException e) {
+            throw new DBException("Unable to read config: " + e.getMessage());
         }
         System.out.println("Connected!");
     }
@@ -909,7 +919,7 @@ public class DBConnection {
     public Collection<IDName> getCitiesNotIn(int countryId, int count) throws DBException {
         return genericIntStringCollectionFetcher(
                 addRandomLimitToQuery(
-                    String.format("SELECT ID, NAME FROM City WHERE Country_ID != %s", countryId),
+                        String.format("SELECT ID, NAME FROM City WHERE Country_ID != %s", countryId),
                         count)
         );
     }
@@ -966,8 +976,8 @@ public class DBConnection {
                         String.format("SELECT ID, NAME FROM Person WHERE birth_City_id in (SELECT ID from City where " +
                                         "Country_id in (SELECT Country.ID FROM Country, Person, City WHERE " +
                                         "City.Country_id=Country.ID AND Person.birth_City_id=City.ID AND Person.ID=%s))", Person_id
-                                        )
-                                , count));
+                        )
+                        , count));
     }
 
     public Collection<IDName> getPersonsNotBornInSameCountry(int Person_id, int count) throws DBException {
