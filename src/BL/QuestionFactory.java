@@ -17,7 +17,7 @@ import db.dao.DAOException;
 
 public class QuestionFactory {
 
-	final int NUMBER_OF_QUESTIONS_WITH_COUNTRY = 19;
+	final int NUMBER_OF_QUESTIONS_WITH_COUNTRY = 17;
 	final int NUMBER_OF_QUESTIONS = 26;
 	private DAO access;
 	
@@ -112,15 +112,15 @@ public class QuestionFactory {
 			{
 				return(cityWithOutUniversityQues(strFavCountry));
 			}
+			//Start of general Questions
 			case(18):
 			{
-				return(actifactCompCountryQues(strFavCountry));
+				return(actifactCompCountryQues());
 			}
 			case(19):
 			{	
-				return(actifactCompNotCountryQues(strFavCountry));
+				return(actifactCompNotCountryQues());
 			}
-			//Start of general Questions
 			case(20):
 			{
 				return(CreateBeforeAndAfterCountryQues());
@@ -406,45 +406,49 @@ public class QuestionFactory {
 							answer3.getName()));
 	}
 	
-	public Question actifactCompCountryQues(IDName country) throws DAOException, DataNotFoundException, EntityNotFound
-	{
-		IDName answer1, answer2, answer3;
-		HashSet<IDName> artifact = (HashSet<IDName>) this.access.getArtifactThatNotInventedByComapnyInCountry(country.getId(), 3);
-		HashSet<IDName> artifactRight = (HashSet<IDName>) this.access.getArtifactThatInventedByComapnyInCountry(country.getId(), 1);
-
-		IDName nAnswer = (IDName)artifactRight.toArray()[0];
-		
-		answer1 = ((IDName)artifact.toArray()[0]);
-		answer2 = ((IDName)artifact.toArray()[1]);
-		answer3 = ((IDName)artifact.toArray()[2]);
-
-		return(new Question(" Which artifact invented by company that today has branch in " +  country.getName().toString()  + "?", 
-							nAnswer.getName(), 
-							answer1.getName(), 
-							answer2.getName(), 
-							answer3.getName()));
-	}
-	
-	public Question actifactCompNotCountryQues(IDName country) throws DAOException, DataNotFoundException, EntityNotFound
-	{
-		IDName answer1, answer2, answer3;
-		HashSet<IDName> artifact = (HashSet<IDName>) this.access.getArtifactThatInventedByComapnyInCountry(country.getId(), 3);
-		HashSet<IDName> artifactRight = (HashSet<IDName>) this.access.getArtifactThatNotInventedByComapnyInCountry(country.getId(), 1);
-
-		IDName nAnswer = (IDName)artifactRight.toArray()[0];
-		
-		answer1 = ((IDName)artifact.toArray()[0]);
-		answer2 = ((IDName)artifact.toArray()[1]);
-		answer3 = ((IDName)artifact.toArray()[2]);
-
-		return(new Question(" Which artifact invented by company that today has branch in  " +  country.getName().toString()  + "?", 
-							nAnswer.getName(), 
-							answer1.getName(), 
-							answer2.getName(), 
-							answer3.getName()));
-	}
-	
 	/**********************************************************************************************************/
+	public Question actifactCompCountryQues() throws DAOException, DataNotFoundException, EntityNotFound
+	{
+		IDName answer1, answer2, answer3, counteryNow;
+		counteryNow =  (IDName) ((HashSet<IDName>) this.access.getRandomCountriesForArtifactBusinessConnection(1)).toArray()[0];
+		HashSet<IDName> artifact = (HashSet<IDName>) this.access.getArtifactThatNotInventedByComapnyInCountry(counteryNow.getId(), 3);
+		HashSet<IDName> artifactRight = (HashSet<IDName>) this.access.getArtifactThatInventedByComapnyInCountry(counteryNow.getId(), 1);
+
+		IDName nAnswer = (IDName)artifactRight.toArray()[0];
+		
+		answer1 = ((IDName)artifact.toArray()[0]);
+		answer2 = ((IDName)artifact.toArray()[1]);
+		answer3 = ((IDName)artifact.toArray()[2]);
+
+		return(new Question(" Which artifact invented by company that today has branch in " +  counteryNow.getName().toString()  + "?", 
+							nAnswer.getName(), 
+							answer1.getName(), 
+							answer2.getName(), 
+							answer3.getName()));
+	}
+	
+	public Question actifactCompNotCountryQues() throws DAOException, DataNotFoundException, EntityNotFound
+	{
+	
+		IDName answer1, answer2, answer3, counteryNow;
+		counteryNow =  (IDName) ((HashSet<IDName>) this.access.getRandomCountriesForArtifactBusinessConnection(1)).toArray()[0];
+		HashSet<IDName> artifact = (HashSet<IDName>) this.access.getArtifactThatInventedByComapnyInCountry(counteryNow.getId(), 3);
+		HashSet<IDName> artifactRight = (HashSet<IDName>) this.access.getArtifactThatNotInventedByComapnyInCountry(counteryNow.getId(), 1);
+
+		IDName nAnswer = (IDName)artifactRight.toArray()[0];
+		
+		answer1 = ((IDName)artifact.toArray()[0]);
+		answer2 = ((IDName)artifact.toArray()[1]);
+		answer3 = ((IDName)artifact.toArray()[2]);
+
+		return(new Question(" Which artifact invented by company that today has branch in  " +  counteryNow.getName().toString()  + "?", 
+							nAnswer.getName(), 
+							answer1.getName(), 
+							answer2.getName(), 
+							answer3.getName()));
+	}
+	
+	
 	public Question MostpopQues() throws DAOException, DataNotFoundException, EntityNotFound
 	{
 		String[] answers = new String[3];
