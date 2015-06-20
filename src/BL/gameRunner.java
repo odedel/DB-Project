@@ -163,6 +163,7 @@ public class gameRunner {
 		if((this.nPlayerOneWorngAnswers > NUMBER_OF_WORNG_ALLOWED) || (this.nPlayerTwoWorngAnswers > NUMBER_OF_WORNG_ALLOWED))
 		{
 			this.SaveScores();
+			this.SwitchPlayer();
 			return (true);
 		}
 		
