@@ -62,14 +62,13 @@ public class User {
 		this.playerScore = 0;
 	}
 	
-	public boolean savePlayerScore(int score) throws DAOException, EntityNotFound
+	public void savePlayerScore() throws DAOException, EntityNotFound
 	{
-		   //get current date time with Date()
-		   java.util.Date date = new Date();
-		   date.getTime();
-		 this.access.setScore(this.nUserId,score, date);
+		  //get current date time with Date()
+		  java.util.Date date = new Date();
+		  date.getTime();
+		  this.access.setScore(this.nUserId, this.playerScore, date);
 			
-		return (true);
 	}
 
 	//update on db user statistic

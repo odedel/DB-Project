@@ -164,10 +164,11 @@ public class gameRunner {
 	}
 	
 	//check if game finished
-	private boolean isCurrentGameFinished()
+	private boolean isCurrentGameFinished() throws DAOException, EntityNotFound
 	{
 		if((this.nPlayerOneWorngAnswers > NUMBER_OF_WORNG_ALLOWED) || (this.nPlayerTwoWorngAnswers > NUMBER_OF_WORNG_ALLOWED))
 		{
+			this.SaveScores();
 			return (true);
 		}
 		
@@ -327,5 +328,17 @@ public class gameRunner {
 		dataCollector.collectData();
 		this.access.uploadDataCollector(dataCollector);
 	}
-
+	
+	public void SaveScores() throws DAOException, EntityNotFound
+	{		
+		if(this.playerOne != null)
+		{
+			this.playerOne.savePlayerScore();
+		}
+		
+		if(this.playerTwo != null)
+		{
+			this.playerTwo.savePlayerScore();
+		}
+	}
 }
