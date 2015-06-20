@@ -12,12 +12,6 @@ import parsing.*;
 
 public class gameRunner {
 	  
-	public static void main(String[] args) throws Exception {
-		gameRunner gm = new gameRunner();
-		String q = gm.getCurrentQuestion();
-		ArrayList<String> ls = gm.getAnswers();
-		int n = 1;
-	  }
 	private User playerOne = null;
 	private User playerTwo = null;
 	private Question currQuestion = null;
