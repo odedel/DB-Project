@@ -449,7 +449,6 @@ public class QuestionFactory {
 	{
 		String[] answers = new String[3];
 		String answerRight = "";
-		int k = 0;
 		HashSet<IDName> countries = (HashSet<IDName>) this.access.getRandomCountries(4);
 		ArrayList<Integer> ids = new ArrayList<Integer>();
 		
@@ -466,11 +465,11 @@ public class QuestionFactory {
 		{
 			if(((IDName)countries.toArray()[0]).getId() == nAnswer)
 			{
-				answerRight = ((IDName)countries.toArray()[k]).getName();
+				answerRight = ((IDName)countries.toArray()[j]).getName();
 			}
 			else
 			{
-				answers[k] = ((IDName)countries.toArray()[k]).getName();
+				answers[j] = ((IDName)countries.toArray()[j]).getName();
 			}
 		}
 		
@@ -481,7 +480,6 @@ public class QuestionFactory {
 	{
 		String[] answers = new String[3];
 		String answerRight = "";
-		int k = 0;
 		HashSet<IDName> countries = (HashSet<IDName>) this.access.getRandomCountries(4);
 		//
 		ArrayList<Integer> ids = new ArrayList<Integer>();
@@ -497,11 +495,11 @@ public class QuestionFactory {
 		{
 			if(((IDName)countries.toArray()[0]).getId() == nAnswer)
 			{
-				answerRight = ((IDName)countries.toArray()[k]).getName();
+				answerRight = ((IDName)countries.toArray()[j]).getName();
 			}
 			else
 			{
-				answers[k] = ((IDName)countries.toArray()[k]).getName();
+				answers[j] = ((IDName)countries.toArray()[j]).getName();
 			}
 		}
 		
@@ -539,7 +537,6 @@ public class QuestionFactory {
 	{
 		String[] answers = new String[3];
 		String answerRight = "";
-		int k = 0;
 		HashSet<IDName> countries = (HashSet<IDName>) this.access.getRandomCountries(4);
 		ArrayList<Integer> ids = new ArrayList<Integer>();
 		
@@ -554,11 +551,11 @@ public class QuestionFactory {
 		{
 			if(((IDName)countries.toArray()[0]).getId() == nAnswer)
 			{
-				answerRight = ((IDName)countries.toArray()[k]).getName();
+				answerRight = ((IDName)countries.toArray()[j]).getName();
 			}
 			else
 			{
-				answers[k] = ((IDName)countries.toArray()[k]).getName();
+				answers[j] = ((IDName)countries.toArray()[j]).getName();
 			}
 		}
 		
