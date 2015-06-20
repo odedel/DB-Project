@@ -319,5 +319,13 @@ public class gameRunner {
 		return (nCount);
 	}	
 	
+	//Update DataFrom Yago
+	public void updateDataFromSource(String yagoPath) throws DAOException, IOException
+	{
+		this.access.deleteDB();
+		DataCollector dataCollector = new DataCollector(yagoPath);
+		dataCollector.collectData();
+		this.access.uploadDataCollector(dataCollector);
+	}
 
 }
