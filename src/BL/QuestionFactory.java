@@ -449,6 +449,7 @@ public class QuestionFactory {
 	{
 		String[] answers = new String[3];
 		String answerRight = "";
+		int k = 0;
 		HashSet<IDName> countries = (HashSet<IDName>) this.access.getRandomCountries(4);
 		ArrayList<Integer> ids = new ArrayList<Integer>();
 		
@@ -469,7 +470,8 @@ public class QuestionFactory {
 			}
 			else
 			{
-				answers[j] = ((IDName)countries.toArray()[j]).getName();
+				answers[k] = ((IDName)countries.toArray()[j]).getName();
+				k++;
 			}
 		}
 		
@@ -480,6 +482,7 @@ public class QuestionFactory {
 	{
 		String[] answers = new String[3];
 		String answerRight = "";
+		int k = 0;
 		HashSet<IDName> countries = (HashSet<IDName>) this.access.getRandomCountries(4);
 		//
 		ArrayList<Integer> ids = new ArrayList<Integer>();
@@ -499,7 +502,8 @@ public class QuestionFactory {
 			}
 			else
 			{
-				answers[j] = ((IDName)countries.toArray()[j]).getName();
+				answers[k] = ((IDName)countries.toArray()[j]).getName();
+				k++;
 			}
 		}
 		
@@ -537,6 +541,7 @@ public class QuestionFactory {
 	{
 		String[] answers = new String[3];
 		String answerRight = "";
+		int k = 0;
 		HashSet<IDName> countries = (HashSet<IDName>) this.access.getRandomCountries(4);
 		ArrayList<Integer> ids = new ArrayList<Integer>();
 		
@@ -555,7 +560,8 @@ public class QuestionFactory {
 			}
 			else
 			{
-				answers[j] = ((IDName)countries.toArray()[j]).getName();
+				answers[k] = ((IDName)countries.toArray()[j]).getName();
+				k++;
 			}
 		}
 		
