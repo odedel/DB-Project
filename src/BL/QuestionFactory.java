@@ -308,7 +308,7 @@ public class QuestionFactory {
 	public Question OlderCityHereQues(IDName country) throws DAOException, DataNotFoundException, EntityNotFound
 	{
 		IDName answer1, answer2, answer3, city;
-		city = (IDName) this.access.getRandomCitiesByCountry(country.getId(), 1).toArray()[0];
+		city = (IDName) this.access.getRandomCitiesByCountryWithCreationDate(country.getId(), 1).toArray()[0];
 		IDName nAnswer = (IDName) this.access.getOlderCityThan(city.getId(), 1);
 		HashSet<IDName> cities = (HashSet<IDName>) this.access.getNewerCityThan(city.getId(), 3);
 		answer1 = (IDName) cities.toArray()[0];
@@ -322,7 +322,7 @@ public class QuestionFactory {
 	public Question newerCityHereQues(IDName country) throws DAOException, DataNotFoundException, EntityNotFound
 	{
 		IDName answer1, answer2, answer3, city;
-		city = (IDName) this.access.getRandomCitiesByCountry(country.getId(), 1).toArray()[0];
+		city = (IDName) this.access.getRandomCitiesByCountryWithCreationDate(country.getId(), 1).toArray()[0];
 		IDName nAnswer = (IDName) this.access.getNewerCityThan(city.getId(), 1);
 		HashSet<IDName> cities = (HashSet<IDName>) this.access.getOlderCityThan(city.getId(), 3);
 		answer1 = (IDName) cities.toArray()[0];
