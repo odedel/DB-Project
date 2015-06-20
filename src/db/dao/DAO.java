@@ -5,6 +5,7 @@ import db.core.DBConnection;
 import db.core.DBException;
 import utils.*;
 
+import java.net.IDN;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -614,6 +615,18 @@ public class DAO {
 
 
     /* --- Business & Artifact --- */
+
+    public Collection<IDName> getRandomCountriesForArtifactBusinessConnection(int count) throws DAOException, DataNotFoundException {
+        try {
+            Collection<IDName> result = connection.getRandomCountriesForArtifactBusinessConnection(count);
+            if(result.size() != count) {
+                throw new DataNotFoundException(String.format("Could not find %s countries", count));
+            }
+            return result;
+        } catch (DBException e) {
+            throw new DAOException("Could not fetch data: " + e.getMessage());
+        }
+    }
 
     /* Which artifact invented by company that today has branch in COUNTRY_ID */
     public Collection<IDName> getArtifactThatInventedByComapnyInCountry(int countryID, int count) throws DAOException, EntityNotFound, DataNotFoundException {

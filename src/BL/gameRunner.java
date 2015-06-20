@@ -12,12 +12,6 @@ import parsing.*;
 
 public class gameRunner {
 	  
-	public static void main(String[] args) throws Exception {
-		gameRunner gm = new gameRunner();
-		String q = gm.getCurrentQuestion();
-		ArrayList<String> ls = gm.getAnswers();
-		int n = 1;
-	  }
 	private User playerOne = null;
 	private User playerTwo = null;
 	private Question currQuestion = null;
@@ -169,6 +163,7 @@ public class gameRunner {
 		if((this.nPlayerOneWorngAnswers > NUMBER_OF_WORNG_ALLOWED) || (this.nPlayerTwoWorngAnswers > NUMBER_OF_WORNG_ALLOWED))
 		{
 			this.SaveScores();
+			this.SwitchPlayer();
 			return (true);
 		}
 		
