@@ -26,7 +26,7 @@ public class gameRunner {
 	private int nPlayerOneWorngAnswers;
 	private int nPlayerTwoWorngAnswers;
 	private final int NUMBER_OF_WORNG_ALLOWED = 2;
-	private final int NUMBER_OF_ERROR_ALLOWED = 3;
+	private final int NUMBER_OF_ERROR_ALLOWED = 10;
 	private DAO access;
 	private Collection<IDName> allCountries;
 	
