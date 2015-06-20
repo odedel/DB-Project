@@ -1091,4 +1091,10 @@ public class DBConnection {
                 addRandomLimitToQuery(String.format("SELECT ID, NAME FROM City WHERE City.Country_ID='%s' and creation_date is not null", countryId), count)
         );
     }
+
+    public Collection<IDName> getRandomCountriesForArtifactBusinessConnection(int count) throws DBException {
+        return genericIntStringCollectionFetcher(
+                "SELECT distinct Country.id, Country.name FROM Country, Business_Country_Relation r1, Business_Artifact_Relation r2 WHERE Country.ID = r1.country_id and r1.business_id=r2.business_id ORDER BY RAND() LIMIT " + count
+        );
+    }
 }
