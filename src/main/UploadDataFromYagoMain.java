@@ -18,7 +18,7 @@ public class UploadDataFromYagoMain {
         }
         DAO dao = new DAO();
         try {
-            dao.connect(DBUser.MODIFIER);
+            dao.connect(DBUser.MODIFIER, null);
 
             System.out.println("Delete data from DB ...");
             dao.deleteDB();     // NOTE: The main deletes the data that is already on the DB

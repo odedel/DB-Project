@@ -19,9 +19,9 @@ public class DAO {
         connection = new DBConnection();
     }
 
-    public void connect(DBUser user) throws DAOException {
+    public void connect(DBUser user, String host) throws DAOException {
         try {
-            connection.connect(user);
+            connection.connect(user, host);
         } catch (DBException e) {
             throw new DAOException("Could not connect to DB: " + e.getMessage());
         }

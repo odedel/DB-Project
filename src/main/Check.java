@@ -9,7 +9,7 @@ public class Check {
     public static void main(String[] args) throws Exception {
         DAO dao = new DAO();
 
-        dao.connect(DBUser.MODIFIER);
+        dao.connect(DBUser.MODIFIER, null);
 
         System.out.println(dao.getPersonBirthDate(32596));
 

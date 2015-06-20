@@ -18,7 +18,7 @@ public class DBConnection {
      * Opens new connection to the db and initialize conn with it.
      * Throws DBException if something bad happened.
      * */
-    public void connect(DBUser user) throws DBException {
+    public void connect(DBUser user, String host) throws DBException {
 
         // loading the driver
         try {
@@ -31,7 +31,7 @@ public class DBConnection {
         // creating the connection
         System.out.print("Trying to connect... ");
         try {
-            String format = String.format(CONNECTION_STRING, DEFAULT_HOST, DEFAULT_SCHEMA);
+            String format = String.format(CONNECTION_STRING, host != null ? host : DEFAULT_HOST, DEFAULT_SCHEMA);
             conn = DriverManager.getConnection(format, "DbMysql19", "DbMysql19");
         } catch (SQLException e) {
             conn = null;

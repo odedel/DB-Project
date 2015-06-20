@@ -36,7 +36,7 @@ public class gameRunner {
 		this.nPlayerOneWorngAnswers = 0;
 		this.nPlayerTwoWorngAnswers = 0;
 		this.access = new DAO();
-		this.access.connect(DBUser.MODIFIER);
+		this.access.connect(DBUser.MODIFIER, null);
 		this.qFactory = new QuestionFactory(this.access);
 		this.allCountries = this.access.getAllCountries();
 	}
