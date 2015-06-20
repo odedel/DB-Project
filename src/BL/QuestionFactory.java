@@ -308,9 +308,9 @@ public class QuestionFactory {
 	public Question OlderCityHereQues(IDName country) throws DAOException, DataNotFoundException, EntityNotFound
 	{
 		IDName answer1, answer2, answer3, city;
-		city = (IDName) this.access.getRandomCitiesByCountry(country.getId(), 1).toArray()[0];
-		IDName nAnswer = (IDName) this.access.getOlderCityThan(country.getId(), 1);
-		HashSet<IDName> cities = (HashSet<IDName>) this.access.getNewerCityThan(country.getId(), 3);
+		city = (IDName) this.access.getRandomCitiesByCountryWithCreationDate(country.getId(), 1).toArray()[0];
+		IDName nAnswer = (IDName) this.access.getOlderCityThan(city.getId(), 1);
+		HashSet<IDName> cities = (HashSet<IDName>) this.access.getNewerCityThan(city.getId(), 3);
 		answer1 = (IDName) cities.toArray()[0];
 		answer2 = (IDName) cities.toArray()[1];
 		answer3 = (IDName) cities.toArray()[2];
@@ -322,9 +322,9 @@ public class QuestionFactory {
 	public Question newerCityHereQues(IDName country) throws DAOException, DataNotFoundException, EntityNotFound
 	{
 		IDName answer1, answer2, answer3, city;
-		city = (IDName) this.access.getRandomCitiesByCountry(country.getId(), 1).toArray()[0];
-		IDName nAnswer = (IDName) this.access.getNewerCityThan(country.getId(), 1);
-		HashSet<IDName> cities = (HashSet<IDName>) this.access.getOlderCityThan(country.getId(), 3);
+		city = (IDName) this.access.getRandomCitiesByCountryWithCreationDate(country.getId(), 1).toArray()[0];
+		IDName nAnswer = (IDName) this.access.getNewerCityThan(city.getId(), 1);
+		HashSet<IDName> cities = (HashSet<IDName>) this.access.getOlderCityThan(city.getId(), 3);
 		answer1 = (IDName) cities.toArray()[0];
 		answer2 = (IDName) cities.toArray()[1];
 		answer3 = (IDName) cities.toArray()[2];
@@ -418,7 +418,7 @@ public class QuestionFactory {
 		answer2 = ((IDName)artifact.toArray()[1]);
 		answer3 = ((IDName)artifact.toArray()[2]);
 
-		return(new Question(" Which artifact invented by company that today has branch in COUNTRY_ID  ?", 
+		return(new Question(" Which artifact invented by company that today has branch in " +  country.getName().toString()  + "?", 
 							nAnswer.getName(), 
 							answer1.getName(), 
 							answer2.getName(), 
@@ -437,7 +437,7 @@ public class QuestionFactory {
 		answer2 = ((IDName)artifact.toArray()[1]);
 		answer3 = ((IDName)artifact.toArray()[2]);
 
-		return(new Question(" Which artifact invented by company that today has branch in COUNTRY_ID  ?", 
+		return(new Question(" Which artifact invented by company that today has branch in  " +  country.getName().toString()  + "?", 
 							nAnswer.getName(), 
 							answer1.getName(), 
 							answer2.getName(), 
@@ -475,7 +475,7 @@ public class QuestionFactory {
 			}
 		}
 		
-		return(new Question("Which country is the most populated ", answerRight, answers[0], answers[1], answers[2]));
+		return(new Question("Which country is the most populated ?", answerRight, answers[0], answers[1], answers[2]));
 	}
 	
 	public Question leastpopQues() throws DAOException, DataNotFoundException, EntityNotFound
@@ -507,7 +507,7 @@ public class QuestionFactory {
 			}
 		}
 		
-		return(new Question("Which country is the least populated ", answerRight, answers[0], answers[1], answers[2]));
+		return(new Question("Which country is the least populated ?", answerRight, answers[0], answers[1], answers[2]));
 	}
 	
 	public Question MorepopQues() throws DAOException, DataNotFoundException, EntityNotFound
@@ -517,7 +517,7 @@ public class QuestionFactory {
 		HashSet<IDName> countries = (HashSet<IDName>) this.access.getCountryThatIsMorePopulatedThan(((IDName)country.toArray()[0]).getId(),1);
 		HashSet<IDName> countriesNot = (HashSet<IDName>) this.access.getCountryThatIsLessPopulatedThan(((IDName)country.toArray()[0]).getId(),3);
 		
-		return(new Question("Which country is more populated than "+ ((IDName)country.toArray()[0]).getName(), 
+		return(new Question("Which country is more populated than ?"+ ((IDName)country.toArray()[0]).getName(), 
 				((IDName)countries.toArray()[0]).getName(),
 				((IDName)countriesNot.toArray()[0]).getName(),
 				((IDName)countriesNot.toArray()[1]).getName(), 
@@ -530,7 +530,7 @@ public class QuestionFactory {
 		HashSet<IDName> countries = (HashSet<IDName>) this.access.getCountryThatIsLessPopulatedThan(((IDName)country.toArray()[0]).getId(),1);
 		HashSet<IDName> countriesNot = (HashSet<IDName>) this.access.getCountryThatIsMorePopulatedThan(((IDName)country.toArray()[0]).getId(),3);
 		
-		return(new Question("Which country is Less populated than "+ ((IDName)country.toArray()[0]).getName(), 
+		return(new Question("Which country is Less populated than ?"+ ((IDName)country.toArray()[0]).getName(), 
 				((IDName)countries.toArray()[0]).getName(),
 				((IDName)countriesNot.toArray()[0]).getName(),
 				((IDName)countriesNot.toArray()[1]).getName(), 
@@ -585,7 +585,7 @@ public class QuestionFactory {
 		
 		answer = ((IDName)this.access.getCountryCreatedBetween(((IDName)Beforecountry.toArray()[0]).getId(),((IDName)Aftercountry.toArray()[0]).getId()));
 		
-		return(new Question(" Which country Created before " + ((IDName)Beforecountry.toArray()[0]).getName() + " but after " +((IDName)Aftercountry.toArray()[0]).getName()
+		return(new Question(" Which country Created before " + ((IDName)Beforecountry.toArray()[0]).getName() + " but after " +((IDName)Aftercountry.toArray()[0]).getName() + "?"
 						, answer.getName(),
 						((IDName)countries.toArray()[0]).getName(),
 						((IDName)countries.toArray()[1]).getName(),
