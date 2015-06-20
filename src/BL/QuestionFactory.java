@@ -474,7 +474,7 @@ public class QuestionFactory {
 			}
 		}
 		
-		return(new Question("Which country is the most populated", answerRight, answers[0], answers[1], answers[2]));
+		return(new Question("Which country is the most populated ", answerRight, answers[0], answers[1], answers[2]));
 	}
 	
 	public Question leastpopQues() throws DAOException, DataNotFoundException, EntityNotFound
@@ -505,7 +505,7 @@ public class QuestionFactory {
 			}
 		}
 		
-		return(new Question("Which country is the least populated", answerRight, answers[0], answers[1], answers[2]));
+		return(new Question("Which country is the least populated ", answerRight, answers[0], answers[1], answers[2]));
 	}
 	
 	public Question MorepopQues() throws DAOException, DataNotFoundException, EntityNotFound
@@ -515,7 +515,7 @@ public class QuestionFactory {
 		HashSet<IDName> countries = (HashSet<IDName>) this.access.getCountryThatIsMorePopulatedThan(((IDName)country.toArray()[0]).getId(),1);
 		HashSet<IDName> countriesNot = (HashSet<IDName>) this.access.getCountryThatIsLessPopulatedThan(((IDName)country.toArray()[0]).getId(),3);
 		
-		return(new Question("Which country is more populated than"+ ((IDName)country.toArray()[0]).getName(), 
+		return(new Question("Which country is more populated than "+ ((IDName)country.toArray()[0]).getName(), 
 				((IDName)countries.toArray()[0]).getName(),
 				((IDName)countriesNot.toArray()[0]).getName(),
 				((IDName)countriesNot.toArray()[1]).getName(), 
@@ -528,7 +528,7 @@ public class QuestionFactory {
 		HashSet<IDName> countries = (HashSet<IDName>) this.access.getCountryThatIsLessPopulatedThan(((IDName)country.toArray()[0]).getId(),1);
 		HashSet<IDName> countriesNot = (HashSet<IDName>) this.access.getCountryThatIsMorePopulatedThan(((IDName)country.toArray()[0]).getId(),3);
 		
-		return(new Question("Which country is Less populated than"+ ((IDName)country.toArray()[0]).getName(), 
+		return(new Question("Which country is Less populated than "+ ((IDName)country.toArray()[0]).getName(), 
 				((IDName)countries.toArray()[0]).getName(),
 				((IDName)countriesNot.toArray()[0]).getName(),
 				((IDName)countriesNot.toArray()[1]).getName(), 
@@ -562,7 +562,7 @@ public class QuestionFactory {
 			}
 		}
 		
-		return(new Question("Which country is the oldest?", answerRight, answers[0], answers[1], answers[2]));
+		return(new Question("Which country is the oldest ?", answerRight, answers[0], answers[1], answers[2]));
 	}
 	
 	

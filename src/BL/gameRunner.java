@@ -257,7 +257,7 @@ public class gameRunner {
 				}
 				else
 				{
-					this.currQuestion = this.qFactory.createNewQuestion(null);
+					this.currQuestion = this.qFactory.createNewQuestion(strFavCountry);
 					isFinished = true;
 				}
 			}
