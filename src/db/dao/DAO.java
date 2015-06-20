@@ -413,6 +413,19 @@ public class DAO {
         }
     }
 
+    public Collection<IDName> getRandomCitiesByCountryWithCreationDate(int countryId, int count) throws DAOException, DataNotFoundException, EntityNotFound {
+        validateCountryExists(countryId);
+        try {
+            Collection<IDName> answer = connection.getCitiesWithCreationDate(countryId, count);
+            if(answer.size() != count) {
+                throw new DataNotFoundException(String.format("Can not find %s cities in %s", count, countryId));
+            }
+            return answer;
+        } catch (DBException e) {
+            throw new DAOException("Could not get random cities: " + e.getMessage());
+        }
+    }
+
     /* What is the oldest city in X? */
     public IDName getOldestCity(int countryId) throws DAOException, DataNotFoundException, EntityNotFound {
         validateCountryExists(countryId);
