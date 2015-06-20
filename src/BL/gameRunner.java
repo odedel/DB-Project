@@ -292,4 +292,32 @@ public class gameRunner {
 	{
 		return(this.access.getUserName(id.getUserID()));
 	}
+	
+	public int getCurrentUserScore() 
+	{
+		return(this.currentPlayer.getUserScore());
+	}	
+	
+	public String getCurrentUserName() 
+	{
+		return(this.currentPlayer.getUserName());
+	}	
+	
+	public int getCurrentUserWorngAnswerCount() 
+	{
+		int nCount;
+		
+		if(this.currentPlayer == this.playerOne)
+		{
+			nCount = this.nPlayerOneWorngAnswers;
+		}
+		else
+		{
+			nCount = this.nPlayerTwoWorngAnswers;
+		}
+		
+		return (nCount);
+	}	
+	
+
 }

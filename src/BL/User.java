@@ -27,6 +27,11 @@ public class User {
 		this.isLogged = this.access.checkPassword(this.nUserId, password); 
 	}
 	
+	public String getUserName()
+	{
+		return(this.strUserName);
+	}
+	
 	public boolean isLoggedIn()
 	{
 		return this.isLogged;

@@ -178,7 +178,7 @@ public class QuestionFactory {
 		answer2 = this.access.getCreationDate(((IDName)countries.toArray()[1]).getId());
 		answer3 = this.access.getCreationDate(((IDName)countries.toArray()[2]).getId());
 		
-		return(new Question(" When does "+ country.getName() +" created" + country.getName(), 
+		return(new Question(" When does "+ country.getName() +" created ?", 
 							nAnswer.toString(), answer1.toString(), answer2.toString(), answer3.toString()));
 	}
 	
