@@ -24,13 +24,13 @@ public class gameRunner {
 	private DAO access;
 	private Collection<IDName> allCountries;
 	
-	public gameRunner(String host) throws DAOException {
+	public gameRunner() throws DAOException {
 		
 		//CreateFactoryHere
 		this.nPlayerOneWorngAnswers = 0;
 		this.nPlayerTwoWorngAnswers = 0;
 		this.access = new DAO();
-		this.access.connect(DBUser.MODIFIER, host);
+		this.access.connect(DBUser.MODIFIER, null);
 		this.qFactory = new QuestionFactory(this.access);
 		this.allCountries = this.access.getAllCountries();
 	}
